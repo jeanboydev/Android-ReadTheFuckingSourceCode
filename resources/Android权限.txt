@@ -1,0 +1,79 @@
+//一般权限不需要授权
+ACCESS_LOCATION_EXTRA_COMMANDS
+ACCESS_NETWORK_STATE//访问网络信息
+ACCESS_NOTIFICATION_POLICY//访问通知
+ACCESS_WIFI_STATE/访问Wi-Fi网络信息
+BLUETOOTH//连接到已配对的蓝牙设备
+BLUETOOTH_ADMIN//发现和配对蓝牙设备
+BROADCAST_STICKY//允许应用程序广播常用意图
+CHANGE_NETWORK_STATE//改变网络连接状态
+CHANGE_WIFI_MULTICAST_STATE//Wi-Fi热点
+CHANGE_WIFI_STATE//更改Wi-Fi连接状态
+DISABLE_KEYGUARD//序禁用键盘锁
+EXPAND_STATUS_BAR//展开或折叠状态栏
+GET_PACKAGE_SIZE//查询所有应用所占空间
+INSTALL_SHORTCUT//创建快捷方式
+INTERNET//使用网络
+KILL_BACKGROUND_PROCESSES//允许应用程序调用 killBackgroundProcesses(String)
+MODIFY_AUDIO_SETTINGS//修改全局音频设置
+NFC
+READ_SYNC_SETTINGS//同步设置
+READ_SYNC_STATS//读取同步状态
+RECEIVE_BOOT_COMPLETED//开机启动广播
+REORDER_TASKS//更改任务顺序
+REQUEST_INSTALL_PACKAGES//安装应用
+SET_ALARM//提醒
+SET_TIME_ZONE//允许设置时区
+SET_WALLPAPER//设置壁纸
+SET_WALLPAPER_HINTS//设置壁纸提示
+TRANSMIT_IR//使用红外线发射器
+UNINSTALL_SHORTCUT//删除快捷方式
+USE_FINGERPRINT//使用指纹硬件
+VIBRATE//访问振动
+WAKE_LOCK//使用PowerManager WakeLocks让处理器进入休眠或屏幕变暗
+WRITE_SYNC_SETTINGS//写入同步设置
+
+//危险权限
+//联系人
+group:android.permission-group.CONTACTS
+  permission:android.permission.WRITE_CONTACTS
+  permission:android.permission.GET_ACCOUNTS
+  permission:android.permission.READ_CONTACTS
+//电话
+group:android.permission-group.PHONE
+  permission:android.permission.READ_CALL_LOG
+  permission:android.permission.READ_PHONE_STATE
+  permission:android.permission.CALL_PHONE
+  permission:android.permission.WRITE_CALL_LOG
+  permission:android.permission.USE_SIP
+  permission:android.permission.PROCESS_OUTGOING_CALLS
+  permission:com.android.voicemail.permission.ADD_VOICEMAIL
+//日历
+group:android.permission-group.CALENDAR
+  permission:android.permission.READ_CALENDAR
+  permission:android.permission.WRITE_CALENDAR
+//相机
+group:android.permission-group.CAMERA
+  permission:android.permission.CAMERA
+//传感器
+group:android.permission-group.SENSORS
+  permission:android.permission.BODY_SENSORS
+//位置
+group:android.permission-group.LOCATION
+  permission:android.permission.ACCESS_FINE_LOCATION
+  permission:android.permission.ACCESS_COARSE_LOCATION
+//存储
+group:android.permission-group.STORAGE
+  permission:android.permission.READ_EXTERNAL_STORAGE
+  permission:android.permission.WRITE_EXTERNAL_STORAGE
+//麦克风
+group:android.permission-group.MICROPHONE
+  permission:android.permission.RECORD_AUDIO
+//短信
+group:android.permission-group.SMS
+  permission:android.permission.READ_SMS
+  permission:android.permission.RECEIVE_WAP_PUSH
+  permission:android.permission.RECEIVE_MMS
+  permission:android.permission.RECEIVE_SMS
+  permission:android.permission.SEND_SMS
+  permission:android.permission.READ_CELL_BROADCASTS
