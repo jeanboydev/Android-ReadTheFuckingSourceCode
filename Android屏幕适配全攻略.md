@@ -1,7 +1,30 @@
-# Android屏幕适配 #
+# Android屏幕适配全攻略 #
 <br>
-## 一、术语和概念 ##
-####1.什么是屏幕尺寸、屏幕分辨率、屏幕像素密度？####
+## Android屏幕碎片化 ##
+由于Android系统的开发性，任何用户、开发者、OEM厂商、运营商都可以对Android进行定制，修改成他们想要的样子。各大厂商、开发者的标准不统一，所以就造成了Android系统碎片化。
+
+但是这种“碎片化”到底到达什么程度呢？
+
+下面这张图片所显示的内容足以充分说明当今Android系统碎片化问题的严重性，因为该图片中的每一个矩形都代表着一种Android设备。
+
+![图05][5]
+
+而随着支持Android系统的设备(手机、平板、电视、手表)的增多，设备碎片化、品牌碎片化、系统碎片化、传感器碎片化和屏幕碎片化的程度也在不断地加深。而我们今天要探讨的，则是对我们开发影响比较大的——屏幕的碎片化。
+
+下面这张图是Android屏幕尺寸的示意图，在这张图里面，蓝色矩形的大小代表不同尺寸，颜色深浅则代表所占百分比的大小。
+
+![图06][6]
+
+而与之相对应的，则是下面这张图。这张图显示了IOS设备所需要进行适配的屏幕尺寸和占比。
+
+![图07][7]
+
+当然，这张图片只是4,4s,5,5c,5s和平板的尺寸，现在还应该加上新推出的iphone6和plus，但是和Android的屏幕碎片化程度相比而言，还是差的太远。
+
+> Android屏幕的碎片化如此严重，所以我们不得不进行屏幕的适配，如何面对如此多的屏幕进行适配？下面结合Google官方给出的资料讨论下最优的解决方案。
+
+## 术语和概念 ##
+####1. 什么是屏幕尺寸、屏幕分辨率、屏幕像素密度？####
 屏幕尺寸
 > 按屏幕对角测量的实际物理尺寸。单位是英寸(inch)，1英寸=2.54厘米。
 
@@ -19,9 +42,10 @@
 
 ![图02][2]<br>
 
-####2.什么是dp、dip、dpi、sp、px？之间的关系是什么？####
+####2. 什么是dp、dip、dpi、sp、px？之间的关系是什么？####
 dip/dp
-> 在定义 UI 布局时应使用的虚拟像素单位，用于以密度无关方式表示布局维度或位置。<br>
+> 在定义 UI 布局时应使用的虚拟像素单位，用于以密度无关方式表示布局维度或位置。
+> 
 > Density Independent Pixels(密度无关像素)的缩写。
 以160dpi为基准，1dp=1px。单位转换： px = dp * (dpi / 160)。
 
@@ -32,10 +56,11 @@ px
 > 像素，物理上的绝对单位
 
 sp
-> Scale-Independent Pixels的缩写，可以根据文字大小首选项自动进行缩放。<br>
+> Scale-Independent Pixels的缩写，可以根据文字大小首选项自动进行缩放。
+> 
 > Google推荐我们使用12sp以上的大小，通常可以使用12sp，14sp，18sp，22sp，最好不要使用奇数和小数。
 
-####3.什么是mdpi、hdpi、xdpi、xxdpi、xxxdpi？如何计算和区分？####
+####3. 什么是mdpi、hdpi、xdpi、xxdpi、xxxdpi？如何计算和区分？####
 
 | 名称				| 像素密度范围	| 图片大小  	|
 | :------------- 	| :-----------	| :-----	|
@@ -44,33 +69,48 @@ sp
 | xhdpi(超高) 		| 240dp~320dp	| 96×96px 	|
 | xxhdpi(超超高) 	| 320dp~480dp	| 144×144px |
 | xxxhdpi(超超超高) 	| 480dp~640dp	| 192×192px |
-![图03][3]<br>
+
+![图03][3]
+
 >在Google官方开发文档中，说明了 mdpi：hdpi：xhdpi：xxhdpi：xxxhdpi=2：3：4：6：8 的尺寸比例进行缩放。例如，一个图标的大小为48×48dp，表示在mdpi上，实际大小为48×48px，在hdpi像素密度上，实际尺寸为mdpi上的1.5倍，即72×72px，以此类推。<br>
 
-####4.支持的屏幕范围####
-四种通用尺寸：小、正常、 大 和超大。<br><br>
-六种通用的密度：<br>
+####4. 支持的屏幕范围####
+四种通用尺寸：小、正常、 大 和超大。
+
+六种通用的密度：
+
 -  ldpi（低）~120dpi<br>
 -  mdpi（中）~160dpi<br>
 -  hdpi（高）~240dpi<br>
 -  xhdpi（超高）~320dpi<br>
 -  xxhdpi（超超高）~480dpi<br>
--  xxxhdpi（超超超高）~640dpi<br><br>
-屏幕尺寸与屏幕密度对比：<br>
+-  xxxhdpi（超超超高）~640dpi
+
+屏幕尺寸与屏幕密度对比：
+
 ![图04][4]<br>
 - 超大屏幕至少为 960dp x 720dp<br>
 - 大屏幕至少为 640dp x 480dp<br>
 - 正常屏幕至少为 470dp x 320dp<br>
-- 小屏幕至少为 426dp x 320dp<br>
-##二、解决方案-支持各种屏幕尺寸##
-####1. 使用配置限定符####
+- 小屏幕至少为 426dp x 320dp
+
+##解决方案-支持各种屏幕尺寸##
+####1.  使用配置限定符####
 ![图05][5]<br>
 
-####2.最佳做法####
+####2. 最佳做法####
 1.	在 XML 布局文件中指定尺寸时使用 wrap_content、match_parent 或 dp 单位 。
 2.	不要在应用代码中使用硬编码的像素值
 3.	不要使用 AbsoluteLayout（已弃用）
 4.	为不同屏幕密度提供替代位图可绘制对象
+
+
+
+## 参考资料 ##
+[https://developer.android.com/guide/practices/screens_support.html?hl=zh-cn#DeclaringTabletLayouts](https://developer.android.com/guide/practices/screens_support.html?hl=zh-cn#DeclaringTabletLayouts)<br>
+[http://blog.csdn.net/zhaokaiqiang1992/article/details/45419023](http://blog.csdn.net/zhaokaiqiang1992/article/details/45419023)<br>
+[http://blog.jeswang.org/blog/2013/08/07/ppi-vs-dpi-you-shi-yao-qu-bie/](
+http://blog.jeswang.org/blog/2013/08/07/ppi-vs-dpi-you-shi-yao-qu-bie/)<br>
 
 
 
