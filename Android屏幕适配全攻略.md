@@ -152,8 +152,9 @@ draw9patch如图 ：
 ![图13][13]<br>
 
 > 表格里面列出了目前主流的 Android 手机设备分辨率对应的 dpi 缩放级别。<br>
-> 一般设计师会以1920*1080来设计效果图，那么只需要将效果图测量出来的px值填入 第8行-px列中即可自动计算出所需的dp/sp的值。<br>
-> 通常情况下以1280*720的效果图来写布局是比较好的方式，因为测量出来的px值是dp/sp的两倍，方便计算。
+> 一般设计师会以 1920 x 1080 来设计效果图，那么只需要将效果图测量出来的 px值填入 第8行-px列 中即可自动计算出所需的 dp/sp 的值。<br>
+> 通常情况下以 1280 x 720 的效果图来写布局是比较好的方式，因为测量出来的 px值是 dp/sp 的两倍，方便计算。<br>
+>表格下载: [Android屏幕适配单位转换.xls](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/Android%E5%B1%8F%E5%B9%95%E9%80%82%E9%85%8D%E5%8D%95%E4%BD%8D%E8%BD%AC%E6%8D%A2.xls)
 
 
 ## 参考资料 ##
