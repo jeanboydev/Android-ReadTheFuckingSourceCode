@@ -139,7 +139,7 @@ draw9patch如图 ：
 > 蓝色和黄色相交部分：表示整个前景能显示的区域。一个区域是矩形的，蓝色规定了上下边界，黄色规定了左右边界，两者共同当然也就规定了一个矩形区域。
 
 ####3.可绘制的资源文件Drawable####
-> 请参考[Google官方开发文档](https://developer.android.com/guide/topics/resources/drawable-resource.html)
+> 请参考：[Google官方开发文档](https://developer.android.com/guide/topics/resources/drawable-resource.html)
 
 ####4. 最佳做法####
 1.	在 XML 布局文件中指定尺寸时使用 wrap_content、 match_parent 或 dp 单位 。
@@ -154,7 +154,7 @@ draw9patch如图 ：
 > 表格里面列出了目前主流的 Android 手机设备分辨率对应的 dpi 缩放级别。<br>
 > 一般设计师会以 1920 x 1080 来设计效果图，那么只需要将效果图测量出来的 px值填入 第8行-px列 中即可自动计算出所需的 dp/sp 的值。<br>
 > 通常情况下以 1280 x 720 的效果图来写布局是比较好的方式，因为测量出来的 px值是 dp/sp 的两倍，方便计算。<br>
->表格下载: [Android屏幕适配单位转换.xls](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/Android%E5%B1%8F%E5%B9%95%E9%80%82%E9%85%8D%E5%8D%95%E4%BD%8D%E8%BD%AC%E6%8D%A2.xls)
+>表格下载：[Android屏幕适配单位转换.xls](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/Android%E5%B1%8F%E5%B9%95%E9%80%82%E9%85%8D%E5%8D%95%E4%BD%8D%E8%BD%AC%E6%8D%A2.xls)
 
 
 ## 参考资料 ##
