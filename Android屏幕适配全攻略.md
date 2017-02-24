@@ -1,6 +1,6 @@
 # Android屏幕适配全攻略 #
 <br>
-## Android屏幕碎片化 ##
+## 一、Android屏幕碎片化 ##
 由于Android系统的开发性，任何用户、开发者、OEM厂商、运营商都可以对Android进行定制，修改成他们想要的样子。各大厂商、开发者的标准不统一，所以就造成了Android系统碎片化。
 
 但是这种“碎片化”到底到达什么程度呢？
@@ -21,9 +21,9 @@
 
 当然，这张图片只是4,4s,5,5c,5s和平板的尺寸，现在还应该加上新推出的iphone6和plus，但是和Android的屏幕碎片化程度相比而言，还是差的太远。
 
-> Android屏幕的碎片化如此严重，所以我们不得不进行屏幕的适配，如何面对如此多的屏幕进行适配？下面结合Google官方给出的资料讨论下最优的解决方案。
+> Android屏幕的碎片化如此严重，所以我们不得不进行屏幕的适配，如何面对如此多的屏幕进行适配？下面结合Google官方开发文档讨论下最优的解决方案。
 
-## 术语和概念 ##
+## 二、术语和概念 ##
 ####1. 什么是屏幕尺寸、屏幕分辨率、屏幕像素密度？####
 屏幕尺寸
 > 按屏幕对角测量的实际物理尺寸。单位是英寸(inch)，1英寸=2.54厘米。
@@ -94,23 +94,22 @@ sp
 - 正常屏幕至少为 470dp x 320dp<br>
 - 小屏幕至少为 426dp x 320dp
 
-##解决方案-支持各种屏幕尺寸##
+##	三、解决方案 - 支持各种屏幕尺寸	##
 ####1.  使用配置限定符####
 ![图05][5]<br>
 
 ####2. 最佳做法####
 1.	在 XML 布局文件中指定尺寸时使用 wrap_content、match_parent 或 dp 单位 。
-2.	不要在应用代码中使用硬编码的像素值
-3.	不要使用 AbsoluteLayout（已弃用）
-4.	为不同屏幕密度提供替代位图可绘制对象
+2.	不要在应用代码中使用硬编码的像素值 。
+3.	不要使用 AbsoluteLayout（已弃用） 。
+4.	为不同屏幕密度提供替代位图可绘制对象 。
 
 
 
 ## 参考资料 ##
 [https://developer.android.com/guide/practices/screens_support.html?hl=zh-cn#DeclaringTabletLayouts](https://developer.android.com/guide/practices/screens_support.html?hl=zh-cn#DeclaringTabletLayouts)<br>
 [http://blog.csdn.net/zhaokaiqiang1992/article/details/45419023](http://blog.csdn.net/zhaokaiqiang1992/article/details/45419023)<br>
-[http://blog.jeswang.org/blog/2013/08/07/ppi-vs-dpi-you-shi-yao-qu-bie/](
-http://blog.jeswang.org/blog/2013/08/07/ppi-vs-dpi-you-shi-yao-qu-bie/)<br>
+[http://blog.jeswang.org/blog/2013/08/07/ppi-vs-dpi-you-shi-yao-qu-bie/](http://blog.jeswang.org/blog/2013/08/07/ppi-vs-dpi-you-shi-yao-qu-bie/)<br>
 
 
 
