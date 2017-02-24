@@ -1,11 +1,11 @@
 # Android屏幕适配全攻略 #
 <br>
 ## 一、Android屏幕碎片化 ##
-由于Android系统的开发性，任何用户、开发者、OEM厂商、运营商都可以对Android进行定制，修改成他们想要的样子。各大厂商、开发者的标准不统一，所以就造成了Android系统碎片化。
+由于 Android 系统的开发性，任何用户、开发者、OEM厂商、运营商都可以对 Android 进行定制，修改成他们想要的样子。各大厂商、开发者的标准不统一，所以就造成了 Android 系统碎片化。
 
 但是这种“碎片化”到底到达什么程度呢？
 
-下面这张图片所显示的内容足以充分说明当今Android系统碎片化问题的严重性，因为该图片中的每一个矩形都代表着一种Android设备。
+下面这张图片所显示的内容足以充分说明当今 Android 系统碎片化问题的严重性，因为该图片中的每一个矩形都代表着一种 Android 设备。
 
 ![图08][8]
 
@@ -15,11 +15,11 @@
 
 ![图06][6]
 
-而与之相对应的，则是下面这张图。这张图显示了IOS设备所需要进行适配的屏幕尺寸和占比。
+而与之相对应的，则是下面这张图。这张图显示了 IOS 设备所需要进行适配的屏幕尺寸和占比。
 
 ![图07][7]
 
-当然，这张图片只是4,4s,5,5c,5s和平板的尺寸，现在还应该加上新推出的iphone6和plus，但是和Android的屏幕碎片化程度相比而言，还是差的太远。
+当然，这张图片只是4,4s,5,5c,5s和平板的尺寸，现在还应该加上新推出的 iphone6 和 plus，但是和 Android 的屏幕碎片化程度相比而言，还是差的太远。
 
 > Android屏幕的碎片化如此严重，所以我们不得不进行屏幕的适配，如何面对如此多的屏幕进行适配？下面结合Google官方开发文档讨论下最优的解决方案。
 
@@ -98,8 +98,47 @@ sp
 ####1.  使用配置限定符####
 ![图05][5]<br>
 
-####2. 最佳做法####
-1.	在 XML 布局文件中指定尺寸时使用 wrap_content、match_parent 或 dp 单位 。
+> 这里只是展示了常用的一些配置限定符，具体用法和详情请参阅：[Google官方开发文档](https://developer.android.com/guide/practices/screens_support.html?hl=zh-cn#DeclaringTabletLayouts)
+
+####2. 使用NinePatch(.9)图片####
+什么是.9图？
+> 后缀以 .9.png 结尾的图片，命名格式为：xxx.9.png。<br>
+> 如：普通图：ic_launcher.png<br>
+> .9图 为：ic_launcher.9.png
+
+怎么制作.9图？
+> 使用 Photoshop（不推荐）<br>
+> 使用 Android SDK 自带工具，在 ...\Android\SDK\tools\ 下名字为 draw9patch 的文件。
+> 使用 Android Studio 同上。
+
+
+draw9patch如图 ：
+
+![图09][9]<br>
+![图10][10]<br>
+
+拉伸区域
+
+![图11][11]<br>
+
+> 红色框区域：表示纵向拉伸的区域，也就是说，当图片需要纵向拉伸的时候它会只指定拉伸红色区域，其他区域在纵向是不会拉伸的。
+> 
+> 绿色框区域：表示横向拉伸的区域，也就是说，当图片需要横向拉伸的时候它会只指定拉伸绿色区域，其他区域在横向是不会拉伸的。
+> 
+> 显然红色和绿色相交的部分是既会进行横向拉伸也会进行纵向拉伸的。
+
+前景的显示区域
+
+![图12][12]<br>
+
+> 蓝色区域：表示前景能显示的纵向范围。即前景的最上面可以显示到什么地方，最下面可以显示的什么地方。
+> 
+> 黄色区域：表示前景能显示的横向范围。即前景的最左边可以显示到什么地方，最右边可以显示的什么地方。
+> 
+> 蓝色和黄色相交部分：表示整个前景能显示的区域。一个区域是矩形的，蓝色规定了上下边界，黄色规定了左右边界，两者共同当然也就规定了一个矩形区域。
+
+####3. 最佳做法####
+1.	在 XML 布局文件中指定尺寸时使用 wrap_content、 match_parent 或 dp 单位 。
 2.	不要在应用代码中使用硬编码的像素值 。
 3.	不要使用 AbsoluteLayout（已弃用） 。
 4.	为不同屏幕密度提供替代位图可绘制对象 。
@@ -121,3 +160,7 @@ sp
 [6]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_screens_support/06.png
 [7]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_screens_support/07.png
 [8]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_screens_support/08.png
+[9]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_screens_support/09.png
+[10]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_screens_support/10.png
+[11]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_screens_support/11.png
+[12]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_screens_support/12.png
