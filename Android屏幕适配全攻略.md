@@ -102,13 +102,14 @@ sp
 
 ####2. 使用NinePatch(.9)图片####
 什么是.9图？
-> 后缀以 .9.png 结尾的图片，命名格式为：xxx.9.png。<br>
+> NinePatch 是一种 PNG 图像，在其中可定义当视图中的内容超出正常图像边界时 Android 缩放的可拉伸区域。 后缀以 .9.png 结尾，命名格式为：xxx.9.png。<br>
 > 如：普通图：ic_launcher.png<br>
-> .9图 为：ic_launcher.9.png
+> .9图 为：ic_launcher.9.png<br>
+> 文件位置： res/drawable/filename.9.png 文件名用作资源 ID。
 
 怎么制作.9图？
 > 使用 Photoshop（不推荐）<br>
-> 使用 Android SDK 自带工具，在 ...\Android\SDK\tools\ 下名字为 draw9patch 的文件。
+> 使用 Android SDK 自带工具，在 ...\Android\SDK\tools\ 下名字为 draw9patch 的文件。<br>
 > 使用 Android Studio 同上。
 
 
@@ -137,18 +138,29 @@ draw9patch如图 ：
 > 
 > 蓝色和黄色相交部分：表示整个前景能显示的区域。一个区域是矩形的，蓝色规定了上下边界，黄色规定了左右边界，两者共同当然也就规定了一个矩形区域。
 
-####3. 最佳做法####
+####3.可绘制的资源文件Drawable####
+> 请参考[Google官方开发文档](https://developer.android.com/guide/topics/resources/drawable-resource.html)
+
+####4. 最佳做法####
 1.	在 XML 布局文件中指定尺寸时使用 wrap_content、 match_parent 或 dp 单位 。
 2.	不要在应用代码中使用硬编码的像素值 。
 3.	不要使用 AbsoluteLayout（已弃用） 。
 4.	为不同屏幕密度提供替代位图可绘制对象 。
 
+####5. 总结####
+
+![图13][13]<br>
+
+> 表格里面列出了目前主流的 Android 手机设备分辨率对应的 dpi 缩放级别。<br>
+> 一般设计师会以1920*1080来设计效果图，那么只需要将效果图测量出来的px值填入 第8行-px列中即可自动计算出所需的dp/sp的值。<br>
+> 通常情况下以1280*720的效果图来写布局是比较好的方式，因为测量出来的px值是dp/sp的两倍，方便计算。
 
 
 ## 参考资料 ##
 [https://developer.android.com/guide/practices/screens_support.html?hl=zh-cn#DeclaringTabletLayouts](https://developer.android.com/guide/practices/screens_support.html?hl=zh-cn#DeclaringTabletLayouts)<br>
-[http://blog.csdn.net/zhaokaiqiang1992/article/details/45419023](http://blog.csdn.net/zhaokaiqiang1992/article/details/45419023)<br>
 [http://blog.jeswang.org/blog/2013/08/07/ppi-vs-dpi-you-shi-yao-qu-bie/](http://blog.jeswang.org/blog/2013/08/07/ppi-vs-dpi-you-shi-yao-qu-bie/)<br>
+[http://blog.csdn.net/zhaokaiqiang1992/article/details/45419023](http://blog.csdn.net/zhaokaiqiang1992/article/details/45419023)<br>
+[http://www.cnblogs.com/vanezkw/archive/2012/07/19/2599092.html](http://www.cnblogs.com/vanezkw/archive/2012/07/19/2599092.html)<br>
 
 
 
@@ -164,3 +176,4 @@ draw9patch如图 ：
 [10]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_screens_support/10.png
 [11]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_screens_support/11.png
 [12]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_screens_support/12.png
+[13]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_screens_support/13.png
