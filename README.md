@@ -8,7 +8,6 @@
 
 > 个人经验有限，内容上难免有不足甚至错误的地方，恳请各位发现后提交issue或其他方式联系我，万分感谢！技术交流，共同进步！
 
-----------
 # 目录 #
 - [一个Demo学会搭建 Android Studio JNI 开发环境](https://github.com/jeanboydev/Android-JNITest)
 - [Android屏幕适配全攻略](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/Android%E5%B1%8F%E5%B9%95%E9%80%82%E9%85%8D%E5%85%A8%E6%94%BB%E7%95%A5.md)
