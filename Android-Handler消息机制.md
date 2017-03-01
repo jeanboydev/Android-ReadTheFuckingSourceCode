@@ -157,14 +157,170 @@ public final class Looper {
 #### 2. MessageQueue 源码分析 ####
 在 Looper 中创建了 MessageQueue，我们接着看下 MessageQueue 是怎么工作的。
 
-MessageQueue的创建
+MessageQueue的构造方法。
 
 ```Java
 MessageQueue(boolean quitAllowed) {
     mQuitAllowed = quitAllowed;
+	//构造函数，quitAllowed 用来标识是否允许退出。
+	//主线程是不允许退出的（不然会退出整个程序），子线程可以退出。
     mPtr = nativeInit();
 }
 ```
+然后我们再看一下 MessageQueue.enqueueMessage() 的源码是怎么添加消息的。
 
+```Java
+boolean enqueueMessage(Message msg, long when) {
+    if (msg.target == null) {
+        throw new IllegalArgumentException("Message must have a target.");
+    }
+    if (msg.isInUse()) {
+        throw new IllegalStateException(msg + " This message is already in use.");
+    }
+
+    synchronized (this) {
+        if (mQuitting) {
+            IllegalStateException e = new IllegalStateException(
+                    msg.target + " sending message to a Handler on a dead thread");
+            Log.w(TAG, e.getMessage(), e);
+            msg.recycle();
+            return false;
+        }
+
+        msg.markInUse();
+        msg.when = when;
+        Message p = mMessages;
+        boolean needWake;
+        if (p == null || when == 0 || when < p.when) {
+            // 如果消息队列里面没有消息，或者消息的执行时间比里面的消息早，就把这条消息设置成第一条消息。一般不会出现这种情况，因为系统一定会有很多消息。
+            msg.next = p;
+            mMessages = msg;
+            needWake = mBlocked;
+        } else {//如果消息队列里面有消息
+            needWake = mBlocked && p.target == null && msg.isAsynchronous();
+            Message prev;
+            for (;;) {//找到消息队列里面的最后一条消息
+                prev = p;
+                p = p.next;
+                if (p == null || when < p.when) {
+                    break;
+                }
+                if (needWake && p.isAsynchronous()) {
+                    needWake = false;
+                }
+            }
+            msg.next = p; // invariant: p == prev.next
+            prev.next = msg;//把消息添加到最后
+        }
+
+        // We can assume mPtr != 0 because mQuitting is false.
+        if (needWake) {
+            nativeWake(mPtr);
+        }
+    }
+    return true;
+}
+```
+
+知道了怎么添加消息，我们在看下 MessageQueue.next() 方法是怎么取出消息的，也就是 Looper.loop() 方法中不断取消息的方法。
+
+```Java
+Message next() {
+    int pendingIdleHandlerCount = -1; // -1 only during first iteration
+    int nextPollTimeoutMillis = 0;
+    for (;;) {
+        if (nextPollTimeoutMillis != 0) {
+            Binder.flushPendingCommands();
+        }
+
+        nativePollOnce(ptr, nextPollTimeoutMillis);
+
+        synchronized (this) {
+            final long now = SystemClock.uptimeMillis();
+            Message prevMsg = null;
+            Message msg = mMessages;//拿到当前的消息队列
+            if (msg != null && msg.target == null) {
+                //处理异步的消息，暂不讨论
+                do {
+                    prevMsg = msg;
+                    msg = msg.next;
+                } while (msg != null && !msg.isAsynchronous());
+            }
+            if (msg != null) {
+                if (now < msg.when) {
+                    // Next message is not ready.  Set a timeout to wake up when it is ready.
+                    nextPollTimeoutMillis = (int) Math.min(msg.when - now, Integer.MAX_VALUE);
+                } else {
+                    //取出一条消息，消息队列往后移动一个
+                    mBlocked = false;
+                    if (prevMsg != null) {
+                        prevMsg.next = msg.next;
+                    } else {
+                        mMessages = msg.next;
+                    }
+                    msg.next = null;
+                    if (DEBUG) Log.v(TAG, "Returning message: " + msg);
+                    msg.markInUse();//标记为已使用
+                    return msg;
+                }
+            } else {
+                // No more messages.
+                nextPollTimeoutMillis = -1;
+            }
+
+            ...
+    }
+}
+
+```
+
+我们知道 MessageQueue 是个链表结构，里面保存的是 Message，我们再看下 Message 是什么。
+
+```Java
+public final class Message implements Parcelable {
+   
+    public int what;//消息类型，标识消息的作用
+
+    public int arg1;//整型参数1
+
+    public int arg2;//整型参数2
+
+    public Object obj;//复杂对象参数
+
+    public Messenger replyTo;
+
+    public int sendingUid = -1;
+
+	/*package*/ static final int FLAG_IN_USE = 1 << 0;//标记消息已使用
+
+    /** If set message is asynchronous */
+    /*package*/ static final int FLAG_ASYNCHRONOUS = 1 << 1;//标记消息是否异步
+
+    /** Flags to clear in the copyFrom method */
+    /*package*/ static final int FLAGS_TO_CLEAR_ON_COPY_FROM = FLAG_IN_USE;
+
+    /*package*/ int flags;//消息当前标记
+
+    /*package*/ long when;//消息执行时间
+    
+    /*package*/ Bundle data;
+    
+    /*package*/ Handler target;//Handler 用于执行 handleMessage();
+    
+    /*package*/ Runnable callback;//消息是一个Runnable
+    
+    // sometimes we store linked lists of these things
+    /*package*/ Message next;//下一个消息
+
+    private static final Object sPoolSync = new Object();//控制并发访问
+    private static Message sPool;//消息池
+    private static int sPoolSize = 0;//消息池数量
+
+    private static final int MAX_POOL_SIZE = 50;//消息最大数量
+
+    ...
+
+}
+```
 
 [1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_handler/01.jpg
