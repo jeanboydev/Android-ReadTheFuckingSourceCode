@@ -60,126 +60,125 @@ Looper 源码最上面的注释里有如下使用示例，可以清晰的看出 
 
     public final class Looper {
    
-    private static final String TAG = "Looper";
-
-    static final ThreadLocal<Looper> sThreadLocal = new ThreadLocal<Looper>();
-	//每个线程都会有一个ThreadLocal 用来保存 Looper对象（里面包含了主线程和 MessageQueue）
-    private static Looper sMainLooper;  // 主线程的 Looper
-
-    final MessageQueue mQueue;//保存消息队列
-    final Thread mThread;//保存主线程
-
-    private Printer mLogging;
-    private long mTraceTag;
-
-    public static void prepare() {//为当前线程创建 Looper
-        prepare(true);
-    }
-
-    private static void prepare(boolean quitAllowed) {
-        if (sThreadLocal.get() != null) {
-			//一个线程只能有一个 Looper， 否则抛出异常
-            throw new RuntimeException("Only one Looper may be created per thread");
-        }
-        sThreadLocal.set(new Looper(quitAllowed));//将创建的 Looper 放入 ThreadLocal
-    }
+	    private static final String TAG = "Looper";
 	
-	//初始化主线程的 Looper
-    public static void prepareMainLooper() {
-        prepare(false);
-        synchronized (Looper.class) {
-            if (sMainLooper != null) {
-                throw new IllegalStateException("The main Looper has already been prepared.");
-            }
-            sMainLooper = myLooper();
-        }
-    }
-
-    //获取主线程的 Looper
-    public static Looper getMainLooper() {
-        synchronized (Looper.class) {
-            return sMainLooper;
-        }
-    }
-
-    //在当前线程中开启轮询
-    public static void loop() {
-        final Looper me = myLooper();//从 ThreadLocal 中取出当前线程的 Looper 对象
-        if (me == null) {
-			//Looper 没有调用 Looper.prepare() 初始化，抛出异常
-            throw new RuntimeException("No Looper; Looper.prepare() wasn't called on this thread.");
-        }
-        final MessageQueue queue = me.mQueue;//从 Looper 对象中取出消息队列
-
-        // Make sure the identity of this thread is that of the local process,
-        // and keep track of what that identity token actually is.
-        Binder.clearCallingIdentity();
-        final long ident = Binder.clearCallingIdentity();
-
-        for (;;) {//死循环
-            Message msg = queue.next(); // 不断的取出消息
-            if (msg == null) {
-                // No message indicates that the message queue is quitting.
-                return;
-            }
-
-            // This must be in a local variable, in case a UI event sets the logger
-            final Printer logging = me.mLogging;
-            if (logging != null) {
-                logging.println(">>>>> Dispatching to " + msg.target + " " +
-                        msg.callback + ": " + msg.what);
-            }
-
-            final long traceTag = me.mTraceTag;
-            if (traceTag != 0) {
-                Trace.traceBegin(traceTag, msg.target.getTraceName(msg));
-            }
-            try {
-                msg.target.dispatchMessage(msg);
-				//取出消息的 target (也就是 Handler)，执行分发消息的操作
-            } finally {
-                if (traceTag != 0) {
-                    Trace.traceEnd(traceTag);
-                }
-            }
-
-            if (logging != null) {
-                logging.println("<<<<< Finished to " + msg.target + " " + msg.callback);
-            }
-
-            // Make sure that during the course of dispatching the
-            // identity of the thread wasn't corrupted.
-            final long newIdent = Binder.clearCallingIdentity();
-            if (ident != newIdent) {
-                Log.wtf(TAG, "Thread identity changed from 0x"
-                        + Long.toHexString(ident) + " to 0x"
-                        + Long.toHexString(newIdent) + " while dispatching to "
-                        + msg.target.getClass().getName() + " "
-                        + msg.callback + " what=" + msg.what);
-            }
-
-            msg.recycleUnchecked();//消息已经分发，进行回收操作
-        }
-    }
-
-    public static @Nullable Looper myLooper() {
-        return sThreadLocal.get();//从 ThreadLocal 中取出当前线程的 Looper 对象
-    }
-
-    private Looper(boolean quitAllowed) {
-        mQueue = new MessageQueue(quitAllowed);//创建消息队列
-        mThread = Thread.currentThread();//保存当前线程
-    }
-
-    public void quit() {
-        mQueue.quit(false);//直接退出消息循环，不管是否还有消息
-    }
-
-    public void quitSafely() {
-        mQueue.quit(true);//执行完所有的消息，退出消息循环
-    }
-
-}
+	    static final ThreadLocal<Looper> sThreadLocal = new ThreadLocal<Looper>();
+		//每个线程都会有一个ThreadLocal 用来保存 Looper对象（里面包含了主线程和 MessageQueue）
+	    private static Looper sMainLooper;  // 主线程的 Looper
+	
+	    final MessageQueue mQueue;//保存消息队列
+	    final Thread mThread;//保存主线程
+	
+	    private Printer mLogging;
+	    private long mTraceTag;
+	
+	    public static void prepare() {//为当前线程创建 Looper
+	        prepare(true);
+	    }
+	
+	    private static void prepare(boolean quitAllowed) {
+	        if (sThreadLocal.get() != null) {
+				//一个线程只能有一个 Looper， 否则抛出异常
+	            throw new RuntimeException("Only one Looper may be created per thread");
+	        }
+	        sThreadLocal.set(new Looper(quitAllowed));//将创建的 Looper 放入 ThreadLocal
+	    }
+		
+		//初始化主线程的 Looper
+	    public static void prepareMainLooper() {
+	        prepare(false);
+	        synchronized (Looper.class) {
+	            if (sMainLooper != null) {
+	                throw new IllegalStateException("The main Looper has already been prepared.");
+	            }
+	            sMainLooper = myLooper();
+	        }
+	    }
+	
+	    //获取主线程的 Looper
+	    public static Looper getMainLooper() {
+	        synchronized (Looper.class) {
+	            return sMainLooper;
+	        }
+	    }
+	
+	    //在当前线程中开启轮询
+	    public static void loop() {
+	        final Looper me = myLooper();//从 ThreadLocal 中取出当前线程的 Looper 对象
+	        if (me == null) {
+				//Looper 没有调用 Looper.prepare() 初始化，抛出异常
+	            throw new RuntimeException("No Looper; Looper.prepare() wasn't called on this thread.");
+	        }
+	        final MessageQueue queue = me.mQueue;//从 Looper 对象中取出消息队列
+	
+	        // Make sure the identity of this thread is that of the local process,
+	        // and keep track of what that identity token actually is.
+	        Binder.clearCallingIdentity();
+	        final long ident = Binder.clearCallingIdentity();
+	
+	        for (;;) {//死循环
+	            Message msg = queue.next(); // 不断的取出消息
+	            if (msg == null) {
+	                // No message indicates that the message queue is quitting.
+	                return;
+	            }
+	
+	            // This must be in a local variable, in case a UI event sets the logger
+	            final Printer logging = me.mLogging;
+	            if (logging != null) {
+	                logging.println(">>>>> Dispatching to " + msg.target + " " +
+	                        msg.callback + ": " + msg.what);
+	            }
+	
+	            final long traceTag = me.mTraceTag;
+	            if (traceTag != 0) {
+	                Trace.traceBegin(traceTag, msg.target.getTraceName(msg));
+	            }
+	            try {
+	                msg.target.dispatchMessage(msg);
+					//取出消息的 target (也就是 Handler)，执行分发消息的操作
+	            } finally {
+	                if (traceTag != 0) {
+	                    Trace.traceEnd(traceTag);
+	                }
+	            }
+	
+	            if (logging != null) {
+	                logging.println("<<<<< Finished to " + msg.target + " " + msg.callback);
+	            }
+	
+	            // Make sure that during the course of dispatching the
+	            // identity of the thread wasn't corrupted.
+	            final long newIdent = Binder.clearCallingIdentity();
+	            if (ident != newIdent) {
+	                Log.wtf(TAG, "Thread identity changed from 0x"
+	                        + Long.toHexString(ident) + " to 0x"
+	                        + Long.toHexString(newIdent) + " while dispatching to "
+	                        + msg.target.getClass().getName() + " "
+	                        + msg.callback + " what=" + msg.what);
+	            }
+	
+	            msg.recycleUnchecked();//消息已经分发，进行回收操作
+	        }
+	    }
+	
+	    public static @Nullable Looper myLooper() {
+	        return sThreadLocal.get();//从 ThreadLocal 中取出当前线程的 Looper 对象
+	    }
+	
+	    private Looper(boolean quitAllowed) {
+	        mQueue = new MessageQueue(quitAllowed);//创建消息队列
+	        mThread = Thread.currentThread();//保存当前线程
+	    }
+	
+	    public void quit() {
+	        mQueue.quit(false);//直接退出消息循环，不管是否还有消息
+	    }
+	
+	    public void quitSafely() {
+	        mQueue.quit(true);//执行完所有的消息，退出消息循环
+	    }
+	}
 
 
 [1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_handler/01.jpg
