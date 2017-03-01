@@ -3,6 +3,10 @@
 ## 概述 ##
 Android 的消息机制主要是指 Handler 的运行机制以及 Handler 所附带的 MessageQueue 和 Looper 的工作过程。 Handler 的主要作用是将某个任务切换到 Handler 所在的线程中去执行。
 ## Handler机制 ##
+
+
+![图1][1]
+
 Looper
 > **每个线程中最多只能有一个 Looper 对象**，由 Looper 来管理此线程里的 MessageQueue (消息队列)。
 > 
@@ -27,4 +31,10 @@ ThreadLocal
 > 一个线程内部的数据存储类，通过它可以在指定线程中存储数据，数据存储后，只有在指定线程中可以获取到存储的数据，对于其他线程来说无法获得数据。
 > 
 > 对于 Handler 来说，它需要获取当前线程的 Looper ,而 Looper 的作用于就是线程并且不同的线程具有不同的 Looper ，通过 ThreadLocal 可以轻松实现线程中的存取。
+> 
+> ThreadLocal原理：不同线程访问同一个ThreadLoacl的get方法，ThreadLocal的get方法会从各自的线程中取出一个数组，然后再从数组中根据当前ThreadLocal的索引去查找对应的Value值。
 
+
+
+
+[1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_handler/01.jpg
