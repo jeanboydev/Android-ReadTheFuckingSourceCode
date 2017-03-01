@@ -39,7 +39,12 @@ ThreadLocal
 通过上面分析我们知道使用 Handler 之前必须先调用 **Looper.prepare();** 进行初始化，我们先看下 Looper 的源码。
 
 
-#### 1. Looper 源码分析 ####
+#### 1. Looper 工作原理 ####
+
+先看一下 Looper 工作流程
+
+![图2][2]
+
 Looper 源码最上面的注释里有一个使用示例如下，可以清晰的看出 Looper 的使用方法。
 
 ```Java
@@ -154,8 +159,13 @@ public final class Looper {
 }
 ```
 
-#### 2. MessageQueue 源码分析 ####
+#### 2. MessageQueue 工作原理 ####
+
 在 Looper 中创建了 MessageQueue，我们接着看下 MessageQueue 是怎么工作的。
+
+MessageQueue 工作流程
+
+![图3][3]
 
 MessageQueue的构造方法。
 
@@ -323,7 +333,7 @@ public final class Message implements Parcelable {
 
 }
 ```
-#### 3. Handler 源码分析 ####
+#### 3. Handler 工作原理 ####
 
 在 Message 中我们看到了 target 是一个 Handler，我们看下 Handler 是怎么与 Looper 和 MessageQueue 一起搭配工作的。
 
@@ -464,4 +474,211 @@ public class Handler {
 }
 ```
 
+#### 4. ActivityThread 创建默认的 Handler ####
+上面说过，ActivityThread 主线程默认是有一个 Handler 的，我们来看一下主线程是怎么创建默认的 Handler 的。
+
+我们看一下 ActivityThread 类中的 main 方法。
+
+```Java
+public static void main(String[] args) {
+    Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, "ActivityThreadMain");
+    SamplingProfilerIntegration.start();
+
+    // CloseGuard defaults to true and can be quite spammy.  We
+    // disable it here, but selectively enable it later (via
+    // StrictMode) on debug builds, but using DropBox, not logs.
+    CloseGuard.setEnabled(false);
+
+    Environment.initForCurrentUser();//准备一些相关环境，给我们的组件启动
+
+    // Set the reporter for event logging in libcore
+    EventLogger.setReporter(new EventLoggingReporter());
+
+    // Make sure TrustedCertificateStore looks in the right place for CA certificates
+    final File configDir = Environment.getUserConfigDirectory(UserHandle.myUserId());
+    TrustedCertificateStore.setDefaultUserDirectory(configDir);
+
+    Process.setArgV0("<pre-initialized>");
+
+    Looper.prepareMainLooper();//初始化主线程 Looper
+
+    ActivityThread thread = new ActivityThread();
+    thread.attach(false);
+
+    if (sMainThreadHandler == null) {
+        sMainThreadHandler = thread.getHandler();
+    }
+
+    if (false) {
+        Looper.myLooper().setMessageLogging(new
+                LogPrinter(Log.DEBUG, "ActivityThread"));
+    }
+
+    // End of event ActivityThreadMain.
+    Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);
+    Looper.loop();//开启消息轮询，不断取出消息
+
+    throw new RuntimeException("Main thread loop unexpectedly exited");
+}
+```
+
+在 Activity 可以直接用 runOnUiThread() 来使用默认的 Handler 发送消息，我们来看下它是怎么实现的。
+
+```Java
+public final void runOnUiThread(Runnable action) {
+    if (Thread.currentThread() != mUiThread) {//非主线程，发送 Runnable 消息
+        mHandler.post(action);
+    } else {//在主线程中直接执行 run()
+        action.run();
+    }
+}
+```
+
+#### 5. HandlerThread 异步消息处理机制 ####
+> 1. HandlerThread 继承了 Thread，是一种可以使用 Handler 的 Thread；
+> 2. 在 run 方法中通过 looper.prepare() 来开启消息循环，这样就可以在 HandlerThread 中创
+建Handler了；
+> 3. 外界可以通过一个 Handler 的消息方式来通知 HandlerThread 来执行具体任务；确定不使
+用之后，可以通过 quit 或 quitSafely 方法来终止线程执行。
+
+先分析一下 HandlerThread 的源码。
+
+```Java
+public class HandlerThread extends Thread {
+    //线程的优先级
+    int mPriority;
+    //线程的id
+    int mTid = -1;
+    //一个与Handler关联的Looper对象
+    Looper mLooper;
+
+    public HandlerThread(String name) {
+        super(name);
+        //设置优先级为默认线程
+        mPriority = android.os.Process.THREAD_PRIORITY_DEFAULT;
+    }
+
+    public HandlerThread(String name, int priority) {
+        super(name);
+        mPriority = priority;
+    }
+    //可重写方法，Looper.loop之前在线程中需要处理的其他逻辑在这里实现
+    protected void onLooperPrepared() {
+    }
+    //HandlerThread线程的run方法
+    @Override
+    public void run() {
+        //获取当前线程的id
+        mTid = Process.myTid();
+        //创建Looper对象
+        //这就是为什么我们要在调用线程的start()方法后才能得到Looper(Looper.myLooper不为Null)
+        Looper.prepare();
+        //同步代码块，当获得mLooper对象后，唤醒所有线程
+        synchronized (this) {
+            mLooper = Looper.myLooper();
+            notifyAll();
+        }
+        //设置线程优先级
+        Process.setThreadPriority(mPriority);
+        //Looper.loop之前在线程中需要处理的其他逻辑
+        onLooperPrepared();
+        //建立了消息循环
+        Looper.loop();
+        //一般执行不到这句，除非quit消息队列
+        mTid = -1;
+    }
+
+    public Looper getLooper() {
+        if (!isAlive()) {
+            //线程死了
+            return null;
+        }
+
+        //同步代码块，正好和上面run方法中同步块对应
+        //只要线程活着并且mLooper为null，则一直等待
+        // If the thread has been started, wait until the looper has been created.
+        synchronized (this) {
+            while (isAlive() && mLooper == null) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+        return mLooper;
+    }
+
+    public boolean quit() {
+        Looper looper = getLooper();
+        if (looper != null) {
+            //退出消息循环
+            looper.quit();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean quitSafely() {
+        Looper looper = getLooper();
+        if (looper != null) {
+            //退出消息循环
+            looper.quitSafely();
+            return true;
+        }
+        return false;
+    }
+
+    public int getThreadId() {
+        //返回线程id
+        return mTid;
+    }
+}
+```
+
+
+HandlerThread 使用代码示例
+
+```Java
+public class MainActivity extends AppCompatActivity {
+
+	private HandlerThread mHandlerThread = null;
+    private Handler mThreadHandler = null;
+    private Handler mUiHandler = null;
+
+ 	@Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+		mHandlerThread = new HandlerThread("HandlerWorkThread");
+        //必须在实例化mThreadHandler之前调运start方法，原因上面源码已经分析了
+        mHandlerThread.start();
+        //将当前mHandlerThread子线程的Looper传入mThreadHandler，使得
+        //mThreadHandler的消息队列依赖于子线程（在子线程中执行）
+        mThreadHandler = new Handler(mHandlerThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                Log.i(null, "在子线程中处理！id="+Thread.currentThread().getId());
+                //从子线程往主线程发送消息
+                mUiHandler.sendEmptyMessage(0);
+            }
+        };
+
+        mUiHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                Log.i(null, "在UI主线程中处理！id="+Thread.currentThread().getId());
+            }
+        };
+        //从主线程往子线程发送消息
+        mThreadHandler.sendEmptyMessage(1);
+
+    }
+}
+```
+
 [1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_handler/01.jpg
+[2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_handler/02.png
+[3]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_handler/03.png
