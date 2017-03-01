@@ -679,11 +679,11 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 ## 总结 ##
-到此 Handler 消息机制的源码已经分析完了，相信你一定明白了 Handler 消息机制。 
+到此 Handler 消息机制的源码已经分析完了，相信你一定明白了 Handler 消息机制。<br>
 一句话，每个线程可以创建一个 Looper ，每个 Looper 轮询着一个 MessageQueue 不断取出消息，有消息则回调给 Handler，Handler 负责向 MessageQueue 中发送消息和处理回调的消息来完成线程之间的转换。
 
-如果对你有帮助，请star一下，然后follow我，给我增加一下分享动力，谢谢！
-如果你有什么疑问或者问题，可以提交issue和request，发邮件给我 jeanboy@foxmail.com 。
+如果对你有帮助，请star一下，然后follow我，给我增加一下分享动力，谢谢！<br>
+如果你有什么疑问或者问题，可以提交issue和request，发邮件给我 jeanboy@foxmail.com 。<br>
 或者加入Android攻城联盟群：386463747 来一起学习交流。
 
 [1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_handler/01.jpg
