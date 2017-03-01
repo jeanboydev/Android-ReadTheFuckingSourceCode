@@ -43,7 +43,7 @@ ThreadLocal
 
 先看一下 Looper 工作流程
 
-![图2][2]
+![图3][3]
 
 Looper 源码最上面的注释里有一个使用示例如下，可以清晰的看出 Looper 的使用方法。
 
@@ -165,7 +165,7 @@ public final class Looper {
 
 MessageQueue 工作流程
 
-![图3][3]
+![图2][2]
 
 MessageQueue的构造方法。
 
