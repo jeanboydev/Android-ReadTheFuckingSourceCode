@@ -40,7 +40,7 @@ ThreadLocal
 
 
 #### 1. Looper 源码分析 ####
-Looper 源码最上面的注释里有如下使用示例，可以清晰的看出 Looper 的使用方法。
+Looper 源码最上面的注释里有一个使用示例如下，可以清晰的看出 Looper 的使用方法。
 
 ```Java
 class LooperThread extends Thread {
@@ -57,7 +57,7 @@ class LooperThread extends Thread {
 }
 ```
 
-看一下 Looper 的完整源码，分析工作过程。
+接续看一下 Looper 的完整源码，分析下工作过程。
 
 ```Java
 public final class Looper {
@@ -167,7 +167,7 @@ MessageQueue(boolean quitAllowed) {
     mPtr = nativeInit();
 }
 ```
-然后我们再看一下 MessageQueue.enqueueMessage() 的源码是怎么添加消息的。
+然后我们再看一下 MessageQueue.enqueueMessage() 的源码，分析下是怎么添加消息的。
 
 ```Java
 boolean enqueueMessage(Message msg, long when) {
@@ -192,7 +192,8 @@ boolean enqueueMessage(Message msg, long when) {
         Message p = mMessages;
         boolean needWake;
         if (p == null || when == 0 || when < p.when) {
-            // 如果消息队列里面没有消息，或者消息的执行时间比里面的消息早，就把这条消息设置成第一条消息。一般不会出现这种情况，因为系统一定会有很多消息。
+            // 如果消息队列里面没有消息，或者消息的执行时间比里面的消息早，就把这条消息设置成第一条消息。
+			//一般不会出现这种情况，因为系统一定会有很多消息。
             msg.next = p;
             mMessages = msg;
             needWake = mBlocked;
@@ -222,7 +223,7 @@ boolean enqueueMessage(Message msg, long when) {
 }
 ```
 
-知道了怎么添加消息，我们在看下 MessageQueue.next() 方法是怎么取出消息的，也就是 Looper.loop() 方法中不断取消息的方法。
+知道了怎么添加消息，我们再看下 MessageQueue.next() 方法是怎么取出消息的，也就是 Looper.loop() 方法中不断取消息的方法。
 
 ```Java
 Message next() {
@@ -319,6 +320,146 @@ public final class Message implements Parcelable {
     private static final int MAX_POOL_SIZE = 50;//消息最大数量
 
     ...
+
+}
+```
+#### 3. Handler 源码分析 ####
+
+在 Message 中我们看到了 target 是一个 Handler，我们看下 Handler 是怎么与 Looper 和 MessageQueue 一起搭配工作的。
+
+看一下 Handler 的源码。
+
+```Java
+public class Handler {
+   
+    public interface Callback {
+        public boolean handleMessage(Message msg);
+    }
+    
+    
+    public void handleMessage(Message msg) {}
+    
+    /**
+     * 消息处理
+     */
+    public void dispatchMessage(Message msg) {
+        if (msg.callback != null) {//如果消息体是 Runnable 就执行 run()
+            handleCallback(msg);
+        } else {
+            if (mCallback != null) {
+				//如果创建 Handler 时传入了 Callback，就执行 Callback 里面的逻辑
+                if (mCallback.handleMessage(msg)) {
+                    return;
+                }
+            }
+            handleMessage(msg);//如果上述两种都没有实现，就执行 handleMessage 的逻辑
+        }
+    }
+
+  
+    public Handler() {
+        this(null, false);
+    }
+
+    public Handler(Callback callback) {
+        this(callback, false);
+    }
+
+    public Handler(Looper looper) {//可以指定关联哪个线程的 Looper
+        this(looper, null, false);
+    }
+
+    public Handler(Looper looper, Callback callback) {
+        this(looper, callback, false);
+    }
+
+    public Handler(boolean async) {
+        this(null, async);
+    }
+
+	/**
+     * 主线程调用的构造方法，主线程已经调用了 Looper.prepareMainLooper();
+     *
+     * @hide
+     */
+    public Handler(Callback callback, boolean async) {
+        if (FIND_POTENTIAL_LEAKS) {
+            final Class<? extends Handler> klass = getClass();
+            if ((klass.isAnonymousClass() || klass.isMemberClass() || klass.isLocalClass()) &&
+                    (klass.getModifiers() & Modifier.STATIC) == 0) {
+                Log.w(TAG, "The following Handler class should be static or leaks might occur: " +
+                    klass.getCanonicalName());
+            }
+        }
+
+        mLooper = Looper.myLooper();//取出主线程的 Looper
+        if (mLooper == null) {
+            throw new RuntimeException(
+                "Can't create handler inside thread that has not called Looper.prepare()");
+        }
+        mQueue = mLooper.mQueue;//把 Handler 的 mQueue 指向 Looper 中的 mQueue
+        mCallback = callback;
+        mAsynchronous = async;
+    }
+
+    /**
+     * 第二种构造方法，专门给子线程中创建 Handler 时使用的
+     *
+     * @hide
+     */
+    public Handler(Looper looper, Callback callback, boolean async) {
+        mLooper = looper;
+        mQueue = looper.mQueue;
+        mCallback = callback;
+        mAsynchronous = async;
+    }
+
+    //发送 Runnable 消息
+    public final boolean post(Runnable r){
+       return  sendMessageDelayed(getPostMessage(r), 0);
+    }
+    
+	private static Message getPostMessage(Runnable r) {
+        Message m = Message.obtain();
+        m.callback = r;
+        return m;
+    }    
+	
+	//一般更新 UI 时发送的消息，延时时间为0
+    public final boolean sendMessage(Message msg){
+        return sendMessageDelayed(msg, 0);
+    }
+
+    //发送延时消息
+    public final boolean sendMessageDelayed(Message msg, long delayMillis){
+        if (delayMillis < 0) {
+            delayMillis = 0;
+        }
+        return sendMessageAtTime(msg, SystemClock.uptimeMillis() + delayMillis);
+    }
+
+    //发送指定时间发送的消息
+    public boolean sendMessageAtTime(Message msg, long uptimeMillis) {
+        MessageQueue queue = mQueue;
+        if (queue == null) {
+            RuntimeException e = new RuntimeException(
+                    this + " sendMessageAtTime() called with no mQueue");
+            Log.w("Looper", e.getMessage(), e);
+            return false;
+        }
+        return enqueueMessage(queue, msg, uptimeMillis);
+    }
+
+    
+    private boolean enqueueMessage(MessageQueue queue, Message msg, long uptimeMillis) {
+        msg.target = this;
+		//把字节传入 Message 中一起发送
+		//Looper 中需要使用 Handler 来执行 dispatchMessage 方法
+        if (mAsynchronous) {
+            msg.setAsynchronous(true);
+        }
+        return queue.enqueueMessage(msg, uptimeMillis);
+    }
 
 }
 ```
