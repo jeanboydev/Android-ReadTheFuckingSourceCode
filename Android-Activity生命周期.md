@@ -37,4 +37,8 @@ Activity 生命周期图
 	
 	配置了 android:**configChanges**="xxx" 属性之后，Activity就不会在对应变化发生时重新创建，而是调用 Activity 的 **onConfigurationChanged** 方法。
 
+## 参考资料 ##
+[Google官方开发文档-Activity](https://developer.android.com/guide/components/activities.html?hl=zh-cn#Lifecycle)
+《Android 开发艺术探索》
+
 [1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity_life_cycle/Android-Activity%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png
