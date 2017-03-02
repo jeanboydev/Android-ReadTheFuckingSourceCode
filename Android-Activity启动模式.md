@@ -35,10 +35,12 @@
 
 #### singleIntance ####
 - 单实例模式，这是一种加强的 singleTask 模式。 具有 singleTask 模式的所有特性外，同时具有此模式的 Activity 只能单独的位于一个任务栈中。
-<br><br>
+
+<br>
 ### 4. 其他情况 ###
 ![图4][4]
 假设目前有2个任务栈，前台任务栈的情况为 AB，而后台任务栈的情况为 CD，这里假设 CD 的启动模式为 singleTask。 现在请求启动 D，那么整个后台的任务栈都会被切换到前台，这个时候整个后退列表变成了 ABCD。 当用户按 back 键的时候，列表中的 Activity 会一一出栈。
+
 <br><br>
 ### 5. TaskAffinity 属性 ###
 TaskAffinity 参数标识了一个 Activity 所需要的任务栈的名字。 为字符串，且中间必须包含包名分隔符“.”。默认情况下，所有 Activity 所需的任务栈名字为应用包名。
@@ -56,14 +58,14 @@ TashAffinity 属性主要和 singleTask 启动模式或者 allowTaskReparenting 
 3. 两种同时存在时，以第二种为准。 第一种方式无法直接为 Activity 添加 **FLAG_ACTIVITY_CLEAR_TOP** 标识，第二种方式无法指定 singleInstance 模式。
 4. 可以通过命令行 adb shell dumpsys activity 命令查看栈中的 Activity 信息。
 
-	#### Activity 的 Flags ####
-	这些FLAG可以设定启动模式、可以影响Activity的运行状态。
-	
-	- **FLAG_ACTIVITY_CLEAR_TOP** 
-	 具有此标记位的 Activity 启动时，同一个任务栈中位于它上面的 Activity 都要出栈，一般和 FLAG_ACTIVITY_NEW_TASK 配合使用。效果和 singleTask 一样。
-	
-	- **FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS** 
-	 如果设置，新的 Activity 不会在最近启动的 Activity 的列表（就是安卓手机里显示最近打开的 Activity 那个系统级的UI）中保存。
+#### Activity 的 Flags ####
+这些FLAG可以设定启动模式、可以影响Activity的运行状态。
+
+- **FLAG_ACTIVITY_CLEAR_TOP** 
+ 具有此标记位的 Activity 启动时，同一个任务栈中位于它上面的 Activity 都要出栈，一般和 FLAG_ACTIVITY_NEW_TASK 配合使用。效果和 singleTask 一样。
+
+- **FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS** 
+ 如果设置，新的 Activity 不会在最近启动的 Activity 的列表（就是安卓手机里显示最近打开的 Activity 那个系统级的UI）中保存。
 
 <br><br><br>
 ## IntentFilter 匹配规则 ##
@@ -74,17 +76,20 @@ TashAffinity 属性主要和 singleTask 启动模式或者 allowTaskReparenting 
 3. IntentFilter 中的过滤信息有 action、 category、 data。<br>
 4. 只有一个 Intent 同时匹配 action类别、 category类别、 data类别才能成功启动目标 Activity。<br>
 5. 一个 Activity 可以有多个 intent-filter ，一个 Intent 只要能匹配任何一组 intent-filter 即可成功启动对应的 Activity。
-<br><br>
+
+<br>
 ### 1. action ###
 - action 是一个字符串。
 - 一个 intent-filter 可以有多个 aciton，只要 Intent 中的 action 能够和任何一个 action 相同即可成功匹配。匹配是指与 action 的字符串完全一样。
 - Intent 中如果没有指定 action，那么匹配失败。
-<br><br>
+
+<br>
 ### 2. category ###
 - category 是一个字符串。
 - Intent 可以没有 category，但是如果你一旦有 category，不管有几个，每个都能够与 intent-filter 中的其中一个 category 相同。
 - 系统在 startActivity 和 startActivityForResult 的时候，会默认为 Intent 加上 android.intent.category.DEFAULT 这个 category，所以为了我们的 activity能够接收隐式调用，就必须在intent-filter 中加上 android.intent.category.DEFAULT 这个 category。
-<br><br>
+
+<br>
 ### 3. data ###
 - data 的匹配规则与 action一样，如果 intent-filter 中定义了 data，那么 Intent 中必须要定义可匹配的 data。
 - intent-filter 中 data 的语法：
@@ -115,7 +120,7 @@ TashAffinity 属性主要和 singleTask 启动模式或者 allowTaskReparenting 
 	
 	- Intent 指定 data 时，必须调用 setDataAndType 方法， setData 和 setType 会清除另一方的值。
 
-<br><br>
+<br>
 ### 4. 隐式调用需注意 ###
 1. 当通过隐式调用启动 Activity 时，没找到对应的Activity系统就会抛出 android.content.ActivityNotFoundException 异常，所以需要判断是否有Activity能够匹配我们的隐式Intent。
 
