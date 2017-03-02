@@ -96,24 +96,21 @@ TashAffinity 属性主要和 singleTask 启动模式或者 allowTaskReparenting 
 ```
 - Intent中 的 data 有两部分组成： mimeType 和 URI。 mimeType 是指媒体类型，比如 image/jpeg、audio/mpeg4-generic和video/ 等，可以表示图片、文本、视频等不同的媒体格式。
 
-
-	1. URI 的结构： ```Xml <scheme>://<host>:<port>/[<path>|<pathPrefix>|<pathPattern>] ```
-	
-	
+1. URI 的结构： ```Xml <scheme>://<host>:<port>/[<path>|<pathPrefix>|<pathPattern>] ```
 ```Xml
 	//实际例子
 	content://com.example.project:200/folder/subfolder/etc
 	http://www.baidu.com:80/search/info
 ```
-scheme：URI的模式，比如http、file、content等，默认值是 file 。
-host：URI的主机名
-port：URI的端口号
-path、pathPattern和pathPrefix：这三个参数描述路径信息。
-path、pathPattern可以表示完整的路径信息，其中pathPattern可以包含通
-配符 * ，表示0个或者多个任意字符。
-pathPrefix只表示路径的前缀信息。
 
-Intent指定data时，必须调用 setDataAndType 方法， setData 和 setType 会清除另一
+	- scheme：URI 的模式，比如 http、 file、 content 等，默认值是 file 。
+	-  host：URI 的主机名
+	-  port：URI 的端口号
+	-  path、 pathPattern 和 pathPrefix：这三个参数描述路径信息。
+		- path、 pathPattern 可以表示完整的路径信息，其中 pathPattern 可以包含通配符 * ，表示0个或者多个任意字符。
+		- pathPrefix 只表示路径的前缀信息。
+
+2. Intent指定data时，必须调用 setDataAndType 方法， setData 和 setType 会清除另一
 方的值。
 
 
