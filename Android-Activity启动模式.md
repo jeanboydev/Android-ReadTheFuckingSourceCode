@@ -11,21 +11,33 @@
 - 每次启动都会重新创建一个实例，不管这个 Activity 在栈中是否已经存在。
 - 谁启动了这个Activity，那么 Activity 就运行在启动它的那个 Activity 所在的栈中。
 
-> 用Application去启动Activity时会报错，提示非Activity的Context没有所谓的任务栈。
-> 解决办法是为待启动Activity制定FLAG_ACTIVITY_NEW_TASH标志位，这样就会为它创建一个新的任务栈。
+	> 用 Application 去启动 Activity 时会报错，提示非 Activity 的 Context没有所谓的任务栈。
+	> 解决办法是为待启动 Activity 指定 **FLAG_ACTIVITY_NEW_TASK** 标志位，这样就会为它创建一个新的任务栈。
 
-2 singleTop
-如果新Activity位于任务栈的栈顶，那么此Activity不会被重新创建，同时回
-调 onNewIntent 方法。
-如果新Activity已经存在但不是位于栈顶，那么新Activity仍然会被创建。
-3 singleTask
-这是一种单实例模式
-只要Activity在栈中存在，那么多次启动这个Activity都不会重新创建实例，同时也会回
-调 onNewIntent 方法。
-同时会导致在Activity之上的栈内Activity出栈。
-4 singleIntance
-具有singleTask模式的所有特性，同时具有此模式的Activity只能单独的位于一个任务栈中
-TaskAffinity属性
+## 2. singleTop ##
+![图2][2]
+
+
+
+- 栈顶复用模式，在这种模式下，如果新 Activity 位于任务栈的栈顶，那么此 Activity 不会被重新创建，同时回调 **onNewIntent** 方法。
+- 如果新 Activity 已经存在但不是位于栈顶，那么新 Activity 仍然会被创建。
+
+## 3. singleTask & singleIntance ##
+![图3][3]
+
+
+#### 1. singleTask ####
+- 栈内复用模式，这是一种单实例模式，在这种模式下，只要 Activity 在栈中存在，那么多次启动这个 Activity 都不会重新创建实例，同时也会回调 **onNewIntent** 方法。 同时会导致在 Activity 之上的栈内 Activity 出栈。
+- 如果 Activity 不存在重新创建。
+
+#### 2. singleIntance ####
+- 单实例模式，这是一种加强的 singleTask 模式。 具有 singleTask 模式的所有特性外，同时具有此模式的 Activity 只能单独的位于一个任务栈中。
+
+## 4. 其他情况 ##
+![图4][4]
+
+## 5. TaskAffinity属性 ##
+
 TaskAffinity参数标识了一个Activity所需要的任务栈的名字。为字符串，且中间必须包含包名
 分隔符“.”。默认情况下，所有Activity所需的任务栈名字为应用包名。TashAffinity属性主要和
 singleTask启动模式或者 allowTaskReparenting 属性配对使用，其他情况下没有意义。 应用A
