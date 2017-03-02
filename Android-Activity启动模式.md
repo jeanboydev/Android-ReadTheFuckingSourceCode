@@ -54,7 +54,7 @@ FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS 如果设置，新的Activity不会在最近�
 
 
 
-![1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_task_launch_modes/01.jpg
-![2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_task_launch_modes/02.jpg
-![3]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_task_launch_modes/03.jpg
-![4]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_task_launch_modes/04.jpg
+[1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_task_launch_modes/01.jpg
+[2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_task_launch_modes/02.jpg
+[3]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_task_launch_modes/03.jpg
+[4]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_task_launch_modes/04.jpg
