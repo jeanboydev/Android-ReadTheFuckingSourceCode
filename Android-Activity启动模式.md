@@ -87,50 +87,50 @@ TashAffinity 属性主要和 singleTask 启动模式或者 allowTaskReparenting 
 - 
 ```Xml
   <data android:scheme="string"
-		android:host="string"
-		android:port="string"
-		android:path="string"
-		android:pathPattern="string"
-		android:pathPrefix="string"
-		android:mimeType="string"/>
+	android:host="string"
+	android:port="string"
+	android:path="string"
+	android:pathPattern="string"
+	android:pathPrefix="string"
+	android:mimeType="string"/>
 ```
 - Intent中 的 data 有两部分组成： mimeType 和 URI。 mimeType 是指媒体类型，比如 image/jpeg、audio/mpeg4-generic和video/ 等，可以表示图片、文本、视频等不同的媒体格式。
 
-	1. URI 的结构： ```Xml <scheme>://<host>:<port>/[<path>|<pathPrefix>|<pathPattern>] ```
-		```Xml
+	- URI 的结构： ```Xml <scheme>://<host>:<port>/[<path>|<pathPrefix>|<pathPattern>] ```
+		```Java
 		//实际例子
 		content://com.example.project:200/folder/subfolder/etc
 		http://www.baidu.com:80/search/info
 		```
-		- scheme：URI 的模式，比如 http、 file、 content 等，默认值是 file 。
-		-  host：URI 的主机名
-		-  port：URI 的端口号
-		-  path、 pathPattern 和 pathPrefix：这三个参数描述路径信息。
+		1. scheme：URI 的模式，比如 http、 file、 content 等，默认值是 file 。
+		2.  host：URI 的主机名
+		3.  port：URI 的端口号
+		4.  path、 pathPattern 和 pathPrefix：这三个参数描述路径信息。
 			- path、 pathPattern 可以表示完整的路径信息，其中 pathPattern 可以包含通配符 * ，表示0个或者多个任意字符。
 			- pathPrefix 只表示路径的前缀信息。
 	
-	2. Intent 指定 data 时，必须调用 setDataAndType 方法， setData 和 setType 会清除另一方的值。
+	- Intent 指定 data 时，必须调用 setDataAndType 方法， setData 和 setType 会清除另一方的值。
 
 
-隐式调用需注意
-1. 当通过隐式调用启动Activity时，没找到对应的Activity系统就会抛
-出 android.content.ActivityNotFoundException 异常，所以需要判断是否有Activity能够匹
-配我们的隐式Intent。
-i. 采用 PackageManager 的 resloveActivity 方法
-public abstract List<ResolveInfo> queryIntentActivityies(Intent intent,int f
-lags);
-public abstract ResolveInfo resloveActivity(Intent intent,int flags);
-Activity的生命周期和启动模式
-8
-以上的第二个参数使用 MATCH_DEFAULT_ONLY ，这个标志位的含义是仅仅匹配那些在
-intent-filter中声明了 android.intent.category.DEFAULT 这个category的Activity。因为
-如果把不含这个category的Activity匹配出来了，由于不含DEFAULT这个category的
-Activity是无法接受隐式Intent的从而导致startActivity失败。
-ii. 采用 Intent 的 resloveActivity 方法
-2. 下面的action和category用来表明这是一个入口Activity并且会出现在系统的应用列表中，
-二者缺一不可。
-<action android:name="android.intent.action.MAIN" />
-<category android:name="android.intent.category.LAUNCHER" />
+#### 隐式调用需注意 ####
+1. 当通过隐式调用启动 Activity 时，没找到对应的Activity系统就会抛出 android.content.ActivityNotFoundException 异常，所以需要判断是否有Activity能够匹配我们的隐式Intent。
+
+	- 采用 PackageManager 的 resloveActivity 方法
+
+		```Java
+		public abstract List<ResolveInfo> queryIntentActivityies(Intent intent,int flags);
+		public abstract ResolveInfo resloveActivity(Intent intent,int flags);
+		```
+
+		> 以上的第二个参数使用 MATCH_DEFAULT_ONLY ，这个标志位的含义是仅仅匹配那些在 intent-filter 中声明了 android.intent.category.DEFAULT 这个 category 的 Activity。 因为如果把不含这个 category 的 Activity 匹配出来了，由于不含 DEFAULT 这个 category 的 Activity 是无法接受隐式 Intent 的从而导致 startActivity 失败。
+
+	- 采用 Intent 的 resloveActivity 方法
+
+2. 下面的 action 和 category 用来表明这是一个入口 Activity 并且会出现在系统的应用列表中，二者缺一不可。
+	```Xml
+	<action android:name="android.intent.action.MAIN" />
+	<category android:name="android.intent.category.LAUNCHER" />
+	```
 
 
 
