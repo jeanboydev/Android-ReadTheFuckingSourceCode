@@ -20,5 +20,5 @@
 
 ## 设计模式 ##
 
-1. 面向对象设计原则
+1. [面向对象设计原则](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99.md)
 2. Singleton （单例模式）
