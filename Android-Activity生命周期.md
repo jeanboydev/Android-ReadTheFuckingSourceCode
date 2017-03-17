@@ -24,9 +24,10 @@ Activity 生命周期图
 > 比如：文本框中用户输入的数据、 listview 滚动的位置等，这些 view 相关的状态系统都会默认为我们恢复。 
 
  具体针对某一个 view 系统能为我们恢复哪些数据可以查看 view 的源码中的 onSaveInstanceState 和 onRestoreInstanceState 方法。
+
 2. Activity按优先级的分类
 
-	**前台 Activity** > **可见但非前台 Activity** > **后台 Activity**
+	前台 Activity > 可见但非前台 Activity > 后台 Activity
 
 3. android:configChanges="xxx" 属性，常用的主要有下面三个选项：
 	> local：设备的本地位置发生了变化，一般指切换了系统语言；
