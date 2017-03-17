@@ -1,5 +1,5 @@
 # Android-Handler消息机制 #
-<br>
+
 ## 概述 ##
 Android 的消息机制主要是指 Handler 的运行机制以及 Handler 所附带的 MessageQueue 和 Looper 的工作过程。 Handler 的主要作用是将某个任务切换到 Handler 所在的线程中去执行。
 ## Handler机制 ##
