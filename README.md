@@ -22,3 +22,7 @@
 
 1. [面向对象设计原则](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/面向对象设计原则.md)
 2. [Singleton （单例模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Singleton.md)
+
+
+## 开源库源码分析 ##
+- [Lottie动画开源库使用 & 源码分析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/Lottie动画开源库使用&源码分析.md)
