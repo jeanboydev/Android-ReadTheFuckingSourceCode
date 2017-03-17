@@ -58,7 +58,7 @@ public static synchronized Singleton getInstance(){
     }
 }
 ```
-> 在JVM编译的过程中会出现指令重排的优化过程，这就会导致当 instance 实际上还没初始化，就可能被分配了内存空间，也就是说会出现 instance !=null 但是又没初始化的情况，这样就会导致返回的 instance报错。在 JDK1.5 之后，官方已经注意到这种问题，因此调整了 JMM、 具体化了 volatile 关键字，因此如果是 JDK1.5 或之后的版本，只需要将instance的定义改成 “private volatile static SingletonKerriganD instance = null;” 就可以保证每次都去 instance 都从主内存读取，就可以使用DCL的写法来完成单例模式。当然 volatile 或多或少也会影响到性能。
+> 在JVM编译的过程中会出现指令重排的优化过程，这就会导致当 instance 实际上还没初始化，就可能被分配了内存空间，也就是说会出现 instance !=null 但是又没初始化的情况，这样就会导致返回的 instance报错。在 JDK1.5 之后，官方已经注意到这种问题，因此调整了 JMM、 具体化了 volatile 关键字，因此如果是 JDK1.5 或之后的版本，只需要将 instance 的定义改成 “private volatile static Singleton instance = null;” 就可以保证每次都去 instance 都从主内存读取，就可以使用DCL的写法来完成单例模式。当然 volatile 或多或少也会影响到性能。
 > 
 > 优点：在并发量不高、安全性不高的情况下可以很好的运行
 > 
