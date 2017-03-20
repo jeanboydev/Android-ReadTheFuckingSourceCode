@@ -23,6 +23,7 @@
 1. [面向对象设计原则](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/面向对象设计原则.md)
 2. [Singleton（单例模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Singleton.md)
 3. [Factory（工厂模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Factory.md)
+4. [Abstract Factory（抽象工厂模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Abstract_Factory.md)
 
 
 ## 开源库源码分析 ##
