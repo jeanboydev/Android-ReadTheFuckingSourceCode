@@ -25,6 +25,7 @@
 3. [Factory（工厂模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Factory.md)
 4. [Abstract Factory（抽象工厂模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Abstract_Factory.md)
 5. [Builder（建造者模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Builder.md)
+6. [Prototype（原型模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Prototype.md)
 
 
 ## 开源库源码分析 ##
