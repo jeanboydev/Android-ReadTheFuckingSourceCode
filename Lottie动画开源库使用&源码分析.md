@@ -7,6 +7,9 @@ https://github.com/airbnb/lottie-android
 
 Lottie是Airbnb开源的动画项目，它能够同时支持iOS,Android与ReactNative的开发，使用流程如下图所示
 
+
+![图片1][1]
+
 如图所示，通过安装AE上的bodymovin的插件，能够将AE中的动画工程文件转换为通用的json格式描述文件(bodymovin插件本身是用于网页上呈现各种AE效果的一个开源库),lottie所做的事情就是实现在不同移动端平台上呈现AE动画的方式，从而达到动画文件的一次绘制、一次转换，随处可用的效果，这个跟Java一次编译随处运行效果一样
 
 ## 使用方式 ##
@@ -70,9 +73,12 @@ animationView.cancelAnimation();
 ## 原理 ##
 Lottie使用json文件来作为动画数据源，json文件是通过Bodymovin插件导出的，查看sample中给出的json文件，其实就是把图片中的元素进行来拆分，并且描述每个元素的动画执行路径和执行时间。Lottie的功能就是读取这些数据，然后绘制到屏幕上。
 
+![图片2][2]
+
 ### 1.解析json文件 ###
 首先要解析json，建立数据到对象的映射，然后根据数据对象创建合适的Drawable绘制到view上，动画的实现可以通过操作读取到的元素完成。
 
+![图片3][3]
 
 
 - LottieComposition (json->数据对象)
@@ -294,3 +300,9 @@ public class LottieAnimationView extends AppCompatImageView {
  
 }
 ```
+
+
+
+![1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/lottie/01.png
+![2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/lottie/02.png
+![3]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/lottie/03.png
