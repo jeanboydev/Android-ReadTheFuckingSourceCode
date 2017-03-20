@@ -303,6 +303,6 @@ public class LottieAnimationView extends AppCompatImageView {
 
 
 
-![1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/lottie/01.png
-![2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/lottie/02.png
-![3]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/lottie/03.png
+[1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/lottie/01.png
+[2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/lottie/02.png
+[3]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/lottie/03.png
