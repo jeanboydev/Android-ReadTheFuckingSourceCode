@@ -1,4 +1,4 @@
-# Android-Activity启动模式 & IntentFilter匹配规则#
+# Android-Activity启动模式 & IntentFilter匹配规则 #
 
 ## 概述 ##
 每个应用都会有多个 Activity，Android 中使用栈来管理 Activity。 Activity 的启动模式目前有四种：standard、singleTop、singleTask、singleIntance。
