@@ -24,7 +24,7 @@ public class SDCard {
     }
 }
 ```
-2. 然后我们需要一台电脑去取数据
+2. 然后我们需要一台电脑读取数据
 ```Java
 public interface USBInterface {
 

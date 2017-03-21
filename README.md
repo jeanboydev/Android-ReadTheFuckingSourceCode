@@ -27,6 +27,7 @@
 5. [Builder（建造者模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Builder.md)
 6. [Prototype（原型模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Prototype.md)
 7. [Adapter（适配器模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Adapter.md)
+8. [Bridge（桥接模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Bridge.md)
 
 
 ## 开源库源码分析 ##
