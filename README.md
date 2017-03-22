@@ -31,6 +31,7 @@
 9. [Composite（组合模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Composite.md)
 10. [Decorator（装饰模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Decorator.md)
 11. [Facade（外观模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Facade.md)
+12. [Flyweight（享元模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Flyweight.md)
 
 
 ## 开源库源码分析 ##
