@@ -79,6 +79,9 @@ public class AdapterTest {
 2. 在 LINUX 上运行 WINDOWS 程序。
 3. JAVA JDK 1.1 提供了 Enumeration 接口，而在 1.2 中提供了 Iterator 接口，想要使用 1.2 的 JDK，则要将以前系统的 Enumeration 接口转化为 Iterator 接口，这时就需要适配器模式。
 
+## 主要解决 ##
+主要解决在软件系统中，常常要将一些"现存的对象"放到新的环境中，而新环境要求的接口是现对象不能满足的。
+
 ## 优点 ##
 1. 可以让任何两个没有关联的类一起运行。
 2. 提高了类的复用。
