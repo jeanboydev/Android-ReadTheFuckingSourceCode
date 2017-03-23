@@ -77,7 +77,7 @@ public class CommandTest {
 }
 ```
 
-4. 输出
+6. 输出
 ```Java
 03-23 11:53:42.221 31493-31521/? I/System.out: Employee 执行命令:去工作
 ```

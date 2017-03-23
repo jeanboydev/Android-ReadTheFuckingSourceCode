@@ -35,6 +35,7 @@
 13. [Proxy（代理模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Proxy.md)
 14. [Chain of Responsibility（责任链模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Chain_of_Responsibility.md)
 15. [Command（命令模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Command.md)
+16. [Interpreter（解释器模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Interpreter.md)
 
 
 ## 开源库源码分析 ##
