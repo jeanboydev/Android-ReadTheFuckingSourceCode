@@ -71,9 +71,10 @@ public class Storage {
 ```
 3. 测试
 ```Java
-public class Test {  
+public class MementoTest {  
   
-    public static void main(String[] args) {  
+	@Test
+    public void testMemento() {  
           
         // 创建原始类  
         Original origi = new Original("egg");  

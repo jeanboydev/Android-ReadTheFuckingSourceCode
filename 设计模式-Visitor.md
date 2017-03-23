@@ -46,9 +46,10 @@ public class MySubject implements Subject {
 ```
 3. 测试
 ```Java
-public class Test {
+public class VisitorTest {
   
-    public static void main(String[] args) {
+	@Test
+    public void testVisitor() {
           
         Visitor visitor = new MyVisitor();  
         Subject sub = new MySubject();  

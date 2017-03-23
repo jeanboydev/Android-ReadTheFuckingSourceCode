@@ -99,9 +99,10 @@ public class MyIterator implements Iterator {
 ```
 3. 测试
 ```Java
-public class Test {  
+public class TestIterator {  
   
-    public static void main(String[] args) {  
+	@Test
+    public void testIterator() {  
         Collection collection = new MyCollection();  
         Iterator it = collection.iterator();  
           
