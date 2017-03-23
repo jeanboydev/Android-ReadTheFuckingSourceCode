@@ -21,17 +21,20 @@
 ## 设计模式 ##
 
 1. [面向对象设计原则](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/面向对象设计原则.md)
+- 创建型模式
 2. [Singleton（单例模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Singleton.md)
 3. [Factory（工厂模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Factory.md)
 4. [Abstract Factory（抽象工厂模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Abstract_Factory.md)
 5. [Builder（建造者模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Builder.md)
 6. [Prototype（原型模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Prototype.md)
+- 结构型模式
 7. [Adapter（适配器模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Adapter.md)
 8. [Bridge（桥接模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Bridge.md)
 9. [Composite（组合模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Composite.md)
 10. [Decorator（装饰模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Decorator.md)
 11. [Facade（外观模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Facade.md)
 12. [Flyweight（享元模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Flyweight.md)
+- 行为型模式
 13. [Proxy（代理模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Proxy.md)
 14. [Chain of Responsibility（责任链模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Chain_of_Responsibility.md)
 15. [Command（命令模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Command.md)
