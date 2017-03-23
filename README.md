@@ -42,7 +42,8 @@
 20. [Observer（观察者模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Observer.md)
 21. [State（状态模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-State.md)
 22. [Strategy（策略模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Strategy.md)
-23. [Template（模板模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Template.md)
+23. [Template Method（模板方法模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Template_Method.md)
+24. [Visitor（访问者模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/设计模式-Visitor.md)
 
 
 ## 开源库源码分析 ##
