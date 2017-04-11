@@ -127,8 +127,8 @@ Binder 线程池：每个 Server 进程在启动时会创建一个 binder 线程
 5. [Binder学习指南](http://weishu.me/2016/01/12/binder-index-for-newer)
 
 ## 参考资料 ##
-[Binder系列](http://gityuan.com/2015/10/31/binder-prepare)
-[Binder学习指南](http://weishu.me/2016/01/12/binder-index-for-newer)
+- [Binder系列](http://gityuan.com/2015/10/31/binder-prepare)
+- [Binder学习指南](http://weishu.me/2016/01/12/binder-index-for-newer)
 
 [1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_binder/binder_main.jpg
 [2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_binder/binder_device.jpg
