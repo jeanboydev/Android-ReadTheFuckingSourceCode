@@ -117,7 +117,18 @@ Binder 线程池：每个 Server 进程在启动时会创建一个 binder 线程
 - ServiceManager 将用户空间的参数等请求数据复制到内核空间，并向服务端插入一条执行执行方法的事务。事务执行完通知 ServiceManager 将执行结果从内核空间复制到用户空间，并唤醒等待的线程，响应结果，通讯结束。
 
 ## 总结 ##
+好了，这里只是从实现逻辑上简单介绍了下 Binder 机制的工作原理，想要深入理解 Binder 机制，还得自己下功夫，看源码，尽管这个过程很痛苦。一遍看不懂就再来一遍，说实话本人理解能力比较差，跟着博客思路看了不下十遍。努力总会有收获，好好欣赏 native 层各方法之间花式跳转的魅力吧。最后你会发现新世界的大门在向你敞开。
 
+网上资料很多，个人觉得比较好的如下：
+1. [Bander设计与实现](http://blog.csdn.net/universus/article/details/6211589)
+2. 老罗的 [Android进程间通信（IPC）机制Binder简要介绍和学习计划](http://blog.csdn.net/luoshengyang/article/details/6618363) 系列
+3. 阿拉神农的 [深入理解Binder](http://blog.csdn.net/innost/article/details/47208049) 系列
+4. Gityuan的 [Binder系列](http://gityuan.com/2015/10/31/binder-prepare) (基于 Android 6.0)
+5. [Binder学习指南](http://weishu.me/2016/01/12/binder-index-for-newer)
+
+## 参考资料 ##
+[Binder系列](http://gityuan.com/2015/10/31/binder-prepare)
+[Binder学习指南](http://weishu.me/2016/01/12/binder-index-for-newer)
 
 [1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_binder/binder_main.jpg
 [2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_binder/binder_device.jpg
