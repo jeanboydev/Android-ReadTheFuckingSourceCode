@@ -1,43 +1,45 @@
 # Android-Binder进程间通讯机制 #
 
 ## 概述 ##
-最近在学习Binder机制，在网上查阅了大量的资料，也看了老罗的Binder系列的博客和阿拉神农的深入理解Binder系列的博客，都是从底层开始讲的，全是C代码，虽然之前学过C和C++，然而各种函数之间花式跳转，看的我都怀疑人生。毫不夸张的讲每看一边都是新的内容，跟没看过一样。后来又看到了Gityuan的博客看到了一些图解仿佛发现了新大陆。 
+最近在学习Binder机制，在网上查阅了大量的资料，也看了老罗的Binder系列的博客和阿拉神农的深入理解Binder系列的博客，都是从底层开始讲的，全是C代码，虽然之前学过C和C++，然而各种函数之间花式跳转，看的我都怀疑人生。毫不夸张的讲每看一遍都是新的内容，跟没看过一样。后来又看到了Gityuan的博客看到了一些图解仿佛发现了新大陆。 
 
 下面就以图解的方式介绍下Binder机制，相信你看这篇文章，一定有所收获。
 
 
-## 什么是Binder？ ##
+## 什么是 Binder？ ##
 
 Binder是Android系统中进程间通讯（IPC）的一种方式，也是Android系统中最重要的特性之一。Android中的四大组件Activity，Service，Broadcast，ContentProvider，不同的App等都运行在不同的进程中，它是这些进程间通讯的桥梁。正如其名“粘合剂”一样，它把系统中各个组件粘合到了一起，是各个组件的桥梁。
 
 理解Binder对于理解整个Android系统有着非常重要的作用，如果对Binder不了解，就很难对Android系统机制有更深入的理解。
 
 
-## 1. Binder架构 ##
+## 1. Binder 架构 ##
 
 ![图1][1]
 
 - Binder 通信采用 C/S 架构，从组件视角来说，包含 Client、 Server、 ServiceManager 以及 Binder 驱动，其中 ServiceManager 用于管理系统中的各种服务。
-- Binder 在 framework 层进行了封装，通过JNI技术调用 Native（C/C++）层的 Binder 架构。 
+- Binder 在 framework 层进行了封装，通过 JNI 技术调用 Native（C/C++）层的 Binder 架构。 
 - Binder 在 Native 层以 ioctl 的方式与 Binder 驱动通讯。
 
-## 2. Binder机制 ##
+## 2. Binder 机制 ##
 
 ![图8][8]
 
-- 首先需要注册服务端，只有注册了服务端客户端才有通讯的目标，服务端通过 ServiceManager 注册服务，注册的过程就是向 Binder 驱动的全局链表 binder_procs 中插入服务端的信息（ binder_proc 结构体，每个 binder_proc 结构体中都有 todo 任务队列），然后向 ServiceManager 的 svcinfo 列表中缓存一下注册的服务。
+- 首先需要注册服务端，只有注册了服务端，客户端才有通讯的目标，服务端通过 ServiceManager 注册服务，注册的过程就是向 Binder 驱动的全局链表 binder_procs 中插入服务端的信息（binder_proc 结构体，每个 binder_proc 结构体中都有 todo 任务队列），然后向 ServiceManager 的 svcinfo 列表中缓存一下注册的服务。
+
 - 有了服务端，客户端就可以跟服务端通讯了，通讯之前需要先获取到服务，拿到服务的代理，也可以理解为引用。比如下面的代码：
 	```Java
 	//获取WindowManager服务引用
 	WindowManager wm = (WindowManager)getSystemService(getApplication().WINDOW_SERVICE);
 	```
 	获取服务端的方式就是通过 ServiceManager 向 svcinfo 列表中查询一下返回服务端的代理，svcinfo 列表就是所有已注册服务的通讯录，保存了所有注册的服务信息。
-- 有了服务端的引用我们就可以向服务端发送请求了，通过 BinderProxy 会将我们的请求参数发送给 ServiceManager，通过共享内存的方式使用内核方法 copy_from_user() 将我们的参数先拷贝到内核空间，这时我们的客户端会进入等待状态，然后 Binder 驱动会向服务端的 todo 队列里面插入一条事务，执行完之后会把执行结果通过 copy_to_user() 将内核的结果拷贝到用户空间，唤醒等待的客户端并把结果响应回来，这样就完成了一次通讯。
 
-怎么样是不是很简单，以上就是 Binder 机制的主要方式。下面我们来看看具体实现。
+- 有了服务端的引用我们就可以向服务端发送请求了，通过 BinderProxy 将我们的请求参数发送给 ServiceManager，通过共享内存的方式使用内核方法 copy_from_user() 将我们的参数先拷贝到内核空间，这时我们的客户端进入等待状态，然后 Binder 驱动向服务端的 todo 队列里面插入一条事务，执行完之后把执行结果通过 copy_to_user() 将内核的结果拷贝到用户空间，唤醒等待的客户端并把结果响应回来，这样就完成了一次通讯。
+
+怎么样是不是很简单，以上就是 Binder 机制的主要通讯方式。仅仅想要了解 Binder 通讯方式的同学到此就可以洗洗睡觉了。如果对你来说太简单，下面我们来看看具体实现。
 
 
-## 3. Binder驱动 ##
+## 3. Binder 驱动 ##
 
 我们先来了解下用户空间与内核空间是怎么交互的。
 
@@ -73,51 +75,59 @@ Kernel space 可以执行任意命令，调用系统的一切资源； User spac
 
 熟悉了上面这些概念，我们再来看下上面的图，用户空间中 binder_open(), binder_mmap(), binder_ioctl() 这些方法通过 system call 来调用内核空间 Binder 驱动中的方法。内核空间与用户空间共享内存通过 copy_from_user(), copy_to_user() 内核方法来完成用户空间与内核空间内存的数据传输。 Binder驱动中有一个全局的 binder_procs 链表保存了服务端的进程信息。
 
-## 4. Binder进程与线程 ##
+## 4. Binder 进程与线程 ##
 
 ![图3][3]
 
 对于底层Binder驱动，通过 binder_procs 链表记录所有创建的 binder_proc 结构体，binder 驱动层的每一个 binder_proc 结构体都与用户空间的一个用于 binder 通信的进程一一对应，且每个进程有且只有一个 ProcessState 对象，这是通过单例模式来保证的。在每个进程中可以有很多个线程，每个线程对应一个 IPCThreadState 对象，IPCThreadState 对象也是单例模式，即一个线程对应一个 IPCThreadState 对象，在 Binder 驱动层也有与之相对应的结构，那就是 Binder_thread 结构体。在 binder_proc 结构体中通过成员变量 rb_root threads，来记录当前进程内所有的 binder_thread。
 
-Binder 线程池：每个 Server 进程在启动时会创建一个 binder 线程池，并向其中注册一个 Binder 线程；之后 Server 进程也可以向 binder 线程池注册新的线程，或者 Binder 驱动在探测到没有空闲 binder 线程时会主动向 Server 进程注册新的的 binder 线程。对于一个 Server 进程有一个最大 Binder 线程数限制，默认为16个 binder 线程，例如 Android 的 system_server 进程就存在16个线程。对于所有 Client 端进程的 binder 请求都是交由 Server 端进程的 binder 线程来处理的。
+Binder 线程池：每个 Server 进程在启动时创建一个 binder 线程池，并向其中注册一个 Binder 线程；之后 Server 进程也可以向 binder 线程池注册新的线程，或者 Binder 驱动在探测到没有空闲 binder 线程时主动向 Server 进程注册新的的 binder 线程。对于一个 Server 进程有一个最大 Binder 线程数限制，默认为16个 binder 线程，例如 Android 的 system_server 进程就存在16个线程。对于所有 Client 端进程的 binder 请求都是交由 Server 端进程的 binder 线程来处理的。
 
-## 5. ServiceManager启动 ##
+## 5. ServiceManager 启动 ##
 
-了解了 Binder 驱动，怎么与 Binder 驱动进行通讯呢？那就是通过 ServiceManager，好多文章称 ServiceManager 是 Binder 驱动的守护进程，大管家，其实 ServiceManager 很简单就是提供了查询服务和注册服务的功能。下面我们来看一下 ServiceManager 启动的过程。
+了解了 Binder 驱动，怎么与 Binder 驱动进行通讯呢？那就是通过 ServiceManager，好多文章称 ServiceManager 是 Binder 驱动的守护进程，大管家，其实 ServiceManager 的作用很简单就是提供了查询服务和注册服务的功能。下面我们来看一下 ServiceManager 启动的过程。
 
 ![图4][4]
 
 - ServiceManager 分为 framework 层和 native 层，framework 层只是对 native 层进行了封装方便调用，图上展示的是 native 层的 ServiceManager 启动过程。
+
 - ServiceManager 的启动是系统在开机时，init 进程解析 init.rc 文件调用 service_manager.c 中的 main() 方法入口启动的。 native 层有一个 binder.c 封装了一些与 Binder 驱动交互的方法。
+
 - ServiceManager 的启动分为三步，首先打开驱动创建全局链表 binder_procs，然后将自己当前进程信息保存到 binder_procs 链表，最后开启 loop 不断的处理共享内存中的数据，并处理 BR_xxx 命令（ioctl 的命令，BR 可以理解为 binder reply 驱动处理完的响应）。
 
-## 6. ServiceManager注册服务 ##
+## 6. ServiceManager 注册服务 ##
 
 ![图5][5]
 
 - 注册 MediaPlayerService 服务端，我们通过 ServiceManager 的 addService() 方法来注册服务。
-- 首先 ServiceManager 会向 Binder 驱动发送 BC_TRANSACTION 命令（ioctl 的命令，BC 可以理解为 binder client 客户端发过来的请求命令）携带 ADD_SERVICE_TRANSACTION 命令，同时注册服务的线程进入等待状态 waitForResponse()。 Binder 驱动收到请求命令会向 ServiceManager 的 todo 队列里面添加一条注册服务的事务。事务的任务就是创建服务端进程 binder_node 信息并插入到 binder_procs 链表中。
-- 事务处理完之后会发送 BR_TRANSACTION 命令，ServiceManager 收到命令后会向 svcinfo 列表中添加已经注册的服务。最后发送 BR_REPLY 命令唤醒等待的线程，通知注册成功。
+
+- 首先 ServiceManager 向 Binder 驱动发送 BC_TRANSACTION 命令（ioctl 的命令，BC 可以理解为 binder client 客户端发过来的请求命令）携带 ADD_SERVICE_TRANSACTION 命令，同时注册服务的线程进入等待状态 waitForResponse()。 Binder 驱动收到请求命令向 ServiceManager 的 todo 队列里面添加一条注册服务的事务。事务的任务就是创建服务端进程 binder_node 信息并插入到 binder_procs 链表中。
+
+- 事务处理完之后发送 BR_TRANSACTION 命令，ServiceManager 收到命令后向 svcinfo 列表中添加已经注册的服务。最后发送 BR_REPLY 命令唤醒等待的线程，通知注册成功。
 
 
-## 7. ServiceManager获取服务 ##
+## 7. ServiceManager 获取服务 ##
 
 ![图6][6]
 
 - 获取服务的过程与注册类似，相反的过程。通过 ServiceManager 的 getService() 方法来注册服务。
-- 首先 ServiceManager 会向 Binder 驱动发送 BC_TRANSACTION 命令携带 CHECK_SERVICE_TRANSACTION 命令，同时获取服务的线程进入等待状态 waitForResponse()。
-- Binder 驱动收到请求命令会向 ServiceManager 的发送 BC_TRANSACTION 查询已注册的服务，查询到直接响应 BR_REPLY 唤醒等待的线程。若查询不到将与 binder_procs 链表中的服务进行一次通讯再响应。
+
+- 首先 ServiceManager 向 Binder 驱动发送 BC_TRANSACTION 命令携带 CHECK_SERVICE_TRANSACTION 命令，同时获取服务的线程进入等待状态 waitForResponse()。
+
+- Binder 驱动收到请求命令向 ServiceManager 的发送 BC_TRANSACTION 查询已注册的服务，查询到直接响应 BR_REPLY 唤醒等待的线程。若查询不到将与 binder_procs 链表中的服务进行一次通讯再响应。
 
 ## 8. 进行一次完整通讯 ##
 
 ![图7][7]
 
 - 我们在使用 Binder 时基本都是调用 framework 层封装好的方法，AIDL 就是 framework 层提供的傻瓜式是使用方式。假设服务已经注册完，我们来看看客户端怎么执行服务端的方法。
-- 首先我们通过 ServiceManager 获取到服务端的 BinderProxy 代理对象，通过调用 BinderProxy 将参数，方法标识（例如：TRANSACTION_test，AIDL中会自动生成）传给  ServiceManager，同时客户端线程进入等待状态。
+
+- 首先我们通过 ServiceManager 获取到服务端的 BinderProxy 代理对象，通过调用 BinderProxy 将参数，方法标识（例如：TRANSACTION_test，AIDL中自动生成）传给  ServiceManager，同时客户端线程进入等待状态。
+
 - ServiceManager 将用户空间的参数等请求数据复制到内核空间，并向服务端插入一条执行执行方法的事务。事务执行完通知 ServiceManager 将执行结果从内核空间复制到用户空间，并唤醒等待的线程，响应结果，通讯结束。
 
 ## 总结 ##
-好了，这里只是从实现逻辑上简单介绍了下 Binder 机制的工作原理，想要深入理解 Binder 机制，还得自己下功夫，看源码，尽管这个过程很痛苦。一遍看不懂就再来一遍，说实话本人理解能力比较差，跟着博客思路看了不下十遍。努力总会有收获，好好欣赏 native 层各方法之间花式跳转的魅力吧。最后你会发现新世界的大门在向你敞开。
+好了，这里只是从实现逻辑上简单介绍了下 Binder 机制的工作原理，想要深入理解 Binder 机制，还得自己下功夫，看源码，尽管这个过程很痛苦。一遍看不懂就再来一遍，说实话本人理解能力比较差，跟着博客思路看了不下十遍。努力总会有收获，好好欣赏 native 层各方法之间花式跳转的魅力吧。最后你将发现新世界的大门在向你敞开。
 
 网上资料很多，个人觉得比较好的如下：
 1. [Bander设计与实现](http://blog.csdn.net/universus/article/details/6211589)
