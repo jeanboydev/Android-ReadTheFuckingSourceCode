@@ -81,7 +81,7 @@ Kernel space 可以执行任意命令，调用系统的一切资源； User spac
 
 Binder 线程池：每个 Server 进程在启动时会创建一个 binder 线程池，并向其中注册一个 Binder 线程；之后 Server 进程也可以向 binder 线程池注册新的线程，或者 Binder 驱动在探测到没有空闲 binder 线程时会主动向 Server 进程注册新的的 binder 线程。对于一个 Server 进程有一个最大 Binder 线程数限制，默认为16个 binder 线程，例如 Android 的 system_server 进程就存在16个线程。对于所有 Client 端进程的 binder 请求都是交由 Server 端进程的 binder 线程来处理的。
 
-## 5. ServiceManager ##
+## 5. ServiceManager启动 ##
 
 了解了 Binder 驱动，怎么与 Binder 驱动进行通讯呢？那就是通过 ServiceManager，好多文章称 ServiceManager 是 Binder 驱动的守护进程，大管家，其实 ServiceManager 很简单就是提供了查询服务和注册服务的功能。下面我们来看一下 ServiceManager 启动的过程。
 
@@ -89,7 +89,32 @@ Binder 线程池：每个 Server 进程在启动时会创建一个 binder 线程
 
 - ServiceManager 分为 framework 层和 native 层，framework 层只是对 native 层进行了封装方便调用，图上展示的是 native 层的 ServiceManager 启动过程。
 - ServiceManager 的启动是系统在开机时，init 进程解析 init.rc 文件调用 service_manager.c 中的 main() 方法入口启动的。 native 层有一个 binder.c 封装了一些与 Binder 驱动交互的方法。
-- ServiceManager 的启动分为三步，首先打开驱动创建全局链表 binder_procs，然后将自己当前进程信息保存到 binder_procs 链表，最后开启 loop 不断的读取共享内存，并处理 BR_xxx 命令（ioctl的命令，BR 可以理解为 binder reply 驱动处理完的响应）。
+- ServiceManager 的启动分为三步，首先打开驱动创建全局链表 binder_procs，然后将自己当前进程信息保存到 binder_procs 链表，最后开启 loop 不断的处理共享内存中的数据，并处理 BR_xxx 命令（ioctl 的命令，BR 可以理解为 binder reply 驱动处理完的响应）。
+
+## 6. ServiceManager注册服务 ##
+
+![图5][5]
+
+- 注册 MediaPlayerService 服务端，我们通过 ServiceManager 的 addService() 方法来注册服务。
+- 首先 ServiceManager 会向 Binder 驱动发送 BC_TRANSACTION 命令（ioctl 的命令，BC 可以理解为 binder client 客户端发过来的请求命令）携带 ADD_SERVICE_TRANSACTION 命令，同时注册服务的线程进入等待状态 waitForResponse()。 Binder 驱动收到请求命令会向 ServiceManager 的 todo 队列里面添加一条注册服务的事务。事务的任务就是创建服务端进程 binder_node 信息并插入到 binder_procs 链表中。
+- 事务处理完之后会发送 BR_TRANSACTION 命令，ServiceManager 收到命令后会向 svcinfo 列表中添加已经注册的服务。最后发送 BR_REPLY 命令唤醒等待的线程，通知注册成功。
+
+
+## 7. ServiceManager获取服务 ##
+
+![图6][6]
+
+- 获取服务的过程与注册类似，相反的过程。通过 ServiceManager 的 getService() 方法来注册服务。
+- 首先 ServiceManager 会向 Binder 驱动发送 BC_TRANSACTION 命令携带 CHECK_SERVICE_TRANSACTION 命令，同时获取服务的线程进入等待状态 waitForResponse()。
+- Binder 驱动收到请求命令会向 ServiceManager 的发送 BC_TRANSACTION 查询已注册的服务，查询到直接响应 BR_REPLY 唤醒等待的线程。若查询不到将与 binder_procs 链表中的服务进行一次通讯再响应。
+
+## 8. 进行一次完整通讯 ##
+
+![图7][7]
+
+- 我们在使用 Binder 时基本都是调用 framework 层封装好的方法，AIDL 就是 framework 层提供的傻瓜式是使用方式。假设服务已经注册完，我们来看看客户端怎么执行服务端的方法。
+- 首先我们通过 ServiceManager 获取到服务端的 BinderProxy 代理对象，通过调用 BinderProxy 将参数，方法标识（例如：TRANSACTION_test，AIDL中会自动生成）传给  ServiceManager，同时客户端线程进入等待状态。
+- ServiceManager 将用户空间的参数等请求数据复制到内核空间，并向服务端插入一条执行执行方法的事务。事务执行完通知 ServiceManager 将执行结果从内核空间复制到用户空间，并唤醒等待的线程，响应结果，通讯结束。
 
 ## 总结 ##
 
