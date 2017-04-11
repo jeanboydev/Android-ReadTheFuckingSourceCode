@@ -132,7 +132,7 @@ Binder 线程池：每个 Server 进程在启动时创建一个 binder 线程池
 网上资料很多，个人觉得比较好的如下：
 1. [Bander设计与实现](http://blog.csdn.net/universus/article/details/6211589)
 2. 老罗的 [Android进程间通信（IPC）机制Binder简要介绍和学习计划](http://blog.csdn.net/luoshengyang/article/details/6618363) 系列
-3. 阿拉神农的 [深入理解Binder](http://blog.csdn.net/innost/article/details/47208049) 系列
+3. Innost的 [深入理解Binder](http://blog.csdn.net/innost/article/details/47208049) 系列
 4. Gityuan的 [Binder系列](http://gityuan.com/2015/10/31/binder-prepare) (基于 Android 6.0)
 5. [Binder学习指南](http://weishu.me/2016/01/12/binder-index-for-newer)
 
