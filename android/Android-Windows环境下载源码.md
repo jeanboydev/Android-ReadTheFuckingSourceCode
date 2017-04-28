@@ -29,7 +29,7 @@ Android 官网（该方式不适合 Windows 平台）：https://source.android.c
 
 > 只需要安装好运行环境即可
 
-## 3. 自梯子 ##
+## 3. 自备梯子 ##
 
 没有梯子？那就使用清华源：https://mirrors.tuna.tsinghua.edu.cn/help/AOSP/
 
