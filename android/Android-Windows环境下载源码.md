@@ -2,9 +2,9 @@
 
 ## 前言 ##
 
-Android 官网：https://source.android.com/source/downloading.html（该方式不适合 Windows 平台）
+Android 官网（该方式不适合 Windows 平台）：https://source.android.com/source/downloading.html
 
-可是我就想在 Windows 中使用 Source Insight 看看源代码，
+可是我就想在 Windows 中使用 Source Insight 看看源代码，当然可以！
 
 ## 准备环境 ##
 
@@ -37,20 +37,21 @@ Android 官网：https://source.android.com/source/downloading.html（该方式�
 
 1. 打开 Git Bash，用 git 克隆源代码仓库
 
-![图1][1]
-
 ```Xml
     git clone https://android.googlesource.com/platform/manifest.git
 	//没有梯子使用清华源
 	git clone https://aosp.tuna.tsinghua.edu.cn/platform/manifest.git
 ```
+
+![图1][1]
+
 > 这时 D:/android_source_code/ 目录下会出现一个 manifest 目录，进入此目录，里面除了 git 的配置目录外，clone 下来了一个 default.xml 文件。
 
 2. 切换到想要的源码版本分支
 
-去这里 https://source.android.com/source/build-numbers.html#source-code-tags-and-builds，找到想要的版本分支，并复制。
+去这里 https://source.android.com/source/build-numbers.html#source-code-tags-and-builds
 
-![图2][2]
+找到想要的版本分支，并复制。
 
 ```Xml
     cd manifest
@@ -58,6 +59,8 @@ Android 官网：https://source.android.com/source/downloading.html（该方式�
 	git branch -a
 	git checkout android-6.0.1_r79 //这里以 6.0 最后一个版本下载
 ```
+
+![图1][1]
 
 ![图3][3]
 
