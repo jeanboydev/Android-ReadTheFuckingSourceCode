@@ -38,7 +38,7 @@ Android 官网（该方式不适合 Windows 平台）：https://source.android.c
 
 ### 1. 打开 Git Bash，用 git 克隆源代码仓库 ###
 
-```Xml
+```Java
 git clone https://android.googlesource.com/platform/manifest.git
 //没有梯子使用清华源
 git clone https://aosp.tuna.tsinghua.edu.cn/platform/manifest.git
@@ -54,7 +54,7 @@ git clone https://aosp.tuna.tsinghua.edu.cn/platform/manifest.git
 
 找到想要的版本分支，并复制。
 
-```Xml
+```Java
 cd manifest
 //没有梯子，使用 git branch -a 查看所有分支，找到想要的分支
 git branch -a
