@@ -10,17 +10,19 @@
 
 ## TCP/IP
 
-计算机与网络设备要相互通信，双方就必须基于相同的方法。比如，如何探测到通信目标、由哪一边先发起通信、使用哪种语言进行通信、怎样结束通信等规则都需要事先确定。不同的硬件、操作系统之间的通信，所有的这一切都需要一种规则。而我们就把这种规则称为协议（protocol）。TCP/IP 是互联网相关的各类协议族的总称，比如：TCP，UDP，IP，FTP，HTTP，ICMP，SMTP 等都属于 TCP/IP 族内的协议。像这样把与互联网相关联的协议集合起来总称为 TCP/IP。也有说法认为，TCP/IP 是指 TCP 和 IP 这两种协议。还有一种说法认为，TCP/IP 是在 IP 协议的通信过程中，使用到的协议族的统称。> 个人认为，因为 TCP/IP 族内的协议有很多，为了突出 TCP 与 IP 这两个协议的重要性，所以就用 TCP/IP 来表示 TCP/IP 协议族了。### 网络参考模型
+计算机与网络设备要相互通信，双方就必须基于相同的方法。比如，如何探测到通信目标、由哪一边先发起通信、使用哪种语言进行通信、怎样结束通信等规则都需要事先确定。不同的硬件、操作系统之间的通信，所有的这一切都需要一种规则。而我们就把这种规则称为协议（protocol）。TCP/IP 是互联网相关的各类协议族的总称，比如：TCP，UDP，IP，FTP，HTTP，ICMP，SMTP 等都属于 TCP/IP 族内的协议。像这样把与互联网相关联的协议集合起来总称为 TCP/IP。也有说法认为，TCP/IP 是指 TCP 和 IP 这两种协议。还有一种说法认为，TCP/IP 是在 IP 协议的通信过程中，使用到的协议族的统称。> 个人认为，因为 TCP/IP 族内的协议有很多，为了突出 TCP 与 IP 这两个协议的重要性，所以就用 TCP/IP 来表示 TCP/IP 协议族了。## 网络参考模型
 
 ![参考模型][1]
 
 - OSI 参考模型
+
 OSI 参考模型是 ISO 的建议，它是为了使各层上的协议国际标准化而发展起来的。OSI 参考模型全称是开放系统互连参考模型(Open System Interconnection Reference Model)。这一参考模型共分为七层：物理层、数据链路层、网络层、传输层、会话层、表示层和应用层。
 
 - TCP/IP 参考模型
+
 TCP/IP 参考模型是首先由 ARPANET 所使用的网络体系结构。这个体系结构在它的两个主要协议出现以后被称为 TCP/IP 参考模型(TCP/IP Reference Model)。这一网络协议共分为四层：数据链路层、网络层、传输层和应用层。
 
-### TCP/IP 的分层管理
+## TCP/IP 的分层管理
 
 TCP/IP 协议族里重要的一点就是分层。把 TCP/IP 层次化是有好处的。比如，如果互联网只由一个协议统筹，某个地方需要改变设计时，就必须把所有部分整体替换掉。而分层之后只需把变动的层替换掉即可。把各层之间的接口部分规划好之后，每个层次内部的设计就能够自由改动了。
 
@@ -208,6 +210,10 @@ IP 模块收到 IP 包首部以及后面的数据部分以后，也做类似的�
 接收端应用程序会直接接收发送端发送的数据。通过解析数据可以获知邮件的内容信息。
 
 ![TCP/IP 数据包][5]
+
+## 参考资料
+
+《图解HTTP》、《图解TCP/IP》、百度百科
 
 [1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/tcp_osi.jpg
 [2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/tcp_start.jpg
