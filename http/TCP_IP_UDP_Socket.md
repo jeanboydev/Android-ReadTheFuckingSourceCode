@@ -57,9 +57,9 @@ Ethernet 802.3、Token Ring 802.5、X.25、Frame relay、HDLC、PPP ATM等。
 2. 处理输入数据报：首先检查其合法性，然后进行寻径--假如该数据报已到达信宿机，则去掉报头，将剩下部分交给适当的传输协议；假如该数据报尚未到达信宿，则转发该数据报。
 3. 处理路径、流控、拥塞等问题。
 
-网络层包括：IP(Internet Protocol）协议、ICMP(Internet Control Message Protocol)
+网络层包括：IP(Internet Protocol) 协议、ICMP(Internet Control Message Protocol)
 
-控制报文协议、ARP(Address Resolution Protocol）地址转换协议、RARP(Reverse ARP)反向地址转换协议。
+控制报文协议、ARP(Address Resolution Protocol) 地址转换协议、RARP(Reverse ARP) 反向地址转换协议。
 
 IP 是网络层的核心，通过路由选择将下一条IP封装后交给接口层。IP数据报是无连接服务。
 
@@ -71,7 +71,7 @@ Ping 命令就是发送 ICMP 的 echo 包，通过回送的 echo relay 进行网
 
 提供应用程序间的通信。其功能包括：一、格式化信息流；二、提供可靠传输。为实现后者，传输层协议规定接收端必须发回确认，并且假如分组丢失，必须重新发送，即耳熟能详的“三次握手”过程，从而提供可靠的数据传输。
 
-传输层协议主要是：传输控制协议 TCP(Transmission Control Protocol）和用户数据报协议 UDP(User Datagram protocol）。
+传输层协议主要是：传输控制协议 TCP(Transmission Control Protocol) 和用户数据报协议 UDP(User Datagram protocol)。
 
 - 应用层
 
@@ -137,7 +137,9 @@ UDP 是不具有可靠性的数据报协议。细微的处理他会交给上层�
 
 TCP 用于在传输层有必要实现可靠传输的情况。由于它是面向有链接并具备顺序控制、重发控制等机制的，所以他可以为应用提供可靠的传输。
 
-而在一方面，UDP 主要用于那些对高速传输和实时性有较高要求的通信或广播通信。我们举一个通过 IP 电话进行通话的例子。如果使用 TCP，数据在传送途中如果丢失会被重发，但这样无法流畅的传输通话人的声音，会导致无法进行正常交流。而采用 UDP，他不会进行重发处理。从而也就不会有声音大幅度延迟到达的问题。即使有部分数据丢失，也支持会影响某一小部分的通话。此外，在多播与广播通信中也是用 UDP 而不是 TCP。
+而在一方面，UDP 主要用于那些对高速传输和实时性有较高要求的通信或广播通信。
+
+我们举一个通过 IP 电话进行通话的例子。如果使用 TCP，数据在传送途中如果丢失会被重发，但这样无法流畅的传输通话人的声音，会导致无法进行正常交流。而采用 UDP，他不会进行重发处理。从而也就不会有声音大幅度延迟到达的问题。即使有部分数据丢失，也支持会影响某一小部分的通话。此外，在多播与广播通信中也是用 UDP 而不是 TCP。
 
 
 ## IP
