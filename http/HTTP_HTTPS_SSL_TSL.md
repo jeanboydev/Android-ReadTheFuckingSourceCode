@@ -7,8 +7,7 @@
 
 伴随着计算机网络和浏览器的诞生，HTTP1.0 也随之而来，处于计算机网络中的应用层，HTTP 是建立在 TCP 协议之上，所以 HTTP 协议的瓶颈及其优化技巧都是基于 TCP 协议本身的特性。
 
-【图 有】
-http0.9->http1.0---->http2
+![http 版本][1]
 
 早在 HTTP 建立之初，主要就是为了将超文本标记语言(HTML)文档从 Web 服务器传送到客户端的浏览器。也是说对于前端来说，我们所写的 HTML 页面将要放在我们的 web 服务器上，用户端通过浏览器访问 url 地址来获取网页的显示内容，但是到了 WEB2.0 以来，我们的页面变得复杂，不仅仅单纯的是一些简单的文字和图片，同时我们的 HTML 页面有了 CSS，Javascript，来丰富我们的页面展示，当 ajax 的出现，我们又多了一种向服务器端获取数据的方法，这些其实都是基于 HTTP 协议的。同样到了移动互联网时代，我们页面可以跑在手机端浏览器里面，但是和 PC 相比，手机端的网络情况更加复杂，这使得我们开始了不得不对 HTTP 进行深入理解并不断优化过程中。 
 
@@ -20,19 +19,19 @@ http0.9->http1.0---->http2
 
 ## HTTP 和 TCP 之间的关系
 
-【图 有】
-HTTP
-TCP
+![http TCP][2]
 
 简单地说，TCP 协议是 HTTP 协议的基石——HTTP 协议需要依靠 TCP 协议来传输数据。在网络分层模型中，TCP 被称为“传输层协议”，而 HTTP 被称为“应用层协议”。
 
+![http connect][3]
+
 HTTP 对 TCP 连接的使用，分为两种方式：俗称“短连接”和“长连接”（“长连接”又称“持久连接”，洋文叫做“Keep-Alive”或“Persistent Connection”）
 
-【图 http simple 有】
+![http simple][4]
 
 假设有一个网页，里面包含好多图片，还包含好多【外部的】CSS 文件和 JS 文件。在“短连接”的模式下，浏览器会先发起一个 TCP 连接，拿到该网页的 HTML 源代码（拿到 HTML 之后，这个 TCP 连接就关闭了）。然后，浏览器开始分析这个网页的源码，知道这个页面包含很多外部资源（图片、CSS、JS）。然后针对【每一个】外部资源，再分别发起一个个 TCP 连接，把这些文件获取到本地（同样的，每抓取一个外部资源后，相应的 TCP 就断开）
 
-【图 http keep 有】
+![http keep][5]
 
 相反，如果是“长连接”的方式，浏览器也会先发起一个 TCP 连接去抓取页面。但是抓取页面之后，该 TCP 连接并不会立即关闭，而是暂时先保持着（所谓的“Keep-Alive”）。然后浏览器分析 HTML 源码之后，发现有很多外部资源，就用刚才那个 TCP 连接去抓取此页面的外部资源。
 
@@ -105,51 +104,40 @@ TLS 1.0通常被标示为SSL 3.1，TLS 1.1为SSL 3.2，TLS 1.2为SSL 3.3。
 
 所谓的 HTTPS 其实是“HTTP over SSL”或“HTTP over TLS”，它是 HTTP 与 SSL/TSL 的结合使用而已。
 
-【图 有】
-HTTPS = HTTP + SSL/TSL
+![http https][6]
 
-http://www.techug.com/post/https-ssl-tls.html
-
-https://sanwen8.cn/p/3edfj7S.html
 
 ## “对称加密”与“非对称加密”
 
+- 明文传输消息
+
+![pass_none][7]
+
 - “加密”和“解密”
+
 通俗而言，你可以把“加密”和“解密”理解为某种【互逆的】数学运算。就好比“加法和减法”互为逆运算、“乘法和除法”互为逆运算。
 “加密”的过程，就是把“明文”变成“密文”的过程；反之，“解密”的过程，就是把“密文”变为“明文”。在这两个过程中，都需要一个关键的东东——叫做“密钥”——来参与数学运算。
+
 - “对称加密”
+
+![pass_key][8]
+
 所谓的“对称加密技术”，意思就是说：“加密”和“解密”使用【相同的】密钥。这个比较好理解。就好比你用 7zip 或 WinRAR 创建一个带密码（口令）的加密压缩包。当你下次要把这个压缩文件解开的时候，你需要输入【同样的】密码。在这个例子中，密码/口令就如同刚才说的“密钥”。
+
+存在疑问：密钥怎么传输？
+如果密钥可以安全的传输，那么消息也应该可以安全的传输，就像蛋生鸡，鸡生蛋一样。
+
 - “非对称加密”
+
+![pass_pub_pre_key][9]
+
 所谓的“非对称加密技术”，意思就是说：“加密”和“解密”使用【不同的】密钥。当年“非对称加密”的发明，还被誉为“密码学”历史上的一次革命。
-
-http://baike.baidu.com/item/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86
-百度百科图
-
-【图 有】
-A ---hello----> B
-A给B发送消息，消息内容明文容易被窃听。
-
-对称加密
-【图 有】
-A +密钥=加密消息---[hello]----> 解密=密钥+B
-A使用密钥对消息内容进行加密，发送给B，B使用密钥对内容进行解密。
-问题：密钥怎么传输？
-
-
-非对称加密
-【图 有】
-私钥+内容=加密消息--->公钥解密
-公钥+内容=加密消息--->私钥解密
-
-【图 有】
-A  -----------公钥-----> B
-A 私钥解密 <------[hello]----加密信息=A的公钥+B
 
 被劫持情况：
 
-【图 有】
-A---A的公钥-->劫持者C [A的公钥]--C的公钥--->B
-A 私钥解密 <------[hello+A的公钥+篡改信息]--劫持者C [A的公钥]解密并篡改=C的私钥+加密信息<------[hello+C的公钥]-----加密信息=C的公钥+B
+![pass_pub_hacker][10]
+
+窃听者可以伪造服务器的公钥与客户端通讯，客户端以为是跟服务器通讯，其实是与窃听者在通讯，后果可想而知。
 
 
 ## CA 证书
@@ -163,15 +151,11 @@ CA 证书
 SPDY- The Chromium Projects
 http://www.chromium.org/spdy/
 
-【图 有】
-HTTP
-SDPY
-SSL
-TCP
+![http_spdy][11]
 
 SPDY位于HTTP之下，TCP和SSL之上，这样可以轻松兼容老版本的HTTP协议(将HTTP1.x的内容封装成一种新的frame格式)，同时可以使用已有的SSL功能。
 
-http://baike.baidu.com/item/SPDY
+具体详见：http://baike.baidu.com/item/SPDY
 
 ## HTTP2.0
 
@@ -179,4 +163,20 @@ http://baike.baidu.com/item/SPDY
 HTTP2.0 支持明文 HTTP 传输，而 SPDY 强制使用 HTTPS。
 HTTP2.0 消息头的压缩算法采用 HPACK，而非 SPDY 采用的 DEFLATE。
 
-http://baike.baidu.com/item/HTTP%202.0
+具体详见：http://baike.baidu.com/item/HTTP%202.0
+
+## 参考资料
+
+《图解HTTP》、《图解TCP/IP》、百度百科
+
+[1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_version.jpg
+[2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_tcp.jpg
+[3]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_connect.jpg
+[4]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_connect_simple.jpg
+[5]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_connect_keep.jpg
+[6]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_https.jpg
+[7]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_none.jpg
+[8]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_key.jpg
+[9]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_pub_pre_key.jpg
+[10]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_pub_hacker.jpg
+[11]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_spdy.jpg
