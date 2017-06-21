@@ -26,7 +26,7 @@
 - [一篇文章了解相见恨晚的 Android Binder 进程间通讯](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Binder进程间通讯.md)
 - [一篇文章学会使用 Android IPC 多进程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-IPC多进程.md)
 - [Windows 环境下载 Android 源码](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Windows环境下载源码.md)
-
+- [Android-反编译指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-反编译指南.md)
 
 ## 设计模式 ##
 
