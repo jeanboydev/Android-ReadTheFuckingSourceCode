@@ -13,10 +13,6 @@
 
 设计 HTTP 最初的目的是为了提供一种发布和接收 HTML 页面的方法。简单来说，HTTP 是一个网络协议，专门用来帮你传输 Web 内容的。
 
-
-【图】
-流程图：开始->浏览网页->http://www.baidu.com->HTTP协议生成请求报文->TCP协议将HTTP请求报文分割成报文段（数据包）->IP协议搜索对方的地址---->TCP协议接收报文段（数据包）重组->HTTP协议处理请求
-
 ## HTTP 和 TCP 之间的关系
 
 ![http TCP][2]
@@ -25,11 +21,11 @@
 
 ![http connect][3]
 
-HTTP 对 TCP 连接的使用，分为两种方式：俗称“短连接”和“长连接”（“长连接”又称“持久连接”，洋文叫做“Keep-Alive”或“Persistent Connection”）
+HTTP 对 TCP 连接的使用，分为两种方式：俗称“短连接”和“长连接”（“长连接(Keep-Alive)”又称“持久连接(Persistent Connection)”）。
 
 ![http simple][4]
 
-假设有一个网页，里面包含好多图片，还包含好多【外部的】CSS 文件和 JS 文件。在“短连接”的模式下，浏览器会先发起一个 TCP 连接，拿到该网页的 HTML 源代码（拿到 HTML 之后，这个 TCP 连接就关闭了）。然后，浏览器开始分析这个网页的源码，知道这个页面包含很多外部资源（图片、CSS、JS）。然后针对【每一个】外部资源，再分别发起一个个 TCP 连接，把这些文件获取到本地（同样的，每抓取一个外部资源后，相应的 TCP 就断开）
+假设有一个网页，里面包含好多图片，还包含好多【外部的】 CSS 文件和 JS 文件。在“短连接”的模式下，浏览器会先发起一个 TCP 连接，拿到该网页的 HTML 源代码（拿到 HTML 之后，这个 TCP 连接就关闭了）。然后，浏览器开始分析这个网页的源码，知道这个页面包含很多外部资源（图片、CSS、JS）。然后针对【每一个】外部资源，再分别发起一个个 TCP 连接，把这些文件获取到本地（同样的，每抓取一个外部资源后，相应的 TCP 就断开）
 
 ![http keep][5]
 
@@ -56,8 +52,7 @@ telnet://192.0.2.16:80/ (URL)
 urn:oasis:names:specification:docbook:dtd:xml:4.1.2
 ```
 
-IANA - Uniform Resource Identifier (URI) SCHEMES（统一资源标识符方案）
-http://www.iana.org/assignments/uri-schemes
+[IANA - Uniform Resource Identifier (URI) SCHEMES（统一资源标识符方案）](http://www.iana.org/assignments/uri-schemes)
 
 具体详见：http://baike.baidu.com/item/URI
 
@@ -69,11 +64,17 @@ http://www.iana.org/assignments/uri-schemes
 scheme://host[:port#]/path/.../[;url-params][?query-string][#anchor]
 ```
 > scheme //有我们很熟悉的http、https、ftp以及著名的ed2k，迅雷的thunder等。
+> 
 > host   //HTTP服务器的IP地址或者域名
+> 
 > port#  //HTTP服务器的默认端口是80，这种情况下端口号可以省略。如果使用了别的端口，必须指明，例如tomcat的默认端口是8080 http://localhost:8080/
+> 
 > path   //访问资源的路径
+> 
 > url-params  //所带参数 
+> 
 > query-string    //发送给http服务器的数据
+> 
 > anchor //锚点定位
 
 具体详见：http://baike.baidu.com/item/URL
@@ -106,7 +107,6 @@ TLS 1.0通常被标示为SSL 3.1，TLS 1.1为SSL 3.2，TLS 1.2为SSL 3.3。
 
 ![http https][6]
 
-
 ## “对称加密”与“非对称加密”
 
 - 明文传输消息
@@ -116,7 +116,7 @@ TLS 1.0通常被标示为SSL 3.1，TLS 1.1为SSL 3.2，TLS 1.2为SSL 3.3。
 - “加密”和“解密”
 
 通俗而言，你可以把“加密”和“解密”理解为某种【互逆的】数学运算。就好比“加法和减法”互为逆运算、“乘法和除法”互为逆运算。
-“加密”的过程，就是把“明文”变成“密文”的过程；反之，“解密”的过程，就是把“密文”变为“明文”。在这两个过程中，都需要一个关键的东东——叫做“密钥”——来参与数学运算。
+“加密”的过程，就是把“明文”变成“密文”的过程；反之，“解密”的过程，就是把“密文”变为“明文”。在这两个过程中，都需要一个关键的东西——叫做“密钥”——来参与数学运算。
 
 - “对称加密”
 
@@ -141,15 +141,22 @@ TLS 1.0通常被标示为SSL 3.1，TLS 1.1为SSL 3.2，TLS 1.2为SSL 3.3。
 
 
 ## CA 证书
-CA 证书
-【图 有】
+
+CA 是 PKI 系统中通信双方信任的实体，被称为可信第三方（Trusted Third Party，简称TTP）。　CA 证书，顾名思义，就是 CA 颁发的证书。
+
+CA 的初始是为了解决上面非对称加密被劫持的情况，服务器申请 CA 证书时将服务器的“公钥”提供给 CA，CA 使用自己的“私钥”将“服务器的公钥”加密后（即：CA证书）返回给服务器，服务器再将“CA 证书”提供给客户端。一般系统或者浏览器会内置 CA 的根证书（公钥），
+
+HTTPS 中 CA 证书的获取
+![https_ca][12]
+
+注：上图步骤 2 之后，客户端获取到“CA 证书”会进行本地验证，即使用本地系统或者浏览器中的公钥进行解密，每个“CA 证书”都会有一个证书编号可用于解密后进行比对（具体验证算法请查阅相关资料）。
+步骤 5 之前使用的是对称加密，之后将使用对称加密来提高通讯效率。
 
 ## SPDY
 
 2012年google如一声惊雷提出了SPDY的方案，大家才开始从正面看待和解决老版本HTTP协议本身的问题，SPDY可以说是综合了HTTPS和HTTP两者有点于一体的传输协议，缩短 Web 页面的加载时间（50%）。
 
-SPDY- The Chromium Projects
-http://www.chromium.org/spdy/
+[SPDY- The Chromium Projects](http://www.chromium.org/spdy/)
 
 ![http_spdy][11]
 
@@ -180,3 +187,4 @@ HTTP2.0 消息头的压缩算法采用 HPACK，而非 SPDY 采用的 DEFLATE。
 [9]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_pub_pre_key.jpg
 [10]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_pub_hacker.jpg
 [11]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_spdy.jpg
+[12]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/https_ca.jpg
