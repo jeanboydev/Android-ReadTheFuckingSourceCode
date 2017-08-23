@@ -1,6 +1,6 @@
-# Android-性能优化-UI优化 #
+# Android-性能优化-UI优化
 
-## 概述 ##
+## 概述
 
 Android 应用的卡顿，丢帧等，这些影响用户体验的因素绝大部分都与 16ms 这个值有关。 下面我们来讨论下 UI 渲染方面影响应用流畅性的因素。
 
@@ -147,9 +147,45 @@ adb pull /sdcard/shixintrace.trace /tmp
 使用代码生成 trace 方式的好处是容易控制追踪的开始和结束，缺点就是步骤稍微多了一点。
 
 - 使用 Android Studio 生成 trace 文件
+
+Android Studio 内置的 Android Monitor 可以很方便的生成 trace 文件到电脑。
+在 CPU 监控的那栏会有一个闹钟似的的按钮，未启动应用时是灰色：
+启动应用后，这个按钮会变亮，点击后开始追踪，相当于代码调用 startMethodTracing：
+当要结束追踪时再次点击这个按钮，就会生成 trace 文件了。
+生成 trace 后 Android Studio 自动加载的 traceview 图形如下：
+
+从这个图可以大概了解一些方法的执行时间、次数以及调用关系，也可以搜索过滤特定的内容。
+
+左上角可以切换不同的线程，这其实也是直接用 Android Studio 查看 trace 文件的缺点：无法直观地对比不同线程的执行时间。
+
+鼠标悬浮到黄色的矩形上，会显示对应方法的开始、结束时间，以及自己占用和调用其他方法占用的时间比例：
+
 - 使用 DDMS 生成 trace 文件
 
+DDMS 即 Dalvik Debug Monitor Server ，是 Android 调试监控工具，它为我们提供了截图，查看 log，查看视图层级，查看内存使用等功能，可以说是如今 Android Studio 中内置的 Android Monitor 的前身。
+
+打开 Android Device Monitor，在 DDMS 中打开 trace 文件，DDMS 会启动 TraceView 加载 trace 文件：
+
+上图介绍了 TraceView 的大致内容：
+
+上半部分显示了 不同线程的执行时间 
+其中不同的颜色表示不同的方法
+同一个颜色越长，说明执行时间越久，如图中的主线程 main
+空白表示这个时间段内没有执行内容
+下半部分展示了不同方法的执行时间信息，关键指标有三个： 
+Cpu Time/Call ：该方法平均占用 CPU 的时间
+Real Time/Call ：平均执行时间，包括切换、阻塞的时间，>= Cpu Time
+Calls + Recur Calls/Total ：调用、递归次数
+点击下面的任意一个方法，可以看到它的详细信息：
+
+Parents：选中方法的调用处
+Children：选中方法调用的方法
+
 ### Systrace
+
+https://medium.com/@459631839/android-ui%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E8%AF%A6%E8%A7%A3-ed6b0f7e75a9
+
+https://www.kancloud.cn/digest/itfootballprefermanc/100904
 
 ## 参考资料
 
