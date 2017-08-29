@@ -43,6 +43,7 @@
 - [Android-反编译指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-反编译指南.md)
 - [Android-多渠道打包最佳实践](https://github.com/jeanboydev/Android-Flavors)
 - [Android-项目架构探索](https://github.com/jeanboydev/Android-Architecture)
+- [Android 性能优化-UI优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-UI优化.md)
 
 ## 设计模式 ##
 
