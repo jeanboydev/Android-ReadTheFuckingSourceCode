@@ -9,7 +9,7 @@ Android 应用的卡顿，丢帧等，这些影响用户体验的因素绝大部
 - 12 fps（帧/秒）：由于人类眼睛的特殊生理结构，如果所看画面之帧率高于每秒约 10-12 fps 的时候，就会认为是连贯的。 早期的无声电影的帧率介于 16-24 fps 之间，虽然帧率足以让人感觉到运动，但往往被认为是在快放幻灯片。 在1920年代中后期，无声电影的帧率提高到 20-26 fps 之间。
 - 24 fps：1926 年有声电影推出，人耳对音频的变化更敏感，反而削弱了人对电影帧率的关注。因为许多无声电影使用 20-26 fps 播放，所以选择了中间值 24 fps 作为有声电影的帧率。 之后 24 fps 成为35mm有声电影的标准。
 - 30 fps：早期的高动态电子游戏，帧率少于每秒 30 fps 的话就会显得不连贯。这是因为没有动态模糊使流畅度降低。 （注:如果需要了解动态模糊技术相关知识，可以查阅[这里](https://www.zhihu.com/question/21081976)）
-- 60 fps：在实际体验中，60帧相对于30帧有着更好的体验。
+- 60 fps：在实际体验中，60 fps 相对于30 fps 有着更好的体验。
 - 85 fps：一般而言，大脑处理视频的极限。
 
 所以，总体而言，帧率越高体验越好。 一般的电影拍摄及播放帧率均为每秒 24 帧，但是据称《霍比特人：意外旅程》是第一部以每秒 48 帧拍摄及播放的电影，观众认为其逼真度得到了显著的提示。
@@ -46,13 +46,13 @@ V-Sync 的原理简单而直观：产生屏幕撕裂的原因是 GPU 在屏幕�
 
 ## Overdraw 过度绘制
 
-- 什么是过度绘制？
+### 什么是过度绘制？
 
 过度绘制就是屏幕上的某个像素在同一帧的时间内被绘制了多次。 在多层次的UI结构里面，如果不可见的 UI 也在做绘制的操作，这就会导致某些像素区域被绘制了多次。 这就浪费大量的 CPU 以及 GPU 资源。
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_overdraw_1.jpg" alt="overdraw options draw"/>
 
-- 如何发现过度绘制？
+### 如何发现过度绘制？
 
 我们可以通过手机设置里面的 **开发者选项** ，打开 **显示过渡绘制区域（Show GPU Overdraw** 的选项，可以观察 UI 上的 Overdraw 情况。
 
@@ -60,10 +60,10 @@ V-Sync 的原理简单而直观：产生屏幕撕裂的原因是 GPU 在屏幕�
 
 蓝色，淡绿，淡红，深红代表了 4 种不同程度的 Overdraw 情况，我们的目标就是尽量减少红色 Overdraw，看到更多的蓝色区域。
 
-> 蓝色： 意味着overdraw 1倍。像素绘制了两次。大片的蓝色还是可以接受的（若整个窗口是蓝色的，可以摆脱一层）。 
-> 绿色： 意味着overdraw 2倍。像素绘制了三次。中等大小的绿色区域是可以接受的但你应该尝试优化、减少它们。 
-> 淡红： 意味着overdraw 3倍。像素绘制了四次，小范围可以接受。 
-> 深红： 意味着overdraw 4倍。像素绘制了五次或者更多。这是错误的，要修复它们。 
+- 蓝色： 意味着overdraw 1倍。像素绘制了两次。大片的蓝色还是可以接受的（若整个窗口是蓝色的，可以摆脱一层）。 
+- 绿色： 意味着overdraw 2倍。像素绘制了三次。中等大小的绿色区域是可以接受的但你应该尝试优化、减少它们。 
+- 淡红： 意味着overdraw 3倍。像素绘制了四次，小范围可以接受。 
+- 深红： 意味着overdraw 4倍。像素绘制了五次或者更多。这是错误的，要修复它们。 
 
 Overdraw 有时候是因为你的UI布局存在大量重叠的部分，还有的时候是因为非必须的重叠背景。
 
@@ -71,14 +71,12 @@ Overdraw 有时候是因为你的UI布局存在大量重叠的部分，还有的
 
 ## 使用 Hierarchy Viewer 分析 UI 性能
 
-- 打开 Hierarchy Viewer
-
-依次找到：Android Studio -> Tools -> Android -> Android Device Monitor
+首先打开 Hierarchy Viewer，依次找到：Android Studio -> Tools -> Android -> Android Device Monitor
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_android_device_monitor.jpg" alt="Android Device Monitor"/>
 
 
-启动 Android Device Monitor 成功之后，在新的的窗口中点击切换视图图标，选择 Hierarchy View，如下图：
+启动 Android Device Monitor 成功之后，在新的窗口中点击切换视图图标，选择 Hierarchy View，如下图：
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_hierarchy_view.jpg" alt="hierarchy view"/>
 
@@ -98,8 +96,7 @@ Hierarchy View 运行界面如下：
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_hierarchy_view_3.jpg" alt="hierarchy view"/>
 
-类似上图可以很方便的查看到当前 View 的许多信息；
-上图最底那三个彩色原点代表了当前 View 的性能指标，从左到右依次代表测量、布局、绘制的渲染时间，红色和黄色的点代表速度渲染较慢的 View（当然了，有些时候较慢不代表有问题，比如 ViewGroup 子节点越多、结构越复杂，性能就越差）。
+类似上图可以很方便的查看到当前 View 的许多信息，上图最底那三个彩色原点代表了当前 View 的性能指标，从左到右依次代表测量、布局、绘制的渲染时间，红色和黄色的点代表速度渲染较慢的 View（当然了，有些时候较慢不代表有问题，比如 ViewGroup 子节点越多、结构越复杂，性能就越差）。
 
 当然了，在自定义 View 的性能调试时，HierarchyViewer 上面的 invalidate Layout 和 requestLayout 按钮的功能更加强大，它可以帮助我们 debug 自定义 View 执行 invalidate() 和 requestLayout() 过程，我们只需要在代码的相关地方打上断点就行了，接下来通过它观察绘制即可。
 
