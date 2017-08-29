@@ -113,9 +113,9 @@ Hierarchy View 运行界面如下：
 
 在 Android 系统中是以 60fps 为满帧，绿色横线为 16ms 分界线，低于绿线即为流畅。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_gpu_16ms2.jpg" alt="gpu 16ms"/>
-
 屏幕下方的柱状图每一根代表一帧，其高度表示“渲染这一帧耗时”，随着手机屏幕界面的变化，柱状图会持续刷新每帧用时的具体情况（通过高度表示）。那么，当柱状图高于绿线，是不是就说明我卡了呢？其实这不完全正确，这里就要开始分析组成每一根柱状图不同颜色所代表的含义了。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_gpu_16ms2.jpg" alt="gpu 16ms"/>
 
 - **红色**，代表了“执行时间”，它指的是 Android 渲染引擎执行盒子中这些绘制命令的时间，假如当前界面的视图越多，那么红色便会“跳”得越高。实际使用中，比如我们平时刷淘宝 App 时遇到出现多张缩略图需要加载时，那么红色会突然跳很高，但是此时你的页面滑动其实是流畅的，虽然等了零点几秒图片才加载出来，但其实这可能并不意味着你卡住了。
 
@@ -133,7 +133,7 @@ Hierarchy View 运行界面如下：
 2. 使用 Android Studio
 3. 使用 DDMS
 
-- 使用代码生成 trace 文件
+## 1. 使用代码生成 trace 文件
 
 ```Java
 Debug.startMethodTracing("test_trace");//开始 trace，保存文件到 "/sdcard/test_trace.trace"
@@ -150,7 +150,7 @@ adb pull /sdcard/test_trace.trace /tmp
 ```
 使用代码生成 trace 方式的好处是容易控制追踪的开始和结束，缺点就是步骤稍微多了一点。
 
-- 使用 Android Studio 生成 trace 文件
+## 2. 使用 Android Studio 生成 trace 文件
 
 Android Studio 内置的 Android Monitor 可以很方便的生成 trace 文件到电脑。
 
@@ -177,7 +177,7 @@ Android Studio 内置的 Android Monitor 可以很方便的生成 trace 文件�
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing5.jpg" alt="android studio tracing"/>
 
-- 使用 DDMS 生成 trace 文件
+## 3. 使用 DDMS 生成 trace 文件
 
 DDMS 即 Dalvik Debug Monitor Server ，是 Android 调试监控工具，它为我们提供了截图，查看 log，查看视图层级，查看内存使用等功能，可以说是如今 Android Studio 中内置的 Android Monitor 的前身。
 
@@ -218,8 +218,8 @@ DDMS 即 Dalvik Debug Monitor Server ，是 Android 调试监控工具，它为�
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing9.jpg" alt="android studio tracing"/>
 
-Parents：选中方法的调用处
-Children：选中方法调用的方法
+- Parents：选中方法的调用处
+- Children：选中方法调用的方法
 
 ## 使用 Systrace 检测 App 的性能
 
