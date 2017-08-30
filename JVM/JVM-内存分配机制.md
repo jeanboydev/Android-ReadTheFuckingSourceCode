@@ -4,7 +4,7 @@
 
 了解 Java GC 机制，必须先清楚在 JVM 中内存区域的划分。 在 Java 运行时的数据区里，由 JVM 管理的内存区域分为下图几个模块：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/jvm_memory_area.png" alt="JVM 内存划分"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/jvm_memory_area.png" alt="JVM 内存划分"/>
 
 ### - 程序计数器（Program Counter Register）
 
