@@ -30,6 +30,11 @@
 
 - 面向对象思想
 
+## 深入理解 Java 虚拟机 ##
+
+- JVM 内存分配机制
+- JVM 内存回收机制
+
 ## Android ##
 
 - [Android 屏幕适配全攻略](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-屏幕适配全攻略.md)
