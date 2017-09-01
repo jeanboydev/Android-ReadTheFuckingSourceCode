@@ -64,3 +64,45 @@
 
 
 ## 内存分配机制
+
+```Java
+//JVM 启动时将 Person.class 放入方法区
+public class Person {
+
+	//new Person 创建实例后，name 引用放入堆区，name 对象放入常量池
+    private String name;
+
+	//new Person 创建实例后，age = 0 放入堆区
+    private int age;
+
+	//Person 方法放入方法区，方法内代码作为 Code 属性放入方法区
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+	//toString 方法放入方法区，方法内代码作为 Code 属性放入方法区
+    @Override
+    public String toString() {
+        return "Person{" + "name='" + name + '\'' + ", age=" + age + '}';
+    }
+}
+```
+
+```Java
+//JVM 启动时将 Test.class 放入方法区
+public class Test {
+
+	//main 方法放入方法区，方法内代码作为 Code 属性放入方法区
+    public static void main(String[] args) {
+
+        //person1 是引用放入虚拟机栈区，new 关键字开辟堆内存 Person 自定义对象放入堆区
+        Person person1 = new Person("张三", 18);
+        Person person2 = new Person("李四", 20);
+
+        //通过 person 引用创建 toString() 方法栈帧
+        person1.toString();
+        person2.toString();
+    }
+}
+```
