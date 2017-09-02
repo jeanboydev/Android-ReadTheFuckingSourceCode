@@ -119,7 +119,7 @@ public class Test {
 Person person1 = new Person("张三", 18);
 ```
 
-执行到这句代码时，JVM 会先创建 Person 实例放入堆区，person2也同理。
+执行到这句代码时，JVM 会先创建 Person 实例放入堆区，person2 也同理。
 
 2. 创建完 Person 两个实例，main() 方法中的 person1，person2 会指向堆区中的 0x001，0x002（这里的内存地址仅作为示范）。紧接着会调用 Person 的构造函数进行赋值，如下图：
 
@@ -127,7 +127,7 @@ Person person1 = new Person("张三", 18);
 
 如上图所示，新创建的的 Person 实例中的 name, age 开始都是默认值。 调用构造函数之后进行赋值，name 是 String 引用类型，会在常量池中创建并将地址赋值给 name，age 是基本数据类型将直接保存数值。
 
-注：Java中基本类型的包装类的大部分都实现了常量池技术，这些类是 Byte, Short, Integer, Long, Character, Boolean，另外两种浮点数类型的包装类则没有实现。
+注：Java 中基本类型的包装类的大部分都实现了常量池技术，这些类是 Byte, Short, Integer, Long, Character, Boolean，另外两种浮点数类型的包装类则没有实现。
 
 
 | 基本数据类型	| 包装类 （是否实现了常量池技术）	|
