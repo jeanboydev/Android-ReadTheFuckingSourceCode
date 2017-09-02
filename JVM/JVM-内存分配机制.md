@@ -65,6 +65,8 @@
 
 ## 内存分配机制
 
+以下面代码为例，来分析，Java 的实例对象在内存中的空间分配。
+
 ```Java
 //JVM 启动时将 Person.class 放入方法区
 public class Person {
@@ -106,3 +108,39 @@ public class Test {
     }
 }
 ```
+
+1. 首先 JVM 会将 Test.class, Person.class 加载到方法区，找到有 main() 方法的类开始执行。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/jvm_memory_area_simple1.png" alt="JVM 内存划分 实例1"/>
+
+如上图所示，JVM 找到 main() 方法入口，创建 main() 方法的栈帧放入虚拟机栈，开始执行 main() 方法。
+
+```Java
+Person person1 = new Person("张三", 18);
+```
+
+执行到这句代码时，JVM 会先创建 Person 实例放入堆区，person2也同理。
+
+2. 创建完 Person 两个实例，main() 方法中的 person1，person2 会指向堆区中的 0x001，0x002（这里的内存地址仅作为示范）。紧接着会调用 Person 的构造函数进行赋值，如下图：
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/jvm_memory_area_simple2.png" alt="JVM 内存划分 实例2"/>
+
+如上图所示，新创建的的 Person 实例中的 name, age 开始都是默认值。 调用构造函数之后进行赋值，name 是 String 引用类型，会在常量池中创建并将地址赋值给 name，age 是基本数据类型将直接保存数值。
+
+注：Java中基本类型的包装类的大部分都实现了常量池技术，这些类是 Byte, Short, Integer, Long, Character, Boolean，另外两种浮点数类型的包装类则没有实现。
+
+
+| 基本数据类型	| 包装类 （是否实现了常量池技术）	|
+| :---------	| :-----------------------		|
+| byte			| Byte	是						|
+| boolean		| Boolean	是					|
+| short			| Short	是						|
+| char			| Character	是					|
+| int			| Integer	是					|
+| long			| Long	是						|
+| float			| Float	否						|
+| double		| Double	否					|
+
+3. Person 实例初始化完后，执行到 toString() 方法，同 main() 方法一样 JVM 会创建一个 toString() 的栈帧放入虚拟机栈中，执行完之后返回一个值。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/jvm_memory_area_simple3.png" alt="JVM 内存划分 实例3"/>
