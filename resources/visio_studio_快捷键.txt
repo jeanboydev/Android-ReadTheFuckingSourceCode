@@ -1,0 +1,21 @@
+格式化选中代码：Ctrl + K + F
+格式化全部代码：Ctrl + K + D
+撤销：Ctrl + Z
+反撤销：Ctrl + Y
+代码提示：Ctrl + J 或 Alt + →
+合并代码块：Ctrl + M + M
+注释代码：Ctrl + K + C
+取消注释：Ctrl + K + U
+设置断点：F9
+启动调试：F5
+逐语句调试：F11
+逐过程调试：F10
+取消所有断点：Ctrl + Shift + F9
+复制整行：Ctrl + C
+剪切整行：Ctrl + X
+删除整行：Ctrl + L
+转小写：Ctrl + U
+转大写：Ctrl + Shift + U
+跳转到指定的某一行：Ctrl + G
+转跳到定义：F12
+查找所有引用：Shift + F12
