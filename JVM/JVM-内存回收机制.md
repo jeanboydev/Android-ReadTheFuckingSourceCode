@@ -18,19 +18,21 @@
 
 可达性分析算法是从离散数学中的图论引入的，程序把所有的引用关系看作一张图，通过一系列的名为 “GC Roots” 的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径称为引用链（Reference Chain）。 当一个对象到 GC Roots 没有任何引用链相连（用图论的话来说就是从 GC Roots 到这个对象不可达）时，则证明此对象是不可用的。
 
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_reference_chain.jpg" alt="可达性分析"/>
+
 ## 如何回收
 
 - 标记-清除算法
 
 1. 标记，也就是垃圾收集器会找出那些需要回收的对象所在的内存和不需要回收的对象所在的内存，并把它们标记出来，简单的说，也就是先找出垃圾在哪儿？
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_marking.png" alt="标记"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_marking.jpg" alt="标记"/>
 
 所有堆中的对象都会被扫描一遍，以此来确定回收的对象，所以这通常会是一个相对比较耗时的过程。
 
 2. 清除，垃圾收集器会清除掉上一步标记出来的那些需要回收的对象区域。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_clean.png" alt="清除"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_clean.jpg" alt="清除"/>
 
 存在的问题就是碎片问题，标记清除之后会产生大量不连续的内存碎片，空间碎片太多可能会导致以后在程序运行过程中需要分配较大对象时，无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。
 
@@ -38,13 +40,13 @@
 
 标记清除算法每次执行都需要对堆中全部对象扫面一遍效率不高，为解决效率问题，复制算法将内存按容量划分为大小相等的两块，每次只是用其中的一块。 当这一块使用完了，就将还存活的对象复制到另一块上面，然后再把已使用过的内存空间一次清理掉。 这样使得每次都对半区进行内存回收，内存分配时也就不用考虑内存碎片等复杂情况，只要移动堆顶指针，按顺序分配内存即可，实现简单，运行高效。
 
-图 待画 见深入理解p70
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_copy.jpg" alt="复制算法"/>
 
 - 标记-整理算法
 
 由于简单的标记清除可能会存在碎片的问题，所以又出现了压缩清除的方法，也就是先清除需要回收的对象，然后再对内存进行压缩操作，将内存分成可用和不可用两大部分。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_compacting.png" alt="压缩"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_compacting.jpg" alt="压缩"/>
 
 ## 内存分代
 
@@ -70,7 +72,7 @@
 
 如果 JVM 发现有些类不在被其他类所需要，同时其他类需要更多的空间，这时候这些类可能就会被垃圾回收。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_heap_structure_desc.png" alt="内存分代详细"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_heap_structure_desc.jpg" alt="内存分代详细"/>
 
 ## 分代垃圾回收过程
 
@@ -78,35 +80,35 @@
 
 1. 第一步 所有 new 出来的对象都会最先分配到新生代区域中，两个 survivor 区域初始化是为空的。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection1.png" alt="内存分代收集1"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection1.jpg" alt="内存分代收集1"/>
 
 2. 第二步，当 eden 区域满了之后，就引发一次小收集（minor garbage collections）。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection2.png" alt="内存分代收集2"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection2.jpg" alt="内存分代收集2"/>
 
 3. 第三步，当在小收集（minor garbage collections）存活下来的对象就会被移动到 S0 survivor 区域。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection3.png" alt="内存分代收集3"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection3.jpg" alt="内存分代收集3"/>
 
 4. 第四步，然后当 eden 区域又填满的时候，又会发生下一次的垃圾回收，存活的对象会被移动到 survivor 区域而未存活对象会被直接删除。 但是，不同的是，在这次的垃圾回收中，存活对象和之前的 survivor 中的对象都会被移动到 s1 中。 一旦所有对象都被移动到 s1 中，那么 s2 中的对象就会被清除，仔细观察图中的对象，数字表示经历的垃圾收集的次数。 目前我们已经有不同的年龄对象了。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection4.png" alt="内存分代收集4"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection4.jpg" alt="内存分代收集4"/>
 
 5. 第五步，下一次垃圾回收的时候，又会重复上次的步骤，清除需要回收的对象，并且又切换一次 survivor 区域，所有存活的对象都被移动至 s0。 eden 和 s1 区域被清除。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection5.png" alt="内存分代收集5"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection5.jpg" alt="内存分代收集5"/>
 
 6. 第六步，重复以上步骤，并记录对象的年龄，当有对象的年龄到达一定的阈值的时候，就将新生代中的对象移动到老年代中。在本例中，这个阈值为8。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection6.png" alt="内存分代收集6"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection6.jpg" alt="内存分代收集6"/>
 
 7. 第七步，接下来垃圾收集器就会重复以上步骤，不断的进行对象的清除和年代的移动。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection7.png" alt="内存分代收集7"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection7.jpg" alt="内存分代收集7"/>
 
 8. 最后，我们观察上述过程可以发现，大部分的垃圾收集过程都是在新生代进行的，直到老年代中的内存不够用了才会发起一次 大收集(major garbage collection)，会进行标记和整理压缩。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection8.png" alt="内存分代收集8"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/gc_collection8.jpg" alt="内存分代收集8"/>
 
 ## 垃圾回收器的类型
 
