@@ -119,7 +119,9 @@ public class Test {
 Person person1 = new Person("张三", 18);
 ```
 
-执行到这句代码时，JVM 会先创建 Person 实例放入堆区，person2 也同理。
+执行到这句代码时，JVM 会先创建 Person 
+
+实例放入堆区，person2 也同理。
 
 2. 创建完 Person 两个实例，main() 方法中的 person1，person2 会指向堆区中的 0x001，0x002（这里的内存地址仅作为示范）。紧接着会调用 Person 的构造函数进行赋值，如下图：
 
@@ -144,3 +146,7 @@ Person person1 = new Person("张三", 18);
 3. Person 实例初始化完后，执行到 toString() 方法，同 main() 方法一样 JVM 会创建一个 toString() 的栈帧放入虚拟机栈中，执行完之后返回一个值。
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/jvm_memory_area_simple3.png" alt="JVM 内存划分 实例3"/>
+
+## 参考资料
+
+《深入理解 Java 虚拟机》

@@ -120,3 +120,7 @@ Java 提供多种类型的垃圾回收器。 JVM 中的垃圾收集一般都采�
 - Serial Old 收集器：老年代收集器，单线程收集器，串行，使用标记整理算法，使用单线程进行GC，其它工作线程暂停。
 - Parallel Old 收集器：吞吐量优先的垃圾回收器，作用在老年代，多线程，并行，多线程机制与 Parallel Scavenge 差不错，使用标记整理算法，在 Parallel Old 执行时，仍然需要暂停其它线程。
 - CMS（Concurrent Mark Sweep）收集器：老年代收集器，致力于获取最短回收停顿时间（即缩短垃圾回收的时间），使用标记清除算法，多线程，优点是并发收集（用户线程可以和GC线程同时工作），停顿小。 使用 -XX:+UseConcMarkSweepGC 进行 ParNew+CMS+Serial Old 进行内存回收，优先使用 ParNew+CMS，当用户线程内存不足时，采用备用方案 Serial Old 收集。
+
+## 参考资料
+
+《深入理解 Java 虚拟机》
