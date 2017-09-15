@@ -75,13 +75,232 @@ RGB_565：每个像素占用2byte内存
 
 ## 内存泄露相关优化
 
-Java 内存泄漏指的是进程中某些对象（垃圾对象）已经没有使用价值了，但是它们却可以直接或间接地引用到 gc roots 导致无法被 GC 回收。 Dalvik VM 具备的 GC 机制会在内存占用过多时自动回收，严重时会造成内存溢出 OOM。
+当一个对象已经不需要再使用了，本该被回收时，而有另外一个正在使用的对象持有它的引用从而导致它不能被回收，这导致本该被回收的对象不能被回收而停留在堆内存中，这就产生了内存泄漏。
 
-- 单例
-- 静态变量
-- Handler
-- 匿名内部类
+- 单例造成的内存泄漏
+
+单例模式非常受开发者的喜爱，不过使用的不恰当的话也会造成内存泄漏，由于单例的静态特性使得单例的生命周期和应用的生命周期一样长，这就说明了如果一个对象已经不需要使用了，而单例对象还持有该对象的引用，那么这个对象将不能被正常回收，这就导致了内存泄漏。
+
+如下这个典例：
+
+```Java
+public class AppManager {
+    private static AppManager instance;
+    private Context context;
+    private AppManager(Context context) {
+        this.context = context;
+    }
+    public static AppManager getInstance(Context context) {
+        if (instance != null) {
+            instance = new AppManager(context);
+        }
+        return instance;
+    }
+}
+```
+
+这是一个普通的单例模式，当创建这个单例的时候，由于需要传入一个 Context，所以这个 Context 的生命周期的长短至关重要：
+
+	1. 传入的是 Application 的 Context：这将没有任何问题，因为单例的生命周期和 Application 的一样长。
+	2. 传入的是 Activity 的 Context：当这个 Context 所对应的 Activity 退出时，由于该 Context 和 Activity 的生命周期一样长（Activity 间接继承于 Context），所以当前 Activity 退出时它的内存并不会被回收，因为单例对象持有该 Activity 的引用。
+
+所以正确的单例应该修改为下面这种方式：
+
+```Java
+public class AppManager {
+    private static AppManager instance;
+    private Context context;
+    private AppManager(Context context) {
+        this.context = context.getApplicationContext();
+    }
+    public static AppManager getInstance(Context context) {
+        if (instance != null) {
+            instance = new AppManager(context);
+        }
+        return instance;
+    }
+}
+```
+这样不管传入什么 Context 最终将使用 Application 的 Context，而单例的生命周期和应用的一样长，这样就防止了内存泄漏。
+
+
+- 非静态内部类创建静态实例造成的内存泄漏
+
+有的时候我们可能会在启动频繁的Activity中，为了避免重复创建相同的数据资源，可能会出现这种写法：
+
+```Java
+public class MainActivity extends AppCompatActivity {
+    private static TestResource mResource = null;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        if(mResource == null){
+            mResource = new TestResource();
+        }
+        //...
+    }
+    class TestResource {
+    //...
+    }
+}
+```
+
+这样就在 Activity 内部创建了一个非静态内部类的单例，每次启动 Activity 时都会使用该单例的数据，这样虽然避免了资源的重复创建，不过这种写法却会造成内存泄漏，因为非静态内部类默认会持有外部类的引用，而又使用了该非静态内部类创建了一个静态的实例，该实例的生命周期和应用的一样长，这就导致了该静态实例一直会持有该 Activity 的引用，导致 Activity 的内存资源不能正常回收。
+
+正确的做法为：
+
+将该内部类设为静态内部类或将该内部类抽取出来封装成一个单例，如果需要使用 Context，请使用 ApplicationContext。
+
+- Handler 造成的内存泄漏
+
+Handler 的使用造成的内存泄漏问题应该说最为常见了，平时在处理网络任务或者封装一些请求回调等 api 都应该会借助 Handler 来处理，对于 Handler 的使用代码编写一不规范即有可能造成内存泄漏，如下示例：
+
+```Java
+public class MainActivity extends AppCompatActivity {
+	private Handler mHandler = new Handler() {
+	    @Override
+	    public void handleMessage(Message msg) {
+	    //...
+	    }
+	};
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        loadData();
+    }
+    private void loadData(){
+        //...request
+        Message message = Message.obtain();
+        mHandler.sendMessage(message);
+    }
+}
+```
+
+这种创建 Handler 的方式会造成内存泄漏，由于 mHandler 是 Handler 的非静态匿名内部类的实例，所以它持有外部类 Activity 的引用，我们知道消息队列是在一个 Looper 线程中不断轮询处理消息，那么当这个 Activity 退出时消息队列中还有未处理的消息或者正在处理消息，而消息队列中的 Message 持有 mHandler 实例的引用，mHandler 又持有 Activity 的引用，所以导致该 Activity 的内存资源无法及时回收，引发内存泄漏，所以另外一种做法为：
+
+```Java
+public class MainActivity extends AppCompatActivity {
+    private MyHandler mHandler = new MyHandler(this);
+    private TextView mTextView ;
+    private static class MyHandler extends Handler {
+        private WeakReference<Context> reference;
+        public MyHandler(Context context) {
+        reference = new WeakReference<>(context);
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            MainActivity activity = (MainActivity) reference.get();
+            if(activity != null){
+            activity.mTextView.setText("");
+            }
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mTextView = (TextView)findViewById(R.id.textview);
+        loadData();
+    }
+
+    private void loadData() {
+        //...request
+        Message message = Message.obtain();
+        mHandler.sendMessage(message);
+    }
+}
+```
+
+创建一个静态 Handler 内部类，然后对 Handler 持有的对象使用弱引用，这样在回收时也可以回收 Handler 持有的对象，这样虽然避免了 Activity 泄漏，不过 Looper 线程的消息队列中还是可能会有待处理的消息，所以我们在 Activity 的 Destroy 时或者 Stop 时应该移除消息队列中的消息，更准确的做法如下：
+
+```Java
+public class MainActivity extends AppCompatActivity {
+    private MyHandler mHandler = new MyHandler(this);
+    private TextView mTextView ;
+    private static class MyHandler extends Handler {
+        private WeakReference<Context> reference;
+        public MyHandler(Context context) {
+        reference = new WeakReference<>(context);
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            MainActivity activity = (MainActivity) reference.get();
+            if(activity != null){
+            activity.mTextView.setText("");
+            }
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mTextView = (TextView)findViewById(R.id.textview);
+        loadData();
+    }
+
+    private void loadData() {
+        //...request
+        Message message = Message.obtain();
+        mHandler.sendMessage(message);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mHandler.removeCallbacksAndMessages(null);
+    }
+}
+```
+
+使用 mHandler.removeCallbacksAndMessages(null); 是移除消息队列中所有消息和所有的 Runnable。 当然也可以使用 mHandler.removeCallbacks(); 或 mHandler.removeMessages(); 来移除指定的 Runnable 和 Message。
+
+- 线程造成的内存泄漏
+
+对于线程造成的内存泄漏，也是平时比较常见的，异步任务和 Runnable 都是一个匿名内部类，因此它们对当前 Activity 都有一个隐式引用。 如果 Activity 在销毁之前，任务还未完成，那么将导致 Activity 的内存资源无法回收，造成内存泄漏。 正确的做法还是使用静态内部类的方式，如下：
+
+```Java
+static class MyAsyncTask extends AsyncTask<Void, Void, Void> {
+    private WeakReference<Context> weakReference;
+
+    public MyAsyncTask(Context context) {
+        weakReference = new WeakReference<>(context);
+    }
+
+    @Override
+    protected Void doInBackground(Void... params) {
+        SystemClock.sleep(10000);
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        MainActivity activity = (MainActivity) weakReference.get();
+        if (activity != null) {
+        //...
+        }
+    }
+}
+static class MyRunnable implements Runnable{
+    @Override
+    public void run() {
+        SystemClock.sleep(10000);
+    }
+}
+//——————
+new Thread(new MyRunnable()).start();
+new MyAsyncTask(this).execute();
+```
+
+这样就避免了 Activity 的内存资源泄漏，当然在 Activity 销毁时候也应该取消相应的任务 AsyncTask::cancel()，避免任务在后台执行浪费资源。
+
 - 资源使用完未关闭
+
+对于使用了 BraodcastReceiver，ContentObserver，File，Cursor，Stream，Bitmap 等资源的使用，应该在 Activity 销毁时及时关闭或者注销，否则这些资源将不会被回收，造成内存泄漏。
 
 ## 其他优化
 
