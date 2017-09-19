@@ -53,17 +53,15 @@ Bitmap 非常消耗内存，而且在 Android 中，读取 bitmap 时， 一般�
 
 - 对象引用类型
 
-强引用，软引用，弱引用，虚引用
-
-- 强引用（Strong Reference）:JVM宁愿抛出OOM，也不会让GC回收的对象 
-- 软引用（Soft Reference） ：只有内存不足时，才会被GC回收。 
-- 弱引用（weak Reference）：在GC时，一旦发现弱引用，立即回收 
-- 虚引用（Phantom Reference）：任何时候都可以被 GC 回收，当垃圾回收器准备回收一个对象时，如果发现它还有虚引用，就会在回收对象的内存之前，把这个虚引用加入到与之关联的引用队列中。 程序可以通过判断引用队列中是否存在该对象的虚引用，来了解这个对象是否将要被回收。 可以用来作为 GC 回收 Object 的标志。 
-
+1. 强引用（Strong Reference）:JVM宁愿抛出OOM，也不会让GC回收的对象 
+2. 软引用（Soft Reference） ：只有内存不足时，才会被GC回收。 
+3. 弱引用（weak Reference）：在GC时，一旦发现弱引用，立即回收 
+4. 虚引用（Phantom Reference）：任何时候都可以被 GC 回收，当垃圾回收器准备回收一个对象时，如果发现它还有虚引用，就会在回收对象的内存之前，把这个虚引用加入到与之关联的引用队列中。 程序可以通过判断引用队列中是否存在该对象的虚引用，来了解这个对象是否将要被回收。 可以用来作为 GC 回收 Object 的标志。 
 
 - 缓存池
 
 对象池：如果某个对象在创建时，需要较大的资源开销，那么可以将其放入对象池，即将对象保存起来，下次需要时直接取出使用，而不用再次创建对象。当然，维护对象池也需要一定开销，故要衡量。
+
 线程池：与对象池差不多，将线程对象放在池中供反复使用，减少反复创建线程的开销。
 
 ## 内存泄露相关优化
@@ -301,9 +299,8 @@ BraodcastReceiver，ContentObserver，FileObserver，Cursor，Callback等在 Act
 
 - 常用数据结构优化
 
-1. ArrayMap 及 SparseArray 是 android 的系统API，是专门为移动设备而定制的。 用于在一定情况下取代 HashMap 而达到节省内存的目的。 对于 key 为 int 的 HashMap 尽量使用 SparceArray 替代，大概可以省 30% 的内存，而对于其他类型，ArrayMap 对内存的节省实际并不明显，10% 左右，但是数据量在 1000 以上时，查找速度可能会变慢。
-2. 避免在 Android 里面使用 Enum。
-3. 在有些时候，代码中会需要使用到大量的字符串拼接的操作，这种时候有必要考虑使用 StringBuilder 来替代频繁的 “+”。
+1. ArrayMap 及 SparseArray 是 android 的系统 API，是专门为移动设备而定制的。 用于在一定情况下取代 HashMap 而达到节省内存的目的。 对于 key 为 int 的 HashMap 尽量使用 SparceArray 替代，大概可以省 30% 的内存，而对于其他类型，ArrayMap 对内存的节省实际并不明显，10% 左右，但是数据量在 1000 以上时，查找速度可能会变慢。
+2. 在有些时候，代码中会需要使用到大量的字符串拼接的操作，这种时候有必要考虑使用 StringBuilder 来替代频繁的 “+”。
 
 - 枚举
 
@@ -452,6 +449,13 @@ public class TestActivity extends AppCompatActivity {
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_leak_test.jpg" alt="LeakCanary"/>
 
 ## ANR
+
+https://dev.qq.com/topic/59151791142eee2b6b97359e
+
+http://haiolv.github.io/2016/06/13/android-anr%E5%88%86%E6%9E%90/
+
+http://www.jianshu.com/p/6d855e984b99
+
 
 ## 参考资料
 
