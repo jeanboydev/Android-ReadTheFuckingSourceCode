@@ -410,7 +410,7 @@ Overview 是一个概况图，把内存的消耗以饼状图形式显示出来�
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat5.jpg" alt="MAT5"/>
 
-内存分析是分析的整个系统的内存泄露，而我们只要查找我们APP的内存泄露情况。 这无疑增加了很多工作，不过幸亏 Histogram 支持正则表达式查找，在 Regex 中输入我们的包名进行过滤，直奔和我们APP有关的内存泄露。
+内存分析是分析的整个系统的内存泄露，而我们只要查找我们 App 的内存泄露情况。 这无疑增加了很多工作，不过幸亏 Histogram 支持正则表达式查找，在 Regex 中输入我们的包名进行过滤，直奔和我们 App 有关的内存泄露。
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat6.jpg" alt="MAT6"/>
 
@@ -424,7 +424,7 @@ Overview 是一个概况图，把内存的消耗以饼状图形式显示出来�
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat8.jpg" alt="MAT8"/>
 
-可以看到 TestActivity 不能被 GC 回收是因为 context 没有释放的问题。 我们再来看下代码：
+可以看到 TestActivity 不能被 GC 回收是因为 context 没有释放的原因。 我们再来看下代码：
 
 ```Java
 public class TestActivity extends AppCompatActivity {
@@ -443,7 +443,13 @@ public class TestActivity extends AppCompatActivity {
 }
 ```
 
-## LeakCanary
+## 使用 LeakCanary 检查
+
+项目地址：https://github.com/square/leakcanary
+
+使用方式很简单，参考项目里面的介绍即可。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_leak_test.jpg" alt="LeakCanary"/>
 
 ## Allocation Traker
 
