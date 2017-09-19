@@ -451,8 +451,6 @@ public class TestActivity extends AppCompatActivity {
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_leak_test.jpg" alt="LeakCanary"/>
 
-## Allocation Traker
-
 ## ANR
 
 ## 参考资料
@@ -464,24 +462,4 @@ public class TestActivity extends AppCompatActivity {
 [使用新版Android Studio检测内存泄露和性能](http://www.jianshu.com/p/216b03c22bb8)
 
 [Android 应用内存泄漏的定位、分析与解决策略](https://www.diycode.cc/topics/475)
-
-
-#####
-
-http://hukai.me/android-performance-oom/
-
-Android 内存优化总结 & 实践
-https://juejin.im/entry/58d4c7735c497d0057ead153
-
-你的 Bitmap 究竟占多大内存？
-https://mp.weixin.qq.com/s?__biz=MzA3NTYzODYzMg==&amp;mid=403263974&amp;idx=1&amp;sn=b0315addbc47f3c38e65d9c633a12cd6&amp;scene=21#wechat_redirect
-
-使用新版Android Studio检测内存泄露和性能
-http://www.jianshu.com/p/216b03c22bb8
-
-基于Android Studio的内存泄漏检测与解决全攻略
-http://wetest.qq.com/lab/view/?id=99
-
-Android 应用内存泄漏的定位、分析与解决策略
-https://www.diycode.cc/topics/475
 
