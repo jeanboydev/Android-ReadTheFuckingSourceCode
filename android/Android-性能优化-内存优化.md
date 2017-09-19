@@ -94,8 +94,8 @@ public class AppManager {
 
 这是一个普通的单例模式，当创建这个单例的时候，由于需要传入一个 Context，所以这个 Context 的生命周期的长短至关重要：
 
-	1. 传入的是 Application 的 Context：这将没有任何问题，因为单例的生命周期和 Application 的一样长。
-	2. 传入的是 Activity 的 Context：当这个 Context 所对应的 Activity 退出时，由于该 Context 和 Activity 的生命周期一样长（Activity 间接继承于 Context），所以当前 Activity 退出时它的内存并不会被回收，因为单例对象持有该 Activity 的引用。
+1. 传入的是 Application 的 Context：这将没有任何问题，因为单例的生命周期和 Application 的一样长。
+2. 传入的是 Activity 的 Context：当这个 Context 所对应的 Activity 退出时，由于该 Context 和 Activity 的生命周期一样长（Activity 间接继承于 Context），所以当前 Activity 退出时它的内存并不会被回收，因为单例对象持有该 Activity 的引用。
 
 所以正确的单例应该修改为下面这种方式：
 
@@ -344,23 +344,23 @@ Lint 是 Android Studio 自带的工具，使用很简单找到 **Analyze** -> *
 
 一般在 Android Studio 的底部可以找到 Android Monitor。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast1.jpg" alt="Monitor Memory 1"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_1.jpg" alt="Monitor Memory 1"/>
 
 可以看到当前 App的内存变动比较大，很有可能出现了内存泄漏。 点击 Dump Java Heap，等一段时间会自动生成 Heap Snapshot 文件。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast2.jpg" alt="Monitor Memory 2"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_2.jpg" alt="Monitor Memory 2"/>
 
 在 Captures 中可以找到 hprof 文件。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast3.jpg" alt="Monitor Memory 3"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_3.jpg" alt="Monitor Memory 3"/>
 
 在右侧找到 Analyzer Tasks 并打开，点击图中 Perform Analysis 按钮开始分析。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast4.jpg" alt="Monitor Memory 4"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_4.jpg" alt="Monitor Memory 4"/>
 
 通过分析结果可以看到 TestActivity 泄漏了，从左侧 Reference Tree 中可以看到是 TestActivity 中的 context 泄露了。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast5.jpg" alt="Monitor Memory 5"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_5.jpg" alt="Monitor Memory 5"/>
 
 我们来看下代码：
 
