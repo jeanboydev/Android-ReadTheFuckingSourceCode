@@ -28,22 +28,18 @@ Dalvik 执行 **.dex** 格式的字节码文件，JVM 执行的是 **.class** �
 
 Bitmap 非常消耗内存，而且在 Android 中，读取 bitmap 时， 一般分配给虚拟机的图片堆栈只有 8M，所以经常造成 OOM 问题。 所以有必要针对 Bitmap 的使用作出优化：
 
-图片显示：加载合适尺寸的图片，比如显示缩略图的地方不要加载大图。
-图片回收：使用完 bitmap，及时使用 Bitmap.recycle() 回收。
-> 问题：Android不是自身具备垃圾回收机制吗？此处为何要手动回收。
-Bitmap对象不是new生成的，而是通过BitmapFactory生产的。而且通过源码可发现是通过调用JNI生成Bitmap对象（nativeDecodeStream()等方法）。所以，加载bitmap到内存里包括两部分，Dalvik内存和Linux kernel内存。前者会被虚拟机自动回收。而后者必须通过recycle()方法，内部调用nativeRecycle()让linux kernel回收。
+1. 图片显示：加载合适尺寸的图片，比如显示缩略图的地方不要加载大图。
+2. 图片回收：使用完 bitmap，及时使用 Bitmap.recycle() 回收。
 
-捕获OOM异常：程序中设定如果发生OOM的应急处理方式。
-图片缓存：内存缓存、硬盘缓存等
-图片压缩：直接使用ImageView显示Bitmap时会占很多资源，尤其当图片较大时容易发生OOM。可以使用BitMapFactory.Options对图片进行压缩。
-图片像素：android默认颜色模式为ARGB_8888，显示质量最高，占用内存最大。若要求不高时可采用RGB_565等模式。图片大小：图片长度*宽度*单位像素所占据字节数
-ARGB_4444：每个像素占用2byte内存
-ARGB_8888：每个像素占用4byte内存 （默认）
-RGB_565：每个像素占用2byte内存
+> 问题：Android 不是自身具备垃圾回收机制吗？此处为何要手动回收？
+> 
+> Bitmap 对象不是 new 生成的，而是通过 BitmapFactory 生产的。 而且通过源码可发现是通过调用 JNI 生成 Bitma p对象（nativeDecodeStream()等方法）。 所以，加载 bitmap 到内存里包括两部分，Dalvik 内存和 Linux kernel 内存。 前者会被虚拟机自动回收。 而后者必须通过 recycle() 方法，内部调用 nativeRecycle() 让 linux kernel 回收。
 
-
-
-计算 Bitmap 内存大小
+3. 捕获 OOM 异常：程序中设定如果发生 OOM 的应急处理方式。
+4. 图片缓存：内存缓存、硬盘缓存等
+5. 图片压缩：直接使用 ImageView 显示 Bitmap 时会占很多资源，尤其当图片较大时容易发 生OOM。 可以使用 BitMapFactory.Options 对图片进行压缩。
+6. 图片像素：android 默认颜色模式为 ARGB_8888，显示质量最高，占用内存最大。 若要求不高时可采用 RGB_565 等模式。 
+7. 图片大小：图片 长度×宽度×单位像素 所占据字节数。
 
 我们知道 ARGB 指的是一种色彩模式，里面 A 代表 Alpha，R 表示 Red，G 表示 Green，B 表示 Blue。 所有的可见色都是由红绿蓝组成的，所以红绿蓝又称为三原色，每个原色都存储着所表示颜色的信息值,下表中对四种颜色模式的详细描述，以及每种色彩模式占用的字节数。
 
@@ -51,9 +47,8 @@ RGB_565：每个像素占用2byte内存
 | :------	| :--------------------------------						| :------ |
 | ALPHA		| Alpha 由 8 位组成										| 1B	  |
 | ARGB_4444	| 4 个 4 位组成 16 位，每个色彩元素站 4 位					| 2B	  |
-| ARGB_8888	| 4 个 8 为组成 32 位，每个色彩元素站 8 位					| 4B	  |
+| ARGB_8888	| 4 个 8 为组成 32 位，每个色彩元素站 8 位（默认）			| 4B	  |
 | RGB_565	| R 为 5 位，G 为 6 位，B 为 5 位共 16 位，没有Alpha		| 2B	  |
-
 
 
 - 对象引用类型
@@ -63,15 +58,13 @@ RGB_565：每个像素占用2byte内存
 - 强引用（Strong Reference）:JVM宁愿抛出OOM，也不会让GC回收的对象 
 - 软引用（Soft Reference） ：只有内存不足时，才会被GC回收。 
 - 弱引用（weak Reference）：在GC时，一旦发现弱引用，立即回收 
-- 虚引用（Phantom Reference）：任何时候都可以被GC回收，当垃圾回收器准备回收一个对象时，如果发现它还有虚引用，就会在回收对象的内存之前，把这个虚引用加入到与之关联的引用队列中。程序可以通过判断引用队列中是否存在该对象的虚引用，来了解这个对象是否将要被回收。可以用来作为GC回收Object的标志。 
+- 虚引用（Phantom Reference）：任何时候都可以被 GC 回收，当垃圾回收器准备回收一个对象时，如果发现它还有虚引用，就会在回收对象的内存之前，把这个虚引用加入到与之关联的引用队列中。 程序可以通过判断引用队列中是否存在该对象的虚引用，来了解这个对象是否将要被回收。 可以用来作为 GC 回收 Object 的标志。 
 
 
-- 对象池
+- 缓存池
 
 对象池：如果某个对象在创建时，需要较大的资源开销，那么可以将其放入对象池，即将对象保存起来，下次需要时直接取出使用，而不用再次创建对象。当然，维护对象池也需要一定开销，故要衡量。
 线程池：与对象池差不多，将线程对象放在池中供反复使用，减少反复创建线程的开销。
-
-- 缓存
 
 ## 内存泄露相关优化
 
@@ -300,19 +293,155 @@ new MyAsyncTask(this).execute();
 
 - 资源使用完未关闭
 
-对于使用了 BraodcastReceiver，ContentObserver，File，Cursor，Stream，Bitmap 等资源的使用，应该在 Activity 销毁时及时关闭或者注销，否则这些资源将不会被回收，造成内存泄漏。
+BraodcastReceiver，ContentObserver，FileObserver，Cursor，Callback等在 Activity onDestroy 或者某类生命周期结束之后一定要 unregister 或者 close 掉，否则这个 Activity 类会被 system 强引用，不会被内存回收。
+
+不要直接对 Activity 进行直接引用作为成员变量，如果不得不这么做，请用 private WeakReference mActivity 来做，相同的，对于Service 等其他有自己声明周期的对象来说，直接引用都需要谨慎考虑是否会存在内存泄露的可能。
 
 ## 其他优化
 
 - 常用数据结构优化
+
+1. ArrayMap 及 SparseArray 是 android 的系统API，是专门为移动设备而定制的。 用于在一定情况下取代 HashMap 而达到节省内存的目的。 对于 key 为 int 的 HashMap 尽量使用 SparceArray 替代，大概可以省 30% 的内存，而对于其他类型，ArrayMap 对内存的节省实际并不明显，10% 左右，但是数据量在 1000 以上时，查找速度可能会变慢。
+2. 避免在 Android 里面使用 Enum。
+3. 在有些时候，代码中会需要使用到大量的字符串拼接的操作，这种时候有必要考虑使用 StringBuilder 来替代频繁的 “+”。
+
 - 枚举
+
+Android 平台上枚举是比较争议的，在较早的 Android 版本，使用枚举会导致包过大，使用枚举甚至比直接使用 int 包的 size 大了 10 多倍。 在 stackoverflow 上也有很多的讨论, 大致意思是随着虚拟机的优化，目前枚举变量在 Android 平台性能问题已经不大，而目前 Android 官方建议，使用枚举变量还是需要谨慎，因为枚举变量可能比直接用 int 多使用 2 倍的内存。
+
 - View 复用
+
+1. 使用 ListView 时 getView 里尽量复用 conertView，同时因为 getView 会频繁调用，要避免频繁地生成对象。 优先考虑使用 RecyclerView 代替 ListView。
+2. 重复的布局优先使用 <include>，使用 <merge> 减少 view 的层级，对于可以延迟初始化的页面，使用 <ViewStub>。
+
 - 谨慎使用多进程
-- 尽量使用系统资源
 
-## Android Studio Monitor Memory
+现在很多 App 都不是单进程，为了保活，或者提高稳定性都会进行一些进程拆分，而实际上即使是空进程也会占用内存(1M 左右)，对于使用完的进程，服务都要及时进行回收。
 
-## Memory Analyzer Tool
+- 系统资源
+
+尽量使用系统组件，图片甚至控件的 id。 例如：@android:color/xxx，@android:style/xxx。
+
+## 使用工具检查内存泄漏
+
+即使在编码时将上述情况都考虑了，往往会有疏忽的地方，更何况通常情况下是团队开发。 所以不仅仅要在编码时考虑内存优化的情况，当出现内存泄漏时，更有效更准确的定位问题才是最重要的方式。 内存泄漏不像 bug，排查起来相对复杂一些，下面介绍下常用的检查方式。
+
+## 使用 Lint 代码静态检查
+
+Lint 是 Android Studio 自带的工具，使用很简单找到 **Analyze** -> **Inspect Code** 然后选择想要扫面的区域即可。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_lint1.jpg" alt="memory_lint1"/>
+
+选择 Lint 扫描区域。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_lint2.jpg" alt="memory_lint2"/>
+
+对可能引起性能问题的代码，Lint 都会进行提示。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_lint3.jpg" alt="memory_lint3"/>
+
+## 使用 Android Studio 自带的 Monitor Memory 检查
+
+一般在 Android Studio 的底部可以找到 Android Monitor。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast1.jpg" alt="Monitor Memory 1"/>
+
+可以看到当前 App的内存变动比较大，很有可能出现了内存泄漏。 点击 Dump Java Heap，等一段时间会自动生成 Heap Snapshot 文件。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast2.jpg" alt="Monitor Memory 2"/>
+
+在 Captures 中可以找到 hprof 文件。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast3.jpg" alt="Monitor Memory 3"/>
+
+在右侧找到 Analyzer Tasks 并打开，点击图中 Perform Analysis 按钮开始分析。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast4.jpg" alt="Monitor Memory 4"/>
+
+通过分析结果可以看到 TestActivity 泄漏了，从左侧 Reference Tree 中可以看到是 TestActivity 中的 context 泄露了。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast5.jpg" alt="Monitor Memory 5"/>
+
+我们来看下代码：
+
+```Java
+public class TestActivity extends AppCompatActivity {
+
+    private static Context context;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_test);
+
+        context = this;
+
+    }
+}
+```
+
+代码中 context 为静态的引用了当前 Activity 造成了当前 Activity 无法释放。
+
+一般的通过 使用 Android Studio 自带的 Monitor Memory 可以定位到内存泄漏所在的类，更详细的信息需要借助 Memory Analyzer Tool（MAT）工具。
+
+
+## 使用 Memory Analyzer Tool 检查
+
+首先下载 Memory Analyzer Tool [下载地址](http://www.eclipse.org/mat/downloads.php)
+
+在 Android Studio 中先将 hprof 文件导出为 MAT 可以识别的 hprof 文件。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat1.jpg" alt="MAT1"/>
+
+打开刚才导出的文件。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat2.jpg" alt="MAT2"/>
+
+经过分析后会显示如下，Leak Suspectss 是一个关于内存泄露猜想的饼图，Problem Suspect 1 是泄露猜想的描述。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat3.jpg" alt="MAT3"/>
+
+Overview 是一个概况图，把内存的消耗以饼状图形式显示出来，鼠标在每个饼块区域划过或者点击，就会在 Inspector 栏目显示这块区域的相关信息。 MAT 从多角度提供了内存分析，其中包括 Histogram、 Dominator Tree、 Leak Suspects 和 Top consumers 等。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat4.jpg" alt="MAT4"/>
+
+这里我们使用 Histogram 进行分析，切换到 Histogram 页面。 这个页面主要有 4 个列，Class Name、 Objects、 Shallow Heap 和 Retained Heap。 其中 Class Name 是全类名，Objects 是这个类的对象实例个数。 Shallow Heap 是对象本身占用内存大小，非数组的常规对象，本身内存占用很小，所以这个对泄露分析作用不大。 Retained Heap 指当前对象大小和当前对象能直接或间接引用的对象大小的总和，这个栏目是分析重点。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat5.jpg" alt="MAT5"/>
+
+内存分析是分析的整个系统的内存泄露，而我们只要查找我们APP的内存泄露情况。 这无疑增加了很多工作，不过幸亏 Histogram 支持正则表达式查找，在 Regex 中输入我们的包名进行过滤，直奔和我们APP有关的内存泄露。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat6.jpg" alt="MAT6"/>
+
+过滤后就显示了我们 App 相关内存信息，按 Retained Heap 大小排列下，发现 MainActivity 和 TestActivity 这两个类问题比较大。 TestActivity 的问题更突出些，所以先从 TestActivity 下手。
+
+首先看下是哪里的引用导致了 TestActivity 不能被 GC 回收。 右键使用 **Merge Shortest Paths to GC Roots** 显示距 GC Root 最短路径，当然选择过程中要排除软引用和弱引用，因为这些标记的一般都是可以被回收的。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat7.jpg" alt="MAT7"/>
+
+进入结果页查看。
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat8.jpg" alt="MAT8"/>
+
+可以看到 TestActivity 不能被 GC 回收是因为 context 没有释放的问题。 我们再来看下代码：
+
+```Java
+public class TestActivity extends AppCompatActivity {
+
+    private static Context context;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_test);
+
+        context = this;
+
+    }
+}
+```
 
 ## LeakCanary
 
@@ -321,6 +450,17 @@ new MyAsyncTask(this).execute();
 ## ANR
 
 ## 参考资料
+
+[Android Bitmap的内存大小是如何计算的？](https://ivonhoe.github.io/2017/03/22/Bitmap&Memory/)
+
+[Android性能优化之常见的内存泄漏](http://hanhailong.com/2015/12/27/Android性能优化之常见的内存泄漏/)
+
+[使用新版Android Studio检测内存泄露和性能](http://www.jianshu.com/p/216b03c22bb8)
+
+[Android 应用内存泄漏的定位、分析与解决策略](https://www.diycode.cc/topics/475)
+
+
+#####
 
 http://hukai.me/android-performance-oom/
 
