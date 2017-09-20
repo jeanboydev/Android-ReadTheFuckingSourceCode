@@ -460,9 +460,9 @@ public class TestActivity extends AppCompatActivity {
 
 ANR 一般有三种类型：
 
-1. KeyDispatchTimeout(5 seconds):主要类型按键或触摸事件在特定时间内无响应
-2. BroadcastTimeout(10 seconds):BroadcastReceiver 在特定时间内无法处理完成
-3. ServiceTimeout(20 seconds):小概率类型 Service 在特定的时间内无法处理完成
+1. KeyDispatchTimeout(5 seconds) : 主要类型按键或触摸事件在特定时间内无响应
+2. BroadcastTimeout(10 seconds) : BroadcastReceiver 在特定时间内无法处理完成
+3. ServiceTimeout(20 seconds) : 小概率类型 Service 在特定的时间内无法处理完成
 
 - ANR 产生的原因
 
@@ -483,7 +483,8 @@ ANR 一般有三种类型：
 
 3. UI线程
 
-UI线程主要包括如下：
+UI 线程主要包括如下：
+
 Activity : onCreate(), onResume(), onDestroy(), onKeyDown(), onClick(), etc 生命周期方法里。
 AsyncTask : onPreExecute(), onProgressUpdate(), onPostExecute(), onCancel, etc 这些异步更改 UI 界面的方法里。
 Mainthread handler : handleMessage(), post*(runnable r), getMainLooper(), etc 通过 handler 发送消息到主线程的 looper，即占用主线程 looper 的。
