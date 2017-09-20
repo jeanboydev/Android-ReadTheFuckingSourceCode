@@ -450,12 +450,67 @@ public class TestActivity extends AppCompatActivity {
 
 ## ANR
 
-https://dev.qq.com/topic/59151791142eee2b6b97359e
+- 什么是 ANR
 
-http://haiolv.github.io/2016/06/13/android-anr%E5%88%86%E6%9E%90/
+1. ANR:Application Not Responding，即应用无响应。
+2. 为用户在主线程长时间被阻塞是提供交互，提高用户体验。
+3. Android 系统自身的一种检测机制。
 
-http://www.jianshu.com/p/6d855e984b99
+- ANR 的类型
 
+ANR 一般有三种类型：
+
+1. KeyDispatchTimeout(5 seconds):主要类型按键或触摸事件在特定时间内无响应
+2. BroadcastTimeout(10 seconds):BroadcastReceiver 在特定时间内无法处理完成
+3. ServiceTimeout(20 seconds):小概率类型 Service 在特定的时间内无法处理完成
+
+- ANR 产生的原因
+
+超时时间的计数一般是从按键分发给 app 开始。 超时的原因一般有两种：
+
+1. 当前的事件没有机会得到处理（即 UI 线程正在处理前一个事件，没有及时的完成或者 looper 被某种原因阻塞住了）
+2. 当前的事件正在处理，但没有及时完成。
+
+- ANR 出现流程分析
+
+1. 输入时间响应超时导致ANR流程
+
+在系统输入管理服务进程（InputManagerService）中有一个线程（InputDispathcerThread）专门管理输入事件的分发，在该线程处理输入事件的过程中，回调用 InputDispatcher 对象方法不断的检测处理过程是否超时，一旦超时，则会通过一些列的回调调用 InputMethod 对象的 notifyANR 方法，其会最终出发 AMS 中 handler 对象的 SHOW_NOT_RESPONDING_MSG 这个事件，显示ANR对话框。
+
+2. 广播发生ANR流程
+
+广播分为三类：普通的，有序的，异步的。 只有有序（ordered）的广播才会发生超时，而在 AndroidManifest 中注册的广播都会被当做有序广播来处理，会被放在广播的队列中串行处理。 AMS 在处理广播队列时，会设置一个超时时间，当处理一个广播达到超时时间的限制时，就会触发 BroadcastQueue 类对象的 processNextBroadcast 方法来判断是否超时，如果超时，就会终止该广播，触发ANR对话框。
+
+3. UI线程
+
+UI线程主要包括如下：
+Activity : onCreate(), onResume(), onDestroy(), onKeyDown(), onClick(), etc 生命周期方法里。
+AsyncTask : onPreExecute(), onProgressUpdate(), onPostExecute(), onCancel, etc 这些异步更改 UI 界面的方法里。
+Mainthread handler : handleMessage(), post*(runnable r), getMainLooper(), etc 通过 handler 发送消息到主线程的 looper，即占用主线程 looper 的。
+
+- ANR 执行流程
+
+了解 ANR 执行流程有利于我们制定 ANR 监控策略和获取 ANR 的相关信息，ANR 的执行步骤如下：
+
+1. 系统捕获到 ANR 发生；
+2. Process 依次向本进程及其他正在运行的进程发送 Linux 信号量 3；
+3. 进程接收到 Linux 信号量，并向 /data/anr/traces.txt 中写入进程信息；
+4. Log 日志打印 ANR 信息；
+5. 进程进入 ANR 状态（此时可以获取到进程 ANR 信息);
+6. 弹出 ANR 提示框；
+7. 提示框消失，进程回归正常状态。
+
+由于向 /data/anr/traces.txt 文件中写入信息耗时较长，从 Input ANR 触发到弹出 ANR 提示框一般在 10s 左右（不同 rom 时间不同）。
+
+- 发生 ANR 如何定位
+
+当 App 的进程发生 ANR 时，系统让活跃的 Top 进程都进行了一下 dump，进程中的各种 Thread 就都 dump 到这个 trace 文件里了，所以 trace 文件中包含了每一条线程的运行时状态。 traces.txt 的文件放在 /data/anr/ 下. 可以通过 adb 命令将其导出到本地:
+
+```Java
+$ adb pull data/anr/traces.txt .
+```
+
+通过分析 traces.txt 文件，查找 App 包名关键信息来定位 ANR。
 
 ## 参考资料
 
@@ -467,3 +522,4 @@ http://www.jianshu.com/p/6d855e984b99
 
 [Android 应用内存泄漏的定位、分析与解决策略](https://www.diycode.cc/topics/475)
 
+[Android 系统稳定性 - ANR](http://rayleeya.iteye.com/blog/1955657)
