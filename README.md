@@ -6,6 +6,9 @@
 如果你有什么疑问或者问题，可以提交 issue 和 request，发邮件给我 jeanboy@foxmail.com 。<br>
 或者加入 **Android攻城联盟群：386463747** 来一起学习交流。
 
+<a target="_blank" href="//shang.qq.com/wpa/qunwpa?idkey=bbbd62c0860ce7c1a6119030f51df102bb0d3ecc12cf66b4d8887941233c6e78"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="Android技术进阶" title="Android技术进阶"></a>
+
+
 > 个人经验有限，内容上难免有不足甚至错误的地方，恳请各位发现后提交issue或其他方式联系我，万分感谢！技术交流，共同进步！
 
 # 目录 #
