@@ -8,8 +8,6 @@
 
 <a target="_blank" href="//shang.qq.com/wpa/qunwpa?idkey=bbbd62c0860ce7c1a6119030f51df102bb0d3ecc12cf66b4d8887941233c6e78"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="Android技术进阶：386463747" title="Android技术进阶：386463747"></a>
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/about_me/qq_386463747.png" alt="Android技术进阶"/>
-
 > 个人经验有限，内容上难免有不足甚至错误的地方，恳请各位发现后提交issue或其他方式联系我，万分感谢！技术交流，共同进步！
 
 # 目录 #
