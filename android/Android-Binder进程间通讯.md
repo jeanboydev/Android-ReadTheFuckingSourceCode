@@ -1,16 +1,17 @@
 # Android-Binder进程间通讯 #
 
 ## 概述 ##
-最近在学习Binder机制，在网上查阅了大量的资料，也看了老罗的Binder系列的博客和Innost的深入理解Binder系列的博客，都是从底层开始讲的，全是C代码，虽然之前学过C和C++，然而各种函数之间花式跳转，看的我都怀疑人生。毫不夸张的讲每看一遍都是新的内容，跟没看过一样。后来又看到了Gityuan的博客看到了一些图解仿佛发现了新大陆。 
 
-下面就以图解的方式介绍下Binder机制，相信你看这篇文章，一定有所收获。
+最近在学习 Binder 机制，在网上查阅了大量的资料，也看了老罗的 Binder 系列的博客和 Innost 的深入理解 Binder 系列的博客，都是从底层开始讲的，全是 C 代码，虽然之前学过 C 和 C++，然而各种函数之间花式跳转，看的我都怀疑人生。 毫不夸张的讲每看一遍都是新的内容，跟没看过一样。 后来又看到了 Gityuan 的博客看到了一些图解仿佛发现了新大陆。 
+
+下面就以图解的方式介绍下 Binder 机制，相信你看这篇文章，一定有所收获。
 
 
 ## 什么是 Binder？ ##
 
-Binder是Android系统中进程间通讯（IPC）的一种方式，也是Android系统中最重要的特性之一。Android中的四大组件Activity，Service，Broadcast，ContentProvider，不同的App等都运行在不同的进程中，它是这些进程间通讯的桥梁。正如其名“粘合剂”一样，它把系统中各个组件粘合到了一起，是各个组件的桥梁。
+Binder 是 Android 系统中进程间通讯（IPC）的一种方式，也是 Android 系统中最重要的特性之一。 Android 中的四大组件 Activity，Service，Broadcast，ContentProvider，不同的 App 等都运行在不同的进程中，它是这些进程间通讯的桥梁。正如其名“粘合剂”一样，它把系统中各个组件粘合到了一起，是各个组件的桥梁。
 
-理解Binder对于理解整个Android系统有着非常重要的作用，如果对Binder不了解，就很难对Android系统机制有更深入的理解。
+理解 Binder 对于理解整个 Android 系统有着非常重要的作用，如果对 Binder 不了解，就很难对 Android 系统机制有更深入的理解。
 
 
 ## 1. Binder 架构 ##
@@ -70,7 +71,7 @@ Kernel space 可以执行任意命令，调用系统的一切资源； User spac
 
 > 驱动程序一般指的是设备驱动程序（Device Driver），是一种可以使计算机和设备通信的特殊程序。相当于硬件的接口，操作系统只有通过这个接口，才能控制硬件设备的工作；
 
-驱动就是操作硬件的接口，为了支持Binder通信过程，Binder 使用了一种“硬件”，因此这个模块被称之为驱动。
+驱动就是操作硬件的接口，为了支持 Binder 通信过程，Binder 使用了一种“硬件”，因此这个模块被称之为驱动。
 
 
 熟悉了上面这些概念，我们再来看下上面的图，用户空间中 binder_open(), binder_mmap(), binder_ioctl() 这些方法通过 system call 来调用内核空间 Binder 驱动中的方法。内核空间与用户空间共享内存通过 copy_from_user(), copy_to_user() 内核方法来完成用户空间与内核空间内存的数据传输。 Binder驱动中有一个全局的 binder_procs 链表保存了服务端的进程信息。
