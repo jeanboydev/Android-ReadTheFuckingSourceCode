@@ -12,6 +12,8 @@ Activity 的整体启动流程如图所示：
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity/activity_start.jpg" alt="Activity 启动过程"/>
 
+下面是图中步骤的详细分析。
+
 ## 1. 发送 START_ACTIVITY_TRANSACTION 命令
 
 ```Java
@@ -167,11 +169,37 @@ app 进程中，收到 SCHEDULE_LAUNCH_ACTIVITY_TRANSACTION 命令后调用 Appl
 
 检查 Application 是否创建，最终回调目标 Activity 的 onCreate()。
 
-## 8. handleResumeActivity
+## 8. 调用 handleResumeActivity()
 
 - ActivityThread.handleResumeActivity()
 
 最终回调目标 Activity 的 onStart()，onResume()。
+
+## Activity 启动过程中涉及到的类
+
+```Java
+frameworks/base/services/core/java/com/android/server/am/
+  - ActivityManagerService.java
+  - ActivityStackSupervisor.java
+  - ActivityStack.java
+  - ActivityRecord.java
+  - ProcessRecord.java
+
+frameworks/base/core/java/android/app/
+  - IActivityManager.java
+  - ActivityManagerNative.java (内含 AMP)
+  - ActivityManager.java
+  
+  - IApplicationThread.java
+  - ApplicationThreadNative.java (内含 ATP)
+  - ActivityThread.java (内含 ApplicationThread)
+  
+  - ContextImpl.java
+```
+
+## 总结
+
+Activity 的启动流程已经分析完了，相对于 Binder 机制来说是不是很简单。 这里只是从大体逻辑分析了一遍 Activity 的启动过程，想要深入的了解实现细节还是需要看一下 Android 的源码。
 
 ## 参考资料
 
