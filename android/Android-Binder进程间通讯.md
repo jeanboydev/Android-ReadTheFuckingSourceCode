@@ -1,20 +1,20 @@
-# Android-Binder进程间通讯 #
+# Android-Binder进程间通讯
 
-## 概述 ##
+## 概述
 
 最近在学习 Binder 机制，在网上查阅了大量的资料，也看了老罗的 Binder 系列的博客和 Innost 的深入理解 Binder 系列的博客，都是从底层开始讲的，全是 C 代码，虽然之前学过 C 和 C++，然而各种函数之间花式跳转，看的我都怀疑人生。 毫不夸张的讲每看一遍都是新的内容，跟没看过一样。 后来又看到了 Gityuan 的博客看到了一些图解仿佛发现了新大陆。 
 
 下面就以图解的方式介绍下 Binder 机制，相信你看这篇文章，一定有所收获。
 
 
-## 什么是 Binder？ ##
+## 什么是 Binder？
 
 Binder 是 Android 系统中进程间通讯（IPC）的一种方式，也是 Android 系统中最重要的特性之一。 Android 中的四大组件 Activity，Service，Broadcast，ContentProvider，不同的 App 等都运行在不同的进程中，它是这些进程间通讯的桥梁。正如其名“粘合剂”一样，它把系统中各个组件粘合到了一起，是各个组件的桥梁。
 
 理解 Binder 对于理解整个 Android 系统有着非常重要的作用，如果对 Binder 不了解，就很难对 Android 系统机制有更深入的理解。
 
 
-## 1. Binder 架构 ##
+## 1. Binder 架构
 
 ![图1][1]
 
@@ -22,7 +22,7 @@ Binder 是 Android 系统中进程间通讯（IPC）的一种方式，也是 And
 - Binder 在 framework 层进行了封装，通过 JNI 技术调用 Native（C/C++）层的 Binder 架构。 
 - Binder 在 Native 层以 ioctl 的方式与 Binder 驱动通讯。
 
-## 2. Binder 机制 ##
+## 2. Binder 机制
 
 ![图8][8]
 
@@ -40,7 +40,7 @@ Binder 是 Android 系统中进程间通讯（IPC）的一种方式，也是 And
 怎么样是不是很简单，以上就是 Binder 机制的主要通讯方式，下面我们来看看具体实现。
 
 
-## 3. Binder 驱动 ##
+## 3. Binder 驱动
 
 我们先来了解下用户空间与内核空间是怎么交互的。
 
@@ -48,14 +48,16 @@ Binder 是 Android 系统中进程间通讯（IPC）的一种方式，也是 And
 
 先了解一些概念
 
-### 用户空间/内核空间 ###
+### 用户空间/内核空间
+
 详细解释可以参考 [Kernel Space Definition](http://www.linfo.org/kernel_space.html)； 简单理解如下：
 
 Kernel space 是 Linux 内核的运行空间，User space 是用户程序的运行空间。 为了安全，它们是隔离的，即使用户的程序崩溃了，内核也不受影响。
 
 Kernel space 可以执行任意命令，调用系统的一切资源； User space 只能执行简单的运算，不能直接调用系统资源，必须通过系统接口（又称 system call），才能向内核发出指令。
 
-### 系统调用/内核态/用户态 ###
+### 系统调用/内核态/用户态
+
 虽然从逻辑上抽离出用户空间和内核空间；但是不可避免的的是，总有那么一些用户空间需要访问内核的资源；比如应用程序访问文件，网络是很常见的事情，怎么办呢？
 
 > Kernel space can be accessed by user processes only through the use of system calls.
@@ -64,7 +66,8 @@ Kernel space 可以执行任意命令，调用系统的一切资源； User spac
 
 当一个任务（进程）执行系统调用而陷入内核代码中执行时，我们就称进程处于内核运行态（或简称为内核态）此时处理器处于特权级最高的（0级）内核代码中执行。当进程在执行用户自己的代码时，则称其处于用户运行态（用户态）。即此时处理器在特权级最低的（3级）用户代码中运行。处理器在特权等级高的时候才能执行那些特权CPU指令。
 
-### 内核模块/驱动 ###
+### 内核模块/驱动
+
 通过系统调用，用户空间可以访问内核空间，那么如果一个用户空间想与另外一个用户空间进行通信怎么办呢？很自然想到的是让操作系统内核添加支持；传统的 Linux 通信机制，比如 Socket，管道等都是内核支持的；但是 Binder 并不是 Linux 内核的一部分，它是怎么做到访问内核空间的呢？ Linux 的动态可加载内核模块（Loadable Kernel Module，LKM）机制解决了这个问题；模块是具有独立功能的程序，它可以被单独编译，但不能独立运行。它在运行时被链接到内核作为内核的一部分在内核空间运行。这样，Android系统可以通过添加一个内核模块运行在内核空间，用户进程之间的通过这个模块作为桥梁，就可以完成通信了。
 
 在 Android 系统中，这个运行在内核空间的，负责各个用户进程通过 Binder 通信的内核模块叫做 Binder 驱动;
@@ -76,7 +79,7 @@ Kernel space 可以执行任意命令，调用系统的一切资源； User spac
 
 熟悉了上面这些概念，我们再来看下上面的图，用户空间中 binder_open(), binder_mmap(), binder_ioctl() 这些方法通过 system call 来调用内核空间 Binder 驱动中的方法。内核空间与用户空间共享内存通过 copy_from_user(), copy_to_user() 内核方法来完成用户空间与内核空间内存的数据传输。 Binder驱动中有一个全局的 binder_procs 链表保存了服务端的进程信息。
 
-## 4. Binder 进程与线程 ##
+## 4. Binder 进程与线程
 
 ![图3][3]
 
@@ -84,7 +87,7 @@ Kernel space 可以执行任意命令，调用系统的一切资源； User spac
 
 Binder 线程池：每个 Server 进程在启动时创建一个 binder 线程池，并向其中注册一个 Binder 线程；之后 Server 进程也可以向 binder 线程池注册新的线程，或者 Binder 驱动在探测到没有空闲 binder 线程时主动向 Server 进程注册新的的 binder 线程。对于一个 Server 进程有一个最大 Binder 线程数限制，默认为16个 binder 线程，例如 Android 的 system_server 进程就存在16个线程。对于所有 Client 端进程的 binder 请求都是交由 Server 端进程的 binder 线程来处理的。
 
-## 5. ServiceManager 启动 ##
+## 5. ServiceManager 启动
 
 了解了 Binder 驱动，怎么与 Binder 驱动进行通讯呢？那就是通过 ServiceManager，好多文章称 ServiceManager 是 Binder 驱动的守护进程，大管家，其实 ServiceManager 的作用很简单就是提供了查询服务和注册服务的功能。下面我们来看一下 ServiceManager 启动的过程。
 
@@ -96,7 +99,7 @@ Binder 线程池：每个 Server 进程在启动时创建一个 binder 线程池
 
 - ServiceManager 的启动分为三步，首先打开驱动创建全局链表 binder_procs，然后将自己当前进程信息保存到 binder_procs 链表，最后开启 loop 不断的处理共享内存中的数据，并处理 BR_xxx 命令（ioctl 的命令，BR 可以理解为 binder reply 驱动处理完的响应）。
 
-## 6. ServiceManager 注册服务 ##
+## 6. ServiceManager 注册服务
 
 ![图5][5]
 
@@ -107,7 +110,7 @@ Binder 线程池：每个 Server 进程在启动时创建一个 binder 线程池
 - 事务处理完之后发送 BR_TRANSACTION 命令，ServiceManager 收到命令后向 svcinfo 列表中添加已经注册的服务。最后发送 BR_REPLY 命令唤醒等待的线程，通知注册成功。
 
 
-## 7. ServiceManager 获取服务 ##
+## 7. ServiceManager 获取服务
 
 ![图6][6]
 
@@ -117,7 +120,7 @@ Binder 线程池：每个 Server 进程在启动时创建一个 binder 线程池
 
 - Binder 驱动收到请求命令向 ServiceManager 的发送 BC_TRANSACTION 查询已注册的服务，查询到直接响应 BR_REPLY 唤醒等待的线程。若查询不到将与 binder_procs 链表中的服务进行一次通讯再响应。
 
-## 8. 进行一次完整通讯 ##
+## 8. 进行一次完整通讯
 
 ![图7][7]
 
@@ -127,7 +130,7 @@ Binder 线程池：每个 Server 进程在启动时创建一个 binder 线程池
 
 - ServiceManager 将用户空间的参数等请求数据复制到内核空间，并向服务端插入一条执行执行方法的事务。事务执行完通知 ServiceManager 将执行结果从内核空间复制到用户空间，并唤醒等待的线程，响应结果，通讯结束。
 
-## 总结 ##
+## 总结
 好了，这里只是从实现逻辑上简单介绍了下 Binder 机制的工作原理，想要深入理解 Binder 机制，还得自己下功夫，看源码，尽管这个过程很痛苦。一遍看不懂就再来一遍，说实话本人理解能力比较差，跟着博客思路看了不下十遍。 努力总会有收获，好好欣赏 native 层各方法之间花式跳转的魅力吧。最后你将发现新世界的大门在向你敞开。
 
 网上资料很多，个人觉得比较好的如下：
@@ -137,7 +140,8 @@ Binder 线程池：每个 Server 进程在启动时创建一个 binder 线程池
 4. Gityuan的 [Binder系列](http://gityuan.com/2015/10/31/binder-prepare) (基于 Android 6.0)
 5. [Binder学习指南](http://weishu.me/2016/01/12/binder-index-for-newer)
 
-## 参考资料 ##
+## 参考资料
+
 - [Binder系列](http://gityuan.com/2015/10/31/binder-prepare)
 - [Binder学习指南](http://weishu.me/2016/01/12/binder-index-for-newer)
 

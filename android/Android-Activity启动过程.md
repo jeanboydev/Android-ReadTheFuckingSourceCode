@@ -199,7 +199,7 @@ frameworks/base/core/java/android/app/
 
 ## 总结
 
-Activity 的启动流程已经分析完了，相对于 Binder 机制来说是不是很简单。 这里只是从大体逻辑分析了一遍 Activity 的启动过程，想要深入的了解实现细节还是需要看一下 Android 的源码。
+Activity 的启动流程已经分析完了，相对于 Binder 机制来说是不是很简单。 这里只是从大体逻辑分析了一遍 Activity 的启动过程，简单了解下 Activity 启动时都经历了什么，想要深入的了解实现细节还是需要看一下 Android 的源码。
 
 ## 参考资料
 
