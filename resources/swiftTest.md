@@ -244,4 +244,12 @@ var model: String? {
 //unowned self 会记录self的地址，不会强引用，对象被释放程序会崩溃
 
 
+//多语言
+NSLocalizedString(key:String, bundle:Bundle, comment:String)//调用系统的标准翻译
+NSLocalizedString(key:"Delete", bundle:Bundle(UIButton.classForCode()), "")
+//其他非标准多语言
+let title:String = "请输入内容"
+NSLocalizedString(key:String, comment:String)
+NSLocalizedString(key:title, comment:"something")
+
 
