@@ -91,9 +91,9 @@ iOS 8.3 系统框架架构图
 
 - 开发语言
 
-    Objective-C，Swift(推荐)
-    [Swift 官方资料](https://swift.org/about/)
-    [Swift 中文资料](https://www.cnswift.org/)
+    Objective-C，Swift(推荐)<br>
+    [Swift 官方资料](https://swift.org/about/)<br>
+    [Swift 中文资料](https://www.cnswift.org/)<br>
     [Swift 中文教程](http://wiki.jikexueyuan.com/project/swift/chapter2/chapter2.html)
 
 
