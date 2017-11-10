@@ -30,33 +30,39 @@ iOS 8.3 系统框架架构图
 
 - 可触摸层（Cocoa Touch Layer）
 
-大部分与用户界面有关，本质上来说它负责用户在 iOS 设备上的触摸交互操作。这一层基本都是基于 Objective-C 的接口。可触摸层主要提供用户交互相关的服务如界面控件、事件管理、通知中心、地图，包含以下框架：
-UIKit（界面相关）
-EventKit（日历事件提醒等）
-Notification Center（通知中心）
-MapKit（地图显示）
-Address Book（联系人）
-iAd（广告）
-Message UI（邮件与 SMS 显示）
-PushKit（iOS8 新 push 机制）
+大部分与用户界面有关，本质上来说它负责用户在 iOS 设备上的触摸交互操作。这一层基本都是基于 Objective-C 的接口。
+
+可触摸层主要提供用户交互相关的服务如界面控件、事件管理、通知中心、地图，包含以下框架：
+* UIKit（界面相关）
+* EventKit（日历事件提醒等）
+* Notification Center（通知中心）
+* MapKit（地图显示）
+* Address Book（联系人）
+* iAd（广告）
+* Message UI（邮件与 SMS 显示）
+* PushKit（iOS8 新 push 机制）
 
 - 媒体层（Media Layer）
 
-通过它我们可以在应用程序中使用各种媒体文件，进行音频与视频的录制，图形的绘制，以及制作基础的动画效果。这一层既有基于 Objective-c 的接口也有基于 C 语言的接口。媒体层主要提供图像引擎、音频引擎、视频引擎框架。
-图像引擎（Core Graphics、Core Image、Core Animation、OpenGL ES）
-音频引擎 （Core Audio、 AV Foundation、OpenAL）
-视频引擎（AV Foundation、Core Media）
+通过它我们可以在应用程序中使用各种媒体文件，进行音频与视频的录制，图形的绘制，以及制作基础的动画效果。这一层既有基于 Objective-c 的接口也有基于 C 语言的接口。
+
+媒体层主要提供图像引擎、音频引擎、视频引擎框架：
+* 图像引擎（Core Graphics、Core Image、Core Animation、OpenGL ES）
+* 音频引擎 （Core Audio、 AV Foundation、OpenAL）
+* 视频引擎（AV Foundation、Core Media）
 
 - 核心服务层（Core Services Layer）
 
-可以通过它来访问 iOS 的一些服务。基本都是基于 C 语言的接口。核心服务层为程序提供基础的系统服务例如网络访问、浏览器引擎、定位、文件访问、数据库访问等，主要包含以下框架：
-CFNetwork（网络访问）
-Core Data（数据存储）
-Core Location（定位功能）
-Core Motion（重力加速度，陀螺仪）
-Foundation（基础功能如 NSString）
-Webkit（浏览器引擎）
-JavaScript（JavaScript 引擎）
+可以通过它来访问 iOS 的一些服务。基本都是基于 C 语言的接口。
+
+核心服务层为程序提供基础的系统服务例如网络访问、浏览器引擎、定位、文件访问、数据库访问等，主要包含以下框架：
+* CFNetwork（网络访问）
+* Core Data（数据存储）
+* Core Location（定位功能）
+* Core Motion（重力加速度，陀螺仪）
+* Foundation（基础功能如 NSString）
+* Webkit（浏览器引擎）
+* JavaScript（JavaScript 引擎）
 
 - 核心系统层（Core OS Layer）
 
@@ -76,15 +82,21 @@ UIKit 框架提供的类是基础的UI类库，用于创建基于触摸的用户
 ## 开发准备
 
 - 开发环境
+
 Mac OS
 
 - 开发工具
+
 [Xcode](https://developer.apple.com/xcode/)
 
 - 开发语言
+
 Objective-C，Swift(推荐)
+
 [Swift 官方资料](https://swift.org/about/)
+
 [Swift 中文资料](https://www.cnswift.org/)
+
 [Swift 中文教程](http://wiki.jikexueyuan.com/project/swift/chapter2/chapter2.html)
 
 
