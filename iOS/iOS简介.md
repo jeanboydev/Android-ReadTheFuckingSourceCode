@@ -1,4 +1,4 @@
-# iOS 简介
+# iOS 入门简介
 
 ## 概述
 iOS（原名 iPhone OS，自 iOS 4 后改名为 iOS）是苹果公司为移动设备所开发的专有移动操作系统，所支持的设备包括 iPhone、iPod touch 和 iPad。与 Android 不同，iOS 不支持任何非苹果的硬件设备。
@@ -20,17 +20,17 @@ iOS 是由苹果公司开发的移动操作系统。苹果公司最早于 2007 �
 
 ## 系统架构
 
-http://upload-images.jianshu.io/upload_images/797918-71efb73f5f3ab3c6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/ios_intro/ios_system_level.png" alt="ios_system_level"/>
 
 iOS 系统分为可分为四级结构，由上至下分别为可触摸层（Cocoa Touch Layer）、媒体层（Media Layer）、核心服务层（Core Services Layer）、核心系统层（Core OS Layer），每个层级提供不同的服务。低层级结构提供基础服务如文件系统、内存管理、I/O 操作等。高层级结构建立在低层级结构之上提供具体服务如 UI 控件、文件访问等。
 
 iOS 8.3 系统框架架构图
 
-http://upload-images.jianshu.io/upload_images/696136-ade633eeaa109baa.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/ios_intro/ios_8_system_level_desc.png" alt="ios_8_system_level_desc"/>
 
 - 可触摸层（Cocoa Touch Layer）
 
-可触摸层主要提供用户交互相关的服务如界面控件、事件管理、通知中心、地图，包含以下框架：
+大部分与用户界面有关，本质上来说它负责用户在 iOS 设备上的触摸交互操作。这一层基本都是基于 Objective-C 的接口。可触摸层主要提供用户交互相关的服务如界面控件、事件管理、通知中心、地图，包含以下框架：
 UIKit（界面相关）
 EventKit（日历事件提醒等）
 Notification Center（通知中心）
@@ -42,14 +42,14 @@ PushKit（iOS8 新 push 机制）
 
 - 媒体层（Media Layer）
 
-媒体层主要提供图像引擎、音频引擎、视频引擎框架。
+通过它我们可以在应用程序中使用各种媒体文件，进行音频与视频的录制，图形的绘制，以及制作基础的动画效果。这一层既有基于 Objective-c 的接口也有基于 C 语言的接口。媒体层主要提供图像引擎、音频引擎、视频引擎框架。
 图像引擎（Core Graphics、Core Image、Core Animation、OpenGL ES）
 音频引擎 （Core Audio、 AV Foundation、OpenAL）
 视频引擎（AV Foundation、Core Media）
 
 - 核心服务层（Core Services Layer）
 
-核心服务层为程序提供基础的系统服务例如网络访问、浏览器引擎、定位、文件访问、数据库访问等，主要包含以下框架：
+可以通过它来访问 iOS 的一些服务。基本都是基于 C 语言的接口。核心服务层为程序提供基础的系统服务例如网络访问、浏览器引擎、定位、文件访问、数据库访问等，主要包含以下框架：
 CFNetwork（网络访问）
 Core Data（数据存储）
 Core Location（定位功能）
@@ -60,7 +60,7 @@ JavaScript（JavaScript 引擎）
 
 - 核心系统层（Core OS Layer）
 
-核心系统层提供为上层结构提供最基础的服务如操作系统内核服务、本地认证、安全、加速等。
+它包括内存管理、文件系统、电源管理以及一些其他的操作系统任务。它可以直接和硬件设备进行交互。作为 App 开发者不需要与这一层打交道。基本都是基于 C 语言的接口。核心系统层提供为上层结构提供最基础的服务如操作系统内核服务、本地认证、安全、加速等。
 
 操作系统内核服务（BSD sockets、I/O 访问、内存申请、文件系统、数学计算等）
 本地认证（指纹识别验证等）
@@ -72,6 +72,21 @@ JavaScript（JavaScript 引擎）
 Foundation 框架提供许多基本的对象类和数据类型，使其成为应用程序开发的基础,为所有应用程序提供最基本的系统服务，和界面无关。
 
 UIKit 框架提供的类是基础的UI类库，用于创建基于触摸的用户界面，所有 iOS 应用程序都是基于 UIKit，它提供应用程序的基础架构，用于构建用户界面，绘图、处理和用户交互事件，响应手势等等。UIKit 通过控制器对象管理屏幕上显示的内容，界面的跳转，来组织应用程序。没有 UIKit 框架就没有 iOS 应用程序。
+
+## 开发准备
+
+- 开发环境
+Mac OS
+
+- 开发工具
+[Xcode](https://developer.apple.com/xcode/)
+
+- 开发语言
+Objective-C，Swift(推荐)
+[Swift 官方资料](https://swift.org/about/)
+[Swift 中文资料](https://www.cnswift.org/)
+[Swift 中文教程](http://wiki.jikexueyuan.com/project/swift/chapter2/chapter2.html)
+
 
 ## 参考资料
 - https://developer.apple.com/library/content/documentation/Miscellaneous/Conceptual/iPhoneOSTechOverview/Introduction/Introduction.html
