@@ -6,11 +6,11 @@
 
 - 引导阶段
 
-Basic Input/Output System（基本输入输出系统），在 IBM PC 兼容系统上，是一种业界标准的固件接口（来自维基百科）。 BIOS 一般是主板芯片上的一个程序，计算机通电后，第一件事就是读取它。
+BIOS: Basic Input/Output System（基本输入输出系统），在 IBM PC 兼容系统上，是一种业界标准的固件接口（来自维基百科）。 BIOS 一般是主板芯片上的一个程序，计算机通电后，第一件事就是读取它。
 
 BIOS 程序首先检查计算机硬件能否满足运行的基本条件，这叫做"硬件自检"（Power-On Self-Test），缩写为 POST。 如果硬件出现问题，主板会发出不同含义的蜂鸣，启动中止。 如果没有问题，屏幕就会显示出 CPU，内存，硬盘等信息。
 
-硬件自检完成后，BIOS把控制权转交给下一阶段的启动程序。 这时 BIOS 需要知道，下一阶段的启动程序到底存放在哪一个设备当中。 也就是说 BIOS 需要有一个外部存储设备的排序，排在前面的设备就是优先转交控制权的设备。 这种排序叫做启动排序，也就是我们平时进入 BIOS 界面时能看到的 Boot Sequence。
+硬件自检完成后，BIOS 把控制权转交给下一阶段的启动程序。 这时 BIOS 需要知道，下一阶段的启动程序到底存放在哪一个设备当中。 也就是说 BIOS 需要有一个外部存储设备的排序，排在前面的设备就是优先转交控制权的设备。 这种排序叫做启动排序，也就是我们平时进入 BIOS 界面时能看到的 Boot Sequence。
 
 如果我们没有进行特殊操作的话，那么 BIOS 就会按照这个启动顺序将控制权交给下一个存储设备。 我们在使用 U 盘光盘之类的装系统时就是在这里将启动顺序改变了，将本来要移交给硬盘的控制权交给了 U 盘或者光盘。
 
@@ -33,7 +33,7 @@ MBR 只有512个字节，放不了太多东西。 它的主要作用是，告诉
 
 ## Android 手机的启动过程
 
-Android 系统虽然也是基于 Linux 系统的，但是由于 Android 属于嵌入式设备，并没有像 PC 那样的 BIOS 程序。 取而代之的是Bootloader —— 系统启动加载器。 它类似于 BIOS，在系统加载前，用以初始化硬件设备，建立内存空间的映像图，为最终调用系统内核准备好环境。 在 Android 里没有硬盘，而是 ROM，它类似于硬盘存放操作系统，用户程序等。 ROM 跟硬盘一样也会划分为不同的区域，用于放置不同的程序，在 Android 中主要划分为一下几个分区：
+Android 系统虽然也是基于 Linux 系统的，但是由于 Android 属于嵌入式设备，并没有像 PC 那样的 BIOS 程序。 取而代之的是 Bootloader —— 系统启动加载器。 它类似于 BIOS，在系统加载前，用以初始化硬件设备，建立内存空间的映像图，为最终调用系统内核准备好环境。 在 Android 里没有硬盘，而是 ROM，它类似于硬盘存放操作系统，用户程序等。 ROM 跟硬盘一样也会划分为不同的区域，用于放置不同的程序，在 Android 中主要划分为一下几个分区：
 
 - /boot：存放引导程序，包括内核和内存操作程序
 - /system：相当于电脑c盘，存放Android系统及系统应用
@@ -43,8 +43,7 @@ Android 系统虽然也是基于 Linux 系统的，但是由于 Android 属于�
 - /misc：包含一些杂项内容，如系统设置和系统功能启用禁用设置
 - /sdcard：用户自己的存储区，可以存放照片，音乐，视频等文件
 
-
-[图](https://github.com/Rogero0o/rogero0o.github.io/blob/master/img/boot_image_1.png?raw=true)
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/boot_image.png" alt=""/>
 
 那么 Bootloader 是如何被加载的呢？跟 PC 启动过程类似，当开机通电时首先会加载 Bootloader，Bootloader 回读取 ROM 找到操作系统并将 Linux 内核加载到 RAM 中。
 
@@ -52,8 +51,7 @@ Android 系统虽然也是基于 Linux 系统的，但是由于 Android 属于�
 
 ## init 进程
 
-
-[图 init 过程](http://gityuan.com/images/process/android-booting.jpg)
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-booting.png" alt=""/>
 
 init 是 Linux 系统中用户空间的第一个进程(pid=1)，Kernel 启动后会调用 /system/core/init/Init.cpp 的 main() 方法。
 
@@ -79,7 +77,7 @@ init.rc 脚本文件配置了一些重要的服务，init 进程通过创建子�
 
 ## Zygote 进程
 
-[fork 过程](http://gityuan.com/images/android-process/process-create.jpg)
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-process.png" alt=""/>
 
 Zygote 进程孵化了所有的 Android 应用进程，是 Android Framework 的基础，该进程的启动也标志着 Framework 框架初始化启动的开始。 
 
@@ -213,3 +211,5 @@ startOtherServices();     // 启动其他服务
 - [计算机是如何启动的？](http://www.ruanyifeng.com/blog/2013/02/booting.html)
 - [按下电源键之后，电脑又默默干了很多事](http://daily.zhihu.com/story/8803295)
 - [Android系统启动-概述](http://gityuan.com/2016/02/01/android-booting/)
+
+
