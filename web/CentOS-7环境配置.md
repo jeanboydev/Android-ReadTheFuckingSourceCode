@@ -8,16 +8,15 @@
 2. 查看安装是否正确
 
 > rpm -qa | grep nginx
+> 
 > rpm -ql nginx	//查看生成的文件
 
 3. 配置
 
 默认的配置文件在 `/etc/nginx/nginx.conf`，打开配置文件：
-
 > vi /etc/nginx/nginx.conf
 
 在 `server` 模块中添加：
-
 > include /home/<用户名>/nginx/config/*.conf;
 
 在上面目录下创建 `*.conf` 文件，内容如下：
@@ -70,7 +69,9 @@ server {
 4. 常用操作
 
 > systemctl start nginx //启动
+> 
 > systemctl stop nginx  //关闭
+> 
 > systemctl reload nginx    //重载配置文件
 
 ## 安装 Java
@@ -112,8 +113,8 @@ https://tomcat.apache.org/download-80.cgi
 2. 上传至服务器并解压
 
 解压到：`/home/<用户名>/tomcat`
-
 > tar –zxv –f apache-tomcat-xxx.tar.gz	//解压压缩包
+> 
 > rm -rf apache-tomcat-7.0.29.tar.gz	//删除压缩包
 
 3. 配置外部应用目录
@@ -148,17 +149,18 @@ https://tomcat.apache.org/download-80.cgi
 6. 启动与停止
 
 > /home/<用户名>/tomcat/bin/startup.sh	//启动
+> 
 > /home/<用户名>/tomcat/bin/shutdown.sh	//停止
 
 启动或停止出错时，使用进程命令操作：
 
 > ps -ef | grep tomcat
+> 
 > kill -9 <进程号>
 
 7. 应用 war 部署
 
 Idea 打 war 包
-
 > Build -> Build Artifacts -> Gradle:xxx.war -> Build
 
 war 包保存位置
@@ -172,8 +174,8 @@ war 包保存位置
 
 在 MySQL 官网中下载 yum 源 rpm 安装包：
 http://dev.mysql.com/downloads/repo/yum/
-
 > sudo wget https://repo.mysql.com//mysql57-community-release-el7-11.noarch.rpm
+> 
 > sudo yum localinstall mysql57-community-release-el7-11.noarch.rpm
 
 2. 检查 MySQL 源是否安装成功：
@@ -189,20 +191,19 @@ http://dev.mysql.com/downloads/repo/yum/
 > systemctl start mysqld
 
 设置开机启动：
-
 > systemctl enable mysqld
 > systemctl daemon-reload
 
 5. 修改root本地登录密码
 
 MySQL 安装完成之后，在 `/var/log/mysqld.log` 文件中给 root 生成了一个默认密码。通过下面的方式找到 root 默认密码，然后登录 MySQL 进行修改：
-
 > grep 'temporary password' /var/log/mysqld.log
+> 
 > mysql -uroot –p	//登录mysql
+> 
 > ALTER USER 'root'@'localhost' IDENTIFIED BY '新密码';
 
 添加远程登录用户：
-
 > GRANT ALL PRIVILEGES ON *.* TO '用户名'@'%' IDENTIFIED BY '密码' WITH GRANT OPTION;
 
 6. 配置默认编码为utf-8:
@@ -220,7 +221,10 @@ init_connect='SET NAMES utf8'
 7. 默认配置文件路径：
 
 配置文件：/etc/my.cnf 
+
 日志文件：/var/log//var/log/mysqld.log 
+
 服务启动脚本：/usr/lib/systemd/system/mysqld.service 
+
 socket文件：/var/run/mysqld/mysqld.pid
 

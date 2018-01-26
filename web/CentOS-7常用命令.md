@@ -72,33 +72,33 @@
 > vi /etc/ssh/sshd_config
 
 在ssh配置文件末尾添加，port端口号可自定义：
-
 > Port 10022
+> 
 > Protocol 2
+> 
 > PermitRootLogin no
 
 保存后退出，然后reload ssh服务，使配置生效：
-
 > service sshd reload
 
 使用命令行登录云主机：
-
 > ssh -p <port> <用户名>@<公网IP地址>
 
 
 ## 系统防火墙
 
 > firewall-cmd --list-ports	//查看防火墙已经开放的端口
+> 
 > systemctl status firewalld	//查看防火墙状态
+> 
 > systemctl start firewalld	//开启防火墙
 
 开启防火墙 8080 端口：
-
 > firewall-cmd --permanent --zone=public --add-port=8080/tcp
+> 
 > firewall-cmd --reload
 
 端口操作：
-
 > netstat -tunlp|grep <port>	//查看端口占用情况
 
 -t：仅显示tcp相关选项
@@ -110,20 +110,27 @@
 ## 系统其它常用命令
 
 systemctl 操作：（systemctl主要负责控制systemd系统和服务管理器，取代service方式）
-
 > systemctl start <软件名> //启动
+> 
 > systemctl restart <软件名>   //重启
+> 
 > systemctl stop <软件名>  //停止
+> 
 > systemctl reload <软件名>    //重载服务
+> 
 > systemctl status <软件名>    //查看服务状态
+> 
 > systemctl enable <软件名>    //设置开机启动
+> 
 > systemctl disable <软件名>   //禁止开机启动
+> 
 > systemctl kill <软件名>  //杀死服务
 
 进程操作：
-
 > ps –ef | grep <软件名>   //查看进程是否存在，例如：nginx，tomcat
+> 
 > kill -9 <进程号> //强制停止
+> 
 > kill -quit <进程号>  //停止进程
 
 
