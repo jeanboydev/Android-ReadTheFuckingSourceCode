@@ -1,0 +1,74 @@
+# 
+
+- ActivityManagerService：管理四大组件以及进程管理，尤其是Activity的各种栈以及各种状态切换管理
+- WindowManagerService：管理Activity所相应的窗口系统
+- SurfaceFlinger：将应用UI绘制到frameBuffer(帧缓冲区)，最终由硬件完成渲染到屏幕上
+
+## 服务端
+WindowManagerService:
+- mPolicy -> PhoneWindowManager:用于实现各种窗口相关的策略
+- mChoreographer -> Choreographer:用于控制窗口动画,屏幕旋转等操作
+- mDisplayContents -> DisplayContent[]:跟多屏输出相关
+- mTokenMap -> HashMap<IBinder,WindowToken>:Window标识，用于与ActivityManagerService交互
+
+system_server进程:
+- WindowManagerService:Activity通过其成员变量mWindowManager(数据类型WindowManagerImpl)，再调用WindowManagerGlobal对象，经过binder call跟WMS通信
+- Session:ViewRootImp创建的用于跟WindowManagerService中的Session进行通信
+- ActivityRecord.Token:startActivity过程通过binder call进入system_server进程，在该进程执行ASS.startActivityLocked()方法中会创建相应的ActivityRecord对象，该对象初始化时会创建数据类型为ActivityRecord.Token的成员变量appToken，然后会将该对象传递到ActivityThread
+- WindowState:代表一个窗口
+
+App进程:
+- IWindow -> ViewRootImpl
+
+Activity:
+- mWindow -> PhoneWindow:继承于Window
+- mWindowManager -> WindowManagerImpl:实现WindowManager接口
+- mMainThread -> ActivityThread:并非真正的线程，只是运行在主线程的对象
+- mUiThread -> Thread:当前activity所在线程，即主线程
+- mHandler -> Handler:当前主线程的handler
+- mDecor -> View:Activity执行完resume之后创建的视图对象
+
+1. 每一个Activity对应一个应用窗口；每一个窗口对应一个ViewRootImpl对象
+2. 每一个App进程对应唯一的WindowManagerGlobal对象；
+    WindowManagerGlobal.sWindowManagerService用于跟WMS交互
+    WindowManagerGlobal.sWindowSession用于跟Session交互；
+3. 每一个App进程对应唯一的相同Session代理对象；
+4. App可以没有Activity/PhoneWindow/DecorView，例如带悬浮窗口的Service；
+5. Activity运行在ActivityThread所在的主线程；
+6. DecorView是Activity所要显示的视图内容；
+7. ViewRootImpl：管理DecorView跟WMS的交互；每次调用addView()添加窗口时，则都会创建一个ViewRootImpl对象；
+
+
+## Activity
+- startActivity
+启动窗口
+- ActivityManagerService.startActivity
+- ActivityStack.startActivityLocked:将目标Activity所对应的AMS和WMS的task，分别移至栈顶；从mTaskHistory中获取该Activity所属的task；若当前Activity所属进程没有启动，则需要显示启动窗口；创建AppWindowToken，并添加到WMS的mTokenMap中；设置启动窗口StartingWindow；恢复栈顶的Activity。
+- ActivityStack.resumeTopActivityInnerLocked:暂停上一个Activity，进程已存在设置为显示触发onResume->ApplicationThreadProxy.scheduleResumeActivity，进程不存在先创建进程，再调用ApplicationThreadProxy.scheduleLaunchActivity。
+- WindowManager.setAppVisibility->ApplicationThreadProxy.scheduleResumeActivity:找到已存在的Token，执行动画，设置AppWindowToken相应窗口可见
+- ApplicationThreadProxy.scheduleLaunchActivity:初始化WindowManagerGlobal，获取ClassLoader，创建目标Activity对象->Activity.attach，创建Application对象，回调Activity.onCreate()。
+- Activity.attach:创建PhoneWindow，获取当前线程的ActivityThread对象，设置当前Activity所属的Application，设置并获取WindowManagerImpl对象
+- ApplicationThreadProxy.handleResumeActivity->performResumeActivity:回调到Activity的onResume。
+- Activity.makeVisible:WindowManagerImpl.addView->WindowManagerGlobal.addView
+- WindowManagerGlobal.addView:创建ViewRootImpl并添加视图
+- ViewRootImpl:获取IWindowSession的代理类，设置线程为主线程；通过binder调用进入system_server进程，再次经过Binder将数据写回app进程，则获取的便是Session的代理对象。
+- ViewRootImpl.setView:通过Binder调用，进入system_server进程的Session对象
+- WindowManagerService.addWindow:创建WindowState，调整WindowManager的LayoutParams参数，设置input
+- Session.windowAddedLocked:创建SurfaceSession对象，并将当前Session添加到WMS.mSessions成员变量。
+- nativeCreate:创建SurfaceComposerClient对象， 作为跟SurfaceFlinger通信的代理对象。
+- WMS.performLayoutLockedInner:开始布局，执行attach窗口的布局操作，
+
+
+
+- ActivityManagerService.setAppStartingWindow:处理上一个显示Activity的token，处理启动窗口，主题theme不存在的情况，最后创建启动数据，发消息到“android.display”线程来处理ADD_STARTING消息。
+- WindowManagerService.H.handleMessage->ADD_STARTING:处理消息
+- PhoneWindowManager.addStartingWindow:设置启动窗口，创建WindowManagerImpl对象，并添加到WMS。
+- WindowManagerImpl.addView:增加视图
+- WindowManagerGlobal.addView:
+- WindowManagerService.performLayoutAndPlaceSurfacesLocked:组件启动之后, 需要先把startingWindow去掉,再显示真正的窗口. window更新的过程都会调用WMS.performLayoutAndPlaceSurfacesLocked方法
+- WindowManagerService.performLayoutAndPlaceSurfacesLockedInner:执行layout操作，销毁不可见的surface，移除所有正在退出的token，移除所有正在退出的applicatin，执行启动动画
+- WindowManagerService.H.handleMessage->FINISHED_STARTING:处理消息
+- PhoneWindowManager.removeStartingWindow:调用WindowManager.removeView
+- WindowManagerImpl.removeView:移除视图
+- WindowManagerGlobal.removeView:
+
