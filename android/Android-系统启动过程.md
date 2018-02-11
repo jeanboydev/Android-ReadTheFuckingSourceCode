@@ -45,7 +45,7 @@ Android 系统虽然也是基于 Linux 系统的，但是由于 Android 属于�
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/boot_image.png" alt=""/>
 
-那么 Bootloader 是如何被加载的呢？跟 PC 启动过程类似，当开机通电时首先会加载 Bootloader，Bootloader 回读取 ROM 找到操作系统并将 Linux 内核加载到 RAM 中。
+那么 Bootloader 是如何被加载的呢？跟 PC 启动过程类似，当开机通电时首先会加载 Bootloader，Bootloader 会读取 ROM 找到操作系统并将 Linux 内核加载到 RAM 中。
 
 当 Linux 内核启动后会初始化各种软硬件环境，加载驱动程序，挂载根文件系统，Linux 内核加载的最后阶段会启动执行第一个用户空间进程 init 进程。
 
@@ -66,17 +66,35 @@ init.rc 文件是 Android 系统的重要配置文件，位于 /system/core/root
 init.rc 脚本文件配置了一些重要的服务，init 进程通过创建子进程启动这些服务，这里创建的 service 都属于 native 服务，运行在 Linux 空间，通过 socket 向上层提供特定的服务，并以守护进程的方式运行在后台。
 
 通过 init.rc 脚本系统启动了以下几个重要的服务：
-- servicemanager：启动binder IPC，管理所有的 Android 系统服务
+- servic_emanager：启动binder IPC，管理所有的 Android 系统服务
 - mountd：设备安装 Daemon，负责设备安装及状态通知
 - debuggerd：启动 debug system，处理调试进程的请求
 - rild：启动 radio interface layer daemon 服务，处理电话相关的事件和请求
-- mediaserver：启动 AudioFlinger，MediaPlayerService and CameraService，负责多媒体播放相关的功能，包括音视频解码、显示输出
+- media_server：启动 AudioFlinger，MediaPlayerService 和 CameraService，负责多媒体播放相关的功能，包括音视频解码
+- surface_flinger：启动 SurfaceFlinger 负责显示输出
 - zygote：进程孵化器，启动 Android Java VMRuntime 和启动 systemserver，负责 Android 应用进程的孵化工作
 
 在这个阶段你可以在设备的屏幕上看到 “Android” logo 了。
 
+以上工作执行完，init 进程就会进入 loop 状态。
+
+## service_manager 进程
+
+ServiceManager 是 Binder IPC 通信过程中的守护进程，本身也是一个 Binder 服务。ServiceManager 进程主要是启动 Binder，提供服务的查询和注册。
+
+具体过程详见 Binder：[Android Binder 进程间通讯](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Binder进程间通讯.md)
+
+## surface_flinger 进程
+
+SurfaceFlinger 负责图像绘制，是应用 UI 的和兴，其功能是合成所有 Surface 并渲染到显示设备。SurfaceFlinger 进程主要是启动 FrameBuffer，初始化显示系统。
+
+## media_server 进程
+
+MediaServer 进程主要是启动 AudioFlinger 音频服务，CameraService 相机服务。负责处理音频解析播放，相机相关的处理。
+
 ## Zygote 进程
 
+fork 创建进程过程：
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-process.png" alt=""/>
 
 Zygote 进程孵化了所有的 Android 应用进程，是 Android Framework 的基础，该进程的启动也标志着 Framework 框架初始化启动的开始。 
@@ -89,122 +107,88 @@ Zygote 服务进程的主要功能：
 
 当 Zygote 进程启动后, 便会执行到 frameworks/base/cmds/app_process/App_main.cpp 文件的 main() 方法。 
 
-- App_main.main()
+```C
+App_main.main() //设置进程名，并启动 AppRuntime。
+AndroidRuntime::start() //创建 Java 虚拟机，注册 JNI 方法，调用 ZygoteInit.main() 方法。
+ZygoteInit.main()   //为 Zygote 注册 socket，预加载类和资源，启动 system_server 进程。
+```
 
-设置进程名，启动 AppRuntime。
-
-- AndroidRuntime::start()
-
-创建 Java 虚拟机，注册 JNI 方法，调用 ZygoteInit.main() 方法。
-
-- ZygoteInit.main()
-
-为 Zygote 注册 socket，预加载类和资源，启动 system_server，进入循环模式等待下次创建进程。
+然后 Zygote 进程会进入 loop 状态，等待下次 fork 进程。
 
 ## system_server 进程
 
-- ZygoteInit.startSystemServer()
+system_server 进程 由 Zygote 进程 fork 而来。接下来看下 system_server 启动过程。
 
-fork 子进程 system_server，进入 system_server 进程。
+```C
+//首先会调用 ZygoteInit.startSystemServer() 方法
+ZygoteInit.startSystemServer()  //fork 子进程 system_server，进入 system_server 进程。
+ZygoteInit.handleSystemServerProcess()  //设置当前进程名为“system_server”，创建 PathClassLoader 类加载器。
+RuntimeInit.zygoteInit()    //重定向 log 输出，通用的初始化（设置默认异常捕捉方法，时区等），初始化 Zygote -> nativeZygoteInit()。
+nativeZygoteInit()  //方法经过层层调用，会进入 app_main.cpp 中的 onZygoteInit() 方法。
+app_main::onZygoteInit()// 启动新 Binder 线程。
+applicationInit()   //方法经过层层调用，会抛出异常 ZygoteInit.MethodAndArgsCaller(m, argv), ZygoteInit.main() 会捕捉该异常。
 
-- ZygoteInit.handleSystemServerProcess()
-
-设置当前进程名为“system_server”，创建 PathClassLoader 类加载器。
-
-- RuntimeInit.zygoteInit()
-
-重定向 log 输出，通用的初始化（设置默认异常捕捉方法，时区等），初始化 Zygote -> nativeZygoteInit()。
-
-nativeZygoteInit() 方法经过层层调用，会进入 app_main.cpp 中的 onZygoteInit() 方法。
-
-- app_main::onZygoteInit()
-
-启动新 Binder 线程。 Binder 详见：[Android Binder 进程间通讯](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Binder进程间通讯.md)
-
-applicationInit() 方法经过层层调用，会抛出异常 ZygoteInit.MethodAndArgsCaller(m, argv), ZygoteInit.main() 会捕捉该异常。
-
-- ZygoteInit.main()
-
-开启 DDMS 功能，preload() 加载资源，预加载 OpenGL，调用 SystemServer.main() 方法。
-
-- SystemServer.main()
-
-先初始化 SystemServer 对象，再调用对象的 run() 方法。
-
-- SystemServer.run()
-
-准备主线程 looper，加载 android_servers.so 库，该库包含的源码在 frameworks/base/services/ 目录下。
-
-初始化系统上下文（设置主题），创建系统服务管理 SystemServiceManager。
-
-启动各种系统服务：
+ZygoteInit.main()   //开启 DDMS 功能，preload() 加载资源，预加载 OpenGL，调用 SystemServer.main() 方法。
+SystemServer.main() //先初始化 SystemServer 对象，再调用对象的 run() 方法。
+SystemServer.run()  //准备主线程 looper，加载 android_servers.so 库，该库包含的源码在 frameworks/base/services/ 目录下。
+```
+system_server 进程启动后将初始化系统上下文（设置主题），创建系统服务管理 SystemServiceManager，然后启动各种系统服务：
 
 ```Java
 startBootstrapServices(); // 启动引导服务
+//该方法主要启动服务 ActivityManagerService，PowerManagerService，LightsService，DisplayManagerService，PackageManagerService，UserManagerService。
+//设置 ActivityManagerService，启动传感器服务。
+
 startCoreServices();      // 启动核心服务
+//该方法主要
+//启动服务 BatteryService 用于统计电池电量，需要 LightService。
+//启动服务 UsageStatsService，用于统计应用使用情况。
+//启动服务 WebViewUpdateService。
+
 startOtherServices();     // 启动其他服务
+//该方法主要启动服务 InputManagerService，WindowManagerService。
+//等待 ServiceManager，SurfaceFlinger启动完成，然后显示启动界面。
+//启动服务 StatusBarManagerService，
+//准备好 window, power, package, display 服务：
+//	- WindowManagerService.systemReady()
+//	- PowerManagerService.systemReady()
+//	- PackageManagerService.systemReady()
+//	- DisplayManagerService.systemReady()
 ```
 
-最后进入循环 Looper.loop()。
+所有的服务启动完成后会注册到 ServiceManager。
+ActivityManagerService 服务启动完成后，会进入 ActivityManagerService.systemReady()，然后启动 SystemUI，WebViewFactory，Watchdog，最后启动桌面 Launcher App。
 
-- SystemServer.startBootstrapServices()
-
-启动服务 ActivityManagerService，PowerManagerService，LightsService，DisplayManagerService，PackageManagerService，UserManagerService。
-
-设置 ActivityManagerService，启动传感器服务。
-
-- SystemServer.startCoreServices()
-
-启动服务 BatteryService 用于统计电池电量，需要 LightService。
-启动服务 UsageStatsService，用于统计应用使用情况。
-启动服务 WebViewUpdateService。
-
-
-- SystemServer.startOtherServices()
-
-启动服务 InputManagerService，WindowManagerService。
-
-显示启动界面。
-
-启动服务 StatusBarManagerService，
-
-准备好 window, power, package, display 服务：
-	- WindowManagerService.systemReady()
-	- PowerManagerService.systemReady()
-	- PackageManagerService.systemReady()
-	- DisplayManagerService.systemReady()
-
-进入 ActivityManagerService.systemReady()，启动 SystemUI， WebViewFactory，Watchdog，启动桌面 Activity。
+最后会进入循环 Looper.loop()。
 
 ## ActivityManagerService 启动
 
-- ActivityManagerService(Context)
+启动桌面 Launcher App 需要等待 ActivityManagerService 启动完成。我们来看下 ActivityManagerService 启动过程。
 
-创建名为“ActivityManager”的前台线程，并获取mHandler。
+```Java
+ActivityManagerService(Context) 
+//创建名为“ActivityManager”的前台线程，并获取mHandler。
+//通过 UiThread 类，创建名为“android.ui”的线程。
+//创建前台广播和后台广播接收器。
+//创建目录 /data/system。
+//创建服务 BatteryStatsService。
 
-通过 UiThread 类，创建名为“android.ui”的线程。
+ActivityManagerService.start()  //启动电池统计服务，创建 LocalService，并添加到 LocalServices。
 
-创建前台广播和后台广播接收器。
+ActivityManagerService.startOtherServices() -> installSystemProviders()
+//安装所有的系统 Provider。
 
-创建目录 /data/system。
+ActivityManagerService.systemReady()
+//恢复最近任务栏的 task。
+//启动 WebView，SystemUI，开启 Watchdog，启动桌面 Launcher App。
+//发送系统广播。
+```
 
-创建服务 BatteryStatsService。
+启动桌面 Launcher App，首先会通过 Zygote 进程 fork 一个新进程作为 App 进程，然后创建 Application，创建启动 Activity，最后用户才会看到桌面。
 
-- ActivityManagerService.start()
+## 完整启动过程
 
-启动电池统计服务，创建 LocalService，并添加到 LocalServices。
-
-- ActivityManagerService.startOtherServices() -> installSystemProviders()
-
-安装所有的系统 Provider。
-
-- ActivityManagerService.systemReady()
-
-恢复最近任务栏的 task。
-
-启动 WebView，SystemUI，开启 Watchdog，启动桌面 Activity。
-
-发送系统广播。
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-bootloader.png" alt=""/>
 
 ## 参考资料
 
