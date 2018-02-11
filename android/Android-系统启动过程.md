@@ -66,7 +66,7 @@ init.rc 文件是 Android 系统的重要配置文件，位于 /system/core/root
 init.rc 脚本文件配置了一些重要的服务，init 进程通过创建子进程启动这些服务，这里创建的 service 都属于 native 服务，运行在 Linux 空间，通过 socket 向上层提供特定的服务，并以守护进程的方式运行在后台。
 
 通过 init.rc 脚本系统启动了以下几个重要的服务：
-- servic_emanager：启动binder IPC，管理所有的 Android 系统服务
+- servic_emanager：启动 binder IPC，管理所有的 Android 系统服务
 - mountd：设备安装 Daemon，负责设备安装及状态通知
 - debuggerd：启动 debug system，处理调试进程的请求
 - rild：启动 radio interface layer daemon 服务，处理电话相关的事件和请求
@@ -121,16 +121,31 @@ system_server 进程 由 Zygote 进程 fork 而来。接下来看下 system_serv
 
 ```C
 //首先会调用 ZygoteInit.startSystemServer() 方法
-ZygoteInit.startSystemServer()  //fork 子进程 system_server，进入 system_server 进程。
-ZygoteInit.handleSystemServerProcess()  //设置当前进程名为“system_server”，创建 PathClassLoader 类加载器。
-RuntimeInit.zygoteInit()    //重定向 log 输出，通用的初始化（设置默认异常捕捉方法，时区等），初始化 Zygote -> nativeZygoteInit()。
-nativeZygoteInit()  //方法经过层层调用，会进入 app_main.cpp 中的 onZygoteInit() 方法。
-app_main::onZygoteInit()// 启动新 Binder 线程。
-applicationInit()   //方法经过层层调用，会抛出异常 ZygoteInit.MethodAndArgsCaller(m, argv), ZygoteInit.main() 会捕捉该异常。
+ZygoteInit.startSystemServer()  
+//fork 子进程 system_server，进入 system_server 进程。
 
-ZygoteInit.main()   //开启 DDMS 功能，preload() 加载资源，预加载 OpenGL，调用 SystemServer.main() 方法。
-SystemServer.main() //先初始化 SystemServer 对象，再调用对象的 run() 方法。
-SystemServer.run()  //准备主线程 looper，加载 android_servers.so 库，该库包含的源码在 frameworks/base/services/ 目录下。
+ZygoteInit.handleSystemServerProcess()  
+//设置当前进程名为“system_server”，创建 PathClassLoader 类加载器。
+
+RuntimeInit.zygoteInit()    
+//重定向 log 输出，通用的初始化（设置默认异常捕捉方法，时区等），初始化 Zygote -> nativeZygoteInit()。
+
+nativeZygoteInit()  
+//方法经过层层调用，会进入 app_main.cpp 中的 onZygoteInit() 方法。
+
+app_main::onZygoteInit()// 启动新 Binder 线程。
+
+applicationInit()   
+//方法经过层层调用，会抛出异常 ZygoteInit.MethodAndArgsCaller(m, argv), ZygoteInit.main() 会捕捉该异常。
+
+ZygoteInit.main()   
+//开启 DDMS 功能，preload() 加载资源，预加载 OpenGL，调用 SystemServer.main() 方法。
+
+SystemServer.main() 
+//先初始化 SystemServer 对象，再调用对象的 run() 方法。
+
+SystemServer.run()  
+//准备主线程 looper，加载 android_servers.so 库，该库包含的源码在 frameworks/base/services/ 目录下。
 ```
 system_server 进程启动后将初始化系统上下文（设置主题），创建系统服务管理 SystemServiceManager，然后启动各种系统服务：
 
