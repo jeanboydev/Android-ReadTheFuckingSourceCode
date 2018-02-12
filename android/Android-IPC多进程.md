@@ -1,4 +1,4 @@
-#Android-IPC多进程 #
+# Android - IPC 多进程
 
 ## 概述 ##
 IPC 即 Inter-Process Communication，含义为进程间通信或者跨进程通信，是指两个进程之间进行数据交换的过程。
@@ -130,3 +130,4 @@ Socket 可以实现计算机网络中的两个进程间的通信，当然也可�
 参考代码：
 
 [https://github.com/jeanboydev/Android-AIDLTest](https://github.com/jeanboydev/Android-AIDLTest)
+
