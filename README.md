@@ -62,7 +62,7 @@
 - [Android-项目架构探索](https://github.com/jeanboydev/Android-Architecture)
 - [Android 性能优化-UI优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-UI优化.md)
 - [Android 性能优化-内存优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-内存优化.md)
-- [Android Activity 启动过程分析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity启动过程.md)
+- [一篇文章看明白 Android 从点击桌面应用图标到应用启动的过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity启动过程.md)
 - [一篇文章看明白 Android 系统启动时都干了什么](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-系统启动过程.md)
 
 ## 设计模式
