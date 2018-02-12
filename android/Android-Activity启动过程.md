@@ -239,7 +239,7 @@ ActivityThread.performLaunchActivity() {
     //因为 Activity 有界面，所以其 Context 是 ContextThemeWrapper 类型，但实现类仍是ContextImpl.
     Context appContext = createBaseContextForActivity(r, activity);
     activity.attach(context,mInstrumentation,application,...);
-    //与 Window 进行关联，具体过程详见：[Activity，Window，View 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity与Window与View之间的关系.md)
+    //与 Window 进行关联
     
     //attach 后调用 activity 的 onCreate()方法。
     mInstrumentation.callActivityOnCreate(activity,...)
@@ -257,6 +257,8 @@ ActivityThread.performResumeActivity()
 //最终回调目标 Activity 的 onResume()。
 
 ```
+
+与 Window 进行关联，具体过程详见：[Activity，Window，View 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity与Window与View之间的关系.md)
 
 ## 总结
 
