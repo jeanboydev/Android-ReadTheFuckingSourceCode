@@ -5,12 +5,14 @@
 从点击桌面应用图标到应用显示的过程我们再熟悉不过了，下面我们来分析下这个过程都做了什么。
 
 本文主要对以下问题分析：
+
+- ActivityThread 是什么，它是一个线程吗，如何被启动的？
+- ActivityClientRecord 与 ActivityRecord 是什么？
+- Context 是什么，ContextImpl，ContextWapper 是什么？
+- Instrumentation 是什么？
 - Application 是什么，什么时候创建的，每个应用程序有几个 Application？
-- Context 是什么，ContextImpl 是什么，每个应用中 Context 个数？
-- Application.attach()，Activity.attach() 的调用时机及作用？
-- Instrumentation 的重要性及具体作用？
 - 点击 Launcher 启动 Activity 和应用内部启动 Activity 的区别？
-- Activity 启动过程，onCreate()，onResume()，onStop()，onDestroy() 回调时机及具体作用？
+- Activity 启动过程，onCreate()，onResume() 回调时机及具体作用？
 
 ## Launcher
 
@@ -28,6 +30,8 @@
 
 ## 点击 Launcher 中应用图标
 
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity/app_start.png" alt=""/>
+
 点击 Launcher 中应用图标将会执行以下方法
 
 ```Java
@@ -39,7 +43,8 @@ Activity.startActivity()
 //这段代码大家已经很熟悉，经常打开 Activity 用的就是这个方法
 
 Activity.startActivityForResult()
-//默认 requestCode = -1，也可通过调用 startActivityForResult() 传入 requestCode。 然后通过 MainThread 获取到 ApplicationThread 传入下面方法。
+//默认 requestCode = -1，也可通过调用 startActivityForResult() 传入 requestCode。 
+//然后通过 MainThread 获取到 ApplicationThread 传入下面方法。
 
 Instrumentation.execStartActivity()
 //通过 ActivityManagerNative.getDefault() 获取到 ActivityManagerService 的代理为进程通讯作准备。
@@ -66,10 +71,13 @@ PackageManagerService.chooseBestActivity()
 //当存在多个满足条件的 Activity 则会弹框让用户来选择。
 
 ActivityStackSupervisor.startActivityLocked()
-//获取到调用者的进程信息。 通过 Intent.FLAG_ACTIVITY_FORWARD_RESULT 判断是否需要进行 startActivityForResult 处理。 检查调用者是否有权限来调用指定的 Activity。 创建 ActivityRecord 对象，并检查是否运行 App 切换。
+//获取到调用者的进程信息。 通过 Intent.FLAG_ACTIVITY_FORWARD_RESULT 判断是否需要进行 startActivityForResult 处理。 
+//检查调用者是否有权限来调用指定的 Activity。 
+//创建 ActivityRecord 对象，并检查是否运行 App 切换。
 
 ActivityStackSupervisor.startActivityUncheckedLocked() -> startActivityLocked()
-//进行对 launchMode 的处理[可参考 Activity 启动模式]，创建 Task 等操作。 启动 Activity 所在进程，已存在则直接 onResume()，不存在则创建 Activity 并处理是否触发 onNewIntent()。
+//进行对 launchMode 的处理[可参考 Activity 启动模式]，创建 Task 等操作。
+//启动 Activity 所在进程，已存在则直接 onResume()，不存在则创建 Activity 并处理是否触发 onNewIntent()。
 
 ActivityStack.resumeTopActivityInnerLocked()
 //找到 resume 状态的 Activity，执行 startPausingLocked() 暂停该 Activity，同时暂停所有处于后台栈的 Activity，找不到 resume 状态的 Activity 则回桌面。
@@ -138,7 +146,6 @@ ApplicationThreadProxy.bindApplication()
 ```Java
 ActivityThread.bindApplication()
 //缓存 Service，初始化 AppBindData，发送消息 H.BIND_APPLICATION。
-
 ```
 
 ApplicationThreadProxy.bindApplication(…) 会传来这个应用的一些信息，如ApplicationInfo，Configuration 等，在 ApplicationThread.bindApplication 里会待信息封装成A ppBindData，通过
@@ -155,8 +162,8 @@ handleBindApplication(AppBindData data) {
     ...
     //初始化 mInstrumentation
     if(data.mInstrumentation!=null) {
-        mInstrumentation = (Instrumentation)    cl.loadClass(data.instrumentationName.getClassName()).newInstance();
-    }else {
+        mInstrumentation = (Instrumentation) cl.loadClass(data.instrumentationName.getClassName()).newInstance();
+    } else {
         mInstrumentation = new Instrumentation();
     }
     //创建Application，data.info 是个 LoadedApk 对象。
@@ -183,7 +190,8 @@ public Application makeApplication(boolean forceDefaultAppClass,Instrumentation 
     appContext.setOuterContext(app);
 }
 
-//设置进程名，获取 LoadedApk 对象，创建 ContextImpl 上下文，LoadedApk.makeApplication() 创建 Application 对象，调用 Application.onCreate() 方法。
+//设置进程名，获取 LoadedApk 对象，创建 ContextImpl 上下文
+//LoadedApk.makeApplication() 创建 Application 对象，调用 Application.onCreate() 方法。
 ```
 
 Instrumentation：
@@ -201,8 +209,7 @@ static public Application newApplication(Class<?> clazz, Context context)  {
     app.attach(context);    
     return app;
 }
-//attach 就是将新建的 ContextImpl 赋值到 mBase，这个 ContextImpl 对象就是所有Application 内 Context 的具体
-//实现，同时赋值一些其他的信息如 mLoadedApk。
+//attach 就是将新建的 ContextImpl 赋值到 mBase，这个 ContextImpl 对象就是所有Application 内 Context 的具体实现，同时赋值一些其他的信息如 mLoadedApk。
 final void attach(Context context) {    
     mBase = base;  
     mLoadedApk = ContextImpl.getImpl(context).mPackageInfo;
@@ -222,15 +229,17 @@ ApplicationThread.scheduleLaunchActivity()
 sendMessage(H.LAUNCH_ACTIVITY, r);
 
 ActivityThread.handleLaunchActivity()
-//最终回调目标 Activity 的 onConfigurationChanged()，初始化 WindowManagerService。调用 ActivityThread.performLaunchActivity()
+//最终回调目标 Activity 的 onConfigurationChanged()，初始化 WindowManagerService。
+//调用 ActivityThread.performLaunchActivity()
 
-ActivityThread.performLaunchActivity {
+ActivityThread.performLaunchActivity() {
     //类似 Application 的创建过程，通过 classLoader 加载到 activity.
     activity = mInstrumentation.newActivity(classLoader, 
                component.getClassName(), r.intent);
     //因为 Activity 有界面，所以其 Context 是 ContextThemeWrapper 类型，但实现类仍是ContextImpl.
     Context appContext = createBaseContextForActivity(r, activity);
     activity.attach(context,mInstrumentation,application,...);
+    //与 Window 进行关联，具体过程详见：[Activity，Window，View 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity与Window与View之间的关系.md)
     
     //attach 后调用 activity 的 onCreate()方法。
     mInstrumentation.callActivityOnCreate(activity,...)
@@ -238,8 +247,15 @@ ActivityThread.performLaunchActivity {
 }
 //在ActivityThread.handleLaunchActivity里，接着调用
 
+Activity.performCreate() -> onCreate()
+//最终回调目标 Activity 的 onCreate()。
+
+Activity.setContentView()
+//设置 layout 布局
+
 ActivityThread.performResumeActivity()
-//最终回调目标 Activity 的 onStart()，onResume()。
+//最终回调目标 Activity 的 onResume()。
+
 ```
 
 ## 总结
@@ -248,11 +264,42 @@ Activity 的整体启动流程如图所示：
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity/activity_start.jpg" alt="Activity 启动过程"/>
 
-1. Application 是在 ActivityThread.handleBindApplication() 中创建的，一个进程只会创建一个 Application，但是一个应用如果有多个进程就会创建多个 Application 对象。
-2. 应用资源是在 Application 初始化的时候，也就是创建 Application，ContextImpl 的时候，ContextImpl 就包含这个路径，主要就是对就是 ResourcesManager 这个单例的引用。
-3. 可以看出每次创建 Application 和 Acitvity 以及 Service 时就会有一个 ContextImpl 实例，ContentProvider 和B roadcastReceiver 的 Context 是其他地方传入的。所以 Context 数量 = Application 数量 + Activity 数量 + Service 数量，单进程情况下 Application 数量就是 1。
-4. 
-5. 点击 Launcher 时会创建一个新进程来开启 Activity，而应用内打开 Activity，如果 Activity 不指定新进程，将在原来进程打开，是否开启新进程实在 ActivityManagerService 进行控制的，上面分析得到，每次开启新进程时会保存进程信息，默认为 应用包名 + 应用UID，打开 Activity 时会检查请求方的信息来判断是否需要新开进程。Launcher 打开 Activity 默认 ACTIVITY_NEW_TASK，新开一个 Activity 栈来保存 Activity 的信息。
+- ActivityThread 是什么，它是一个线程吗，如何被启动的？
+
+它不是一个线程，它是运行在 App 进程中的主线程中的一个方法中。当 App 进程创建时会执行 ActivityThread.main()，ActivityThread.main() 首先会创建 Looper 执行 Looper.prepareMainLooper()；然后创建 ActivityThread 并调用 ActivityThread.attach() 方法告诉 ActivityManagerService 我们创建了一个应用 并将 ApplicationThread 传给 ActivityManagerService；最后调用 Looper.loop()。
+
+- ActivityClientRecord 与 ActivityRecord 是什么？
+
+记录 Activity 相关信息，比如：Window，configuration，ActivityInfo 等。
+ActivityClientRecord 是客户端的，ActivityRecord 是 ActivityManagerService 服务端的。
+
+- Context 是什么，ContextImpl，ContextWapper 是什么？
+
+Context 定义了 App 进程的相关环境，Context 是一个接口，ContextImpl 是子类，ContextWapper 是具体实现。
+
+应用资源是在 Application 初始化的时候，也就是创建 Application，ContextImpl 的时候，ContextImpl 就包含这个路径，主要就是对就是 ResourcesManager 这个单例的引用。
+
+可以看出每次创建 Application 和 Acitvity 以及 Service 时就会有一个 ContextImpl 实例，ContentProvider 和B roadcastReceiver 的 Context 是其他地方传入的。
+
+所以 Context 数量 = Application 数量 + Activity 数量 + Service 数量，单进程情况下 Application 数量就是 1。
+
+- Instrumentation 是什么？
+
+管理着组件Application,Activity，Service等的创建，生命周期调用。
+
+- Application 是什么，什么时候创建的，每个应用程序有几个 Application？
+
+Application 是在 ActivityThread.handleBindApplication() 中创建的，一个进程只会创建一个 Application，但是一个应用如果有多个进程就会创建多个 Application 对象。
+
+- 点击 Launcher 启动 Activity 和应用内部启动 Activity 的区别？
+
+点击 Launcher 时会创建一个新进程来开启 Activity，而应用内打开 Activity，如果 Activity 不指定新进程，将在原来进程打开，是否开启新进程实在 ActivityManagerService 进行控制的，上面分析得到，每次开启新进程时会保存进程信息，默认为 应用包名 + 应用UID，打开 Activity 时会检查请求方的信息来判断是否需要新开进程。Launcher 打开 Activity 默认 ACTIVITY_NEW_TASK，新开一个 Activity 栈来保存 Activity 的信息。
+
+- Activity 启动过程，onCreate()，onResume() 回调时机及具体作用？
+
+Activity.onCreate() 完成了 App 进程，Application，Activity 的创建，调用 setContentView() 给 Activity 设置了 layout 布局。
+
+Activity.onResume() 完成了 Activity 中 Window 与 WindowManager 的关联，并对所有子 View 进行渲染并显示。
 
 ## 参考资料
 
