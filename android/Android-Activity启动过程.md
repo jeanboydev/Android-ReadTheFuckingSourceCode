@@ -257,6 +257,7 @@ Activity 的整体启动流程如图所示：
 ## 参考资料
 
 - [startActivity启动过程分析](http://gityuan.com/2016/03/12/start-activity/)
-- [ Android应用程序的Activity启动过程简要介绍和学习计划](http://blog.csdn.net/luoshengyang/article/details/6685853/)
+- [Android应用程序的Activity启动过程简要介绍和学习计划](http://blog.csdn.net/luoshengyang/article/details/6685853/)
+- [Android 应用点击图标到Activity界面显示的过程分析](https://silencedut.github.io/2016/08/02/Android%20应用点击图标到Activity界面显示的过程分析/)
 - 《深入理解 Android 内核设计思想》
 
