@@ -56,14 +56,14 @@
 - [一篇文章看明白 Android Activity 启动模式 & IntentFilter匹配规则](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity启动模式&IntentFilter匹配规则.md)
 - [一篇文章了解相见恨晚的 Android Binder 进程间通讯](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Binder进程间通讯.md)
 - [一篇文章学会使用 Android IPC 多进程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-IPC多进程.md)
-- [Windows 环境下载 Android 源码](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Windows环境下载源码.md)
-- [Android-反编译指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-反编译指南.md)
-- [Android-多渠道打包最佳实践](https://github.com/jeanboydev/Android-Flavors)
-- [Android-项目架构探索](https://github.com/jeanboydev/Android-Architecture)
-- [Android 性能优化-UI优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-UI优化.md)
-- [Android 性能优化-内存优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-内存优化.md)
 - [一篇文章看明白 Android 系统启动时都干了什么](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-系统启动过程.md)
 - [一篇文章看明白 Android 从点击应用图标到界面显示的过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity启动过程.md)
+- [Windows 环境下载 Android 源码](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Windows环境下载源码.md)
+- [Android 反编译指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-反编译指南.md)
+- [Android 多渠道打包最佳实践](https://github.com/jeanboydev/Android-Flavors)
+- [Android 项目架构探索](https://github.com/jeanboydev/Android-Architecture)
+- [Android 性能优化 - UI优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-UI优化.md)
+- [Android 性能优化 - 内存优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-内存优化.md)
 
 ## 设计模式
 
