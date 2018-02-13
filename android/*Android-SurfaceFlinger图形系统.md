@@ -5,6 +5,6 @@ SurfaceFlinger 进程是由 init 进程创建的，运行在独立的 SurfaceFli
 
 ## 参考资料
 
-- [计算机是如何启动的？](http://www.ruanyifeng.com/blog/2013/02/booting.html)
+- [资料标题](http://www.baidu.com)
 
 
