@@ -106,7 +106,6 @@ final void attach(Context context, ActivityThread aThread, Instrumentation instr
 同时得到一个 WindowManager 对象，WindowManager 是一个抽象类，这个 WindowManager 的具体实现是在 WindowManagerImpl 中，对比 Context 和 ContextImpl。
 
 Window.setWindowManager()：
-
 ```Java
 public void setWindowManager(WindowManager wm, IBinder appToken, String appName, boolean hardwareAccelerated) { 
     ...    
@@ -126,7 +125,6 @@ mWindow.setWindowManager(..., mToken, ..., ...)
 接着执行 onCreate() 中的 setContentView() 方法将我们写的 Layout 布局页面设置给 Activity。
 
 Activity.setContentView()：
-
 ```Java
 public void setContentView(@LayoutRes int layoutResID) {
     getWindow().setContentView(layoutResID);        
@@ -135,7 +133,6 @@ public void setContentView(@LayoutRes int layoutResID) {
 ```
 
 PhoneWindow.setContentView()：
-
 ```Java
 public void setContentView(int layoutResID) {
     ...    
@@ -145,7 +142,6 @@ public void setContentView(int layoutResID) {
 ```
 
 PhoneWindow.installDecor()：
-
 ```Java
 private void installDecor() {    
 //根据不同的 Theme，创建不同的 DecorView，DecorView 是一个 FrameLayout 
@@ -156,7 +152,6 @@ private void installDecor() {
 ## onResume() - Window 显示过程
 
 ActivityThread.performResumeActivity()：
-
 ```Java
 final void handleResumeActivity(IBinder token, boolean clearHide, boolean isForward, boolean reallyResume) {
     //执行到 onResume()
@@ -216,7 +211,6 @@ public final ActivityClientRecord performResumeActivity(IBinder token, boolean c
 
 
 Activity.makeVisible()：
-
 ```Java
 void makeVisible() {
     if (!mWindowAdded) {
@@ -232,7 +226,6 @@ void makeVisible() {
 WindowManager 的 addView 的具体实现在 WindowManagerImpl 中，而 WindowManagerImpl 的 addView 又会调用 WindowManagerGlobal.addView()。
 
 WindowManagerGlobal.addView()：
-
 ```Java
 public void addView(View view, ViewGroup.LayoutParams params,Display display, Window parentWindow) {
     ...
