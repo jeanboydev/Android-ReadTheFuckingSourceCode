@@ -287,7 +287,7 @@ Context 定义了 App 进程的相关环境，Context 是一个接口，ContextI
 
 - Instrumentation 是什么？
 
-管理着组件Application,Activity，Service等的创建，生命周期调用。
+管理着组件 Application，Activity，Service 等的创建，生命周期调用。
 
 - Application 是什么，什么时候创建的，每个应用程序有几个 Application？
 

@@ -8,9 +8,8 @@
 
 本文主要对于以下问题进行分析：
 
-- Window 是什么，一个 Activity 几个 Window？
-- Activity 与 Window 与 View 之间什么关系？
-- PhoneWindow，ViewRoot，DecorView 是什么？
+- Window 是什么？
+- Activity 与 PhoneWindow 与 DecorView 之间什么关系？
 
 ## onCreate() - Window 创建过程
 
@@ -122,7 +121,7 @@ mWindow.setWindowManager(..., mToken, ..., ...)
 
 这个 Activity 的 mToken，这个 mToken 是一个 IBinder，WindowManagerService 就是通过这个 IBinder 来管理 Activity 里的 View。
 
-接着执行 onCreate() 中的 setContentView() 方法将我们写的 Layout 布局页面设置给 Activity。
+回调 Activity.onCreate() 后，会执行 setContentView() 方法将我们写的 Layout 布局页面设置给 Activity。
 
 Activity.setContentView()：
 ```Java
@@ -151,7 +150,11 @@ private void installDecor() {
 
 ## onResume() - Window 显示过程
 
-ActivityThread.performResumeActivity()：
+Activity 与 PhoneWindow 与 DecorView 关系图：
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity_window_view/android_phonewindow_decorview.png" alt=""/>
+
+ActivityThread.handleResumeActivity()：
 ```Java
 final void handleResumeActivity(IBinder token, boolean clearHide, boolean isForward, boolean reallyResume) {
     //执行到 onResume()
@@ -243,9 +246,115 @@ public void addView(View view, ViewGroup.LayoutParams params,Display display, Wi
 
 ViewRootImpl 是个 ViewParent，在 DecoView 添加的 View 时，就会将 View 中的 ViewParent 设为 DecoView 所在的 ViewRootImpl，View 的 ViewParent 相同时，理解为这些 View 在一个 View 链上。所以每当调用 View 的 requestLayout()时，其实是调用到 ViewRootImpl，ViewRootImpl 会控制整个事件的流程。可以看出一个 ViewRootImpl 对添加到 DecoView 的所有 View 进行事件管理。
 
+ViewRootImpl：
+```Java
+public ViewRootImpl(Context context, Display display) {
+    mContext = context;
+    //获取 IWindowSession 的代理类
+    mWindowSession = WindowManagerGlobal.getWindowSession();
+    mDisplay = display;
+    mThread = Thread.currentThread(); //主线程
+    mWindow = new W(this); 
+    mChoreographer = Choreographer.getInstance();
+    ...
+}
+
+public void setView(View view, WindowManager.LayoutParams attrs, View panelParentView) {
+  synchronized (this) {
+    ...
+    //通过 Binder 调用，进入 system 进程的 Session
+    res = mWindowSession.addToDisplay(mWindow, mSeq, mWindowAttributes,
+          getHostVisibility(), mDisplay.getDisplayId(),
+          mAttachInfo.mContentInsets, mAttachInfo.mStableInsets,
+          mAttachInfo.mOutsets, mInputChannel);
+    ...
+  }
+}
+```
+
+WindowManagerGlobal：
+```Java
+public static IWindowSession getWindowSession() {
+    synchronized (WindowManagerGlobal.class) {
+        if (sWindowSession == null) {
+            try {
+                //获取 InputManagerService 的代理类
+                InputMethodManager imm = InputMethodManager.getInstance();
+                //获取 WindowManagerService 的代理类
+                IWindowManager windowManager = getWindowManagerService();
+                //经过 Binder 调用，最终调用 WindowManagerService
+                sWindowSession = windowManager.openSession(
+                        new IWindowSessionCallback.Stub() {...},
+                        imm.getClient(), imm.getInputContext());
+            } catch (RemoteException e) {
+                ...
+            }
+        }
+        return sWindowSession
+    }
+}
+```
+
+通过 binder 调用进入 system_server 进程。
+Session：
+```Java
+final class Session extends IWindowSession.Stub implements IBinder.DeathRecipient {
+
+    public int addToDisplay(IWindow window, int seq, WindowManager.LayoutParams attrs, int viewVisibility, int displayId, Rect outContentInsets, Rect outStableInsets, Rect outOutsets, InputChannel outInputChannel) {
+        //详情见下面
+        return mService.addWindow(this, window, seq, attrs, viewVisibility, displayId,
+                outContentInsets, outStableInsets, outOutsets, outInputChannel);
+    }
+}
+```
+
+WindowManagerService：
+```Java
+public int addWindow(Session session, IWindow client, int seq, WindowManager.LayoutParams attrs, int viewVisibility, int displayId, Rect outContentInsets, Rect outStableInsets, Rect outOutsets, InputChannel outInputChannel) {
+    ...
+    WindowToken token = mTokenMap.get(attrs.token);
+    //创建 WindowState
+    WindowState win = new WindowState(this, session, client, token,
+                attachedWindow, appOp[0], seq, attrs, viewVisibility, displayContent);
+    ...
+    //调整 WindowManager 的 LayoutParams 参数
+    mPolicy.adjustWindowParamsLw(win.mAttrs);
+    res = mPolicy.prepareAddWindowLw(win, attrs);
+    addWindowToListInOrderLocked(win, true);
+    // 设置 input
+    mInputManager.registerInputChannel(win.mInputChannel, win.mInputWindowHandle);
+    // 创建 Surface 与 SurfaceFlinger 通信
+    win.attach();
+    mWindowMap.put(client.asBinder(), win);
+    
+    if (win.canReceiveKeys()) {
+        //当该窗口能接收按键事件，则更新聚焦窗口
+        focusChanged = updateFocusedWindowLocked(UPDATE_FOCUS_WILL_ASSIGN_LAYERS,
+                false /*updateInputWindows*/);
+    }
+    assignLayersLocked(displayContent.getWindowList());
+    ...
+}
+```
+
+Activity 中 Window 创建过程：
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity_window_view/android_activity_window_create.png" alt=""/>
+
+## 总结
+
+- Window 是什么？
+
+Window 是 Android 中窗口的宏观定义，主要是管理 View 的创建，以及与 ViewRootImpl 的交互，将 Activity 与 View 解耦。
+
+- Activity 与 PhoneWindow 与 DecorView 之间什么关系？
+
+一个 Activity 对应一个 Window 也就是 PhoneWindow，一个 PhoneWindow 持有一个 DecorView 的实例，DecorView 本身是一个 FrameLayout。
+
 ## 参考资料
 
 - [以Window视角来看startActivity](http://gityuan.com/2017/01/22/start-activity-wms/)
 - [Android视图框架Activity,Window,View,ViewRootImpl理解](https://silencedut.github.io/2016/08/10/Android视图框架Activity,Window,View,ViewRootImpl理解)
 - 《深入理解 Android 内核设计思想》
+
 
