@@ -19,11 +19,10 @@
 在 Activity 创建过程中执行 scheduleLaunchActivity() 之后便调用到了 handleLaunchActivity() 方法。
 
 ActivityThread.handleLaunchActivity()：
-
 ```Java
 private void handleLaunchActivity(ActivityClientRecord r, Intent customIntent) {
     handleConfigurationChanged(null, null);
-    //初始化 WindowManagerService，主要是获取到 WMS 代理对象
+    //初始化 WindowManagerService，主要是获取到 WindowManagerService 代理对象
     WindowManagerGlobal.initialize();
     //详情见下面分析
     Activity a = performLaunchActivity(r, customIntent);
@@ -106,7 +105,7 @@ final void attach(Context context, ActivityThread aThread, Instrumentation instr
 
 同时得到一个 WindowManager 对象，WindowManager 是一个抽象类，这个 WindowManager 的具体实现是在 WindowManagerImpl 中，对比 Context 和 ContextImpl。
 
-Window.setWindowManager：
+Window.setWindowManager()：
 
 ```Java
 public void setWindowManager(WindowManager wm, IBinder appToken, String appName, boolean hardwareAccelerated) { 
@@ -116,13 +115,13 @@ public void setWindowManager(WindowManager wm, IBinder appToken, String appName,
 }
 ```
 
-每个 Activity 会有一个 WindowManager 对象，这个 mWindowManager 就是和 WindowManagerService(WMS) 进行通信，也是 WMS 识别 View 具体属于那个 Activity 的关键，创建时传入 IBinder 类型的 mToken。
+每个 Activity 会有一个 WindowManager 对象，这个 mWindowManager 就是和 WindowManagerService 进行通信，也是 WindowManagerService 识别 View 具体属于那个 Activity 的关键，创建时传入 IBinder 类型的 mToken。
 
 ```Java
-mWindow.setWindowManager(...,mToken, ...,...)
+mWindow.setWindowManager(..., mToken, ..., ...)
 ```
 
-这个 Activity 的 mToken，这个 mToken 是一个 IBinder，WMS 就是通过这个 IBinder 来管理 Activity 里的 View。
+这个 Activity 的 mToken，这个 mToken 是一个 IBinder，WindowManagerService 就是通过这个 IBinder 来管理 Activity 里的 View。
 
 接着执行 onCreate() 中的 setContentView() 方法将我们写的 Layout 布局页面设置给 Activity。
 
