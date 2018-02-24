@@ -323,7 +323,7 @@ public int addWindow(Session session, IWindow client, int seq, WindowManager.Lay
     addWindowToListInOrderLocked(win, true);
     // 设置 input
     mInputManager.registerInputChannel(win.mInputChannel, win.mInputWindowHandle);
-    // 创建 Surface 与 SurfaceFlinger 通信
+    // 创建 Surface 与 SurfaceFlinger 通信，详见下面
     win.attach();
     mWindowMap.put(client.asBinder(), win);
     
@@ -336,6 +336,8 @@ public int addWindow(Session session, IWindow client, int seq, WindowManager.Lay
     ...
 }
 ```
+
+创建 Surface 的过程详见：[SurfaceFlinger 图形系统](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-SurfaceFlinger图形系统.md)
 
 Activity 中 Window 创建过程：
 
