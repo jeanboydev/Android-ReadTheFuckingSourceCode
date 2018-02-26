@@ -323,7 +323,7 @@ public int addWindow(Session session, IWindow client, int seq, WindowManager.Lay
     addWindowToListInOrderLocked(win, true);
     // 设置 input
     mInputManager.registerInputChannel(win.mInputChannel, win.mInputWindowHandle);
-    // 创建 Surface 与 SurfaceFlinger 通信，详见下面
+    // 创建 Surface 与 SurfaceFlinger 通信，详见下面[SurfaceFlinger 图形系统]
     win.attach();
     mWindowMap.put(client.asBinder(), win);
     
