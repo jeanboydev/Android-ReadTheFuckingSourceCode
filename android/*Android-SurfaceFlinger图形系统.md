@@ -568,7 +568,7 @@ private void performTraversals() {
 }
 
 private int relayoutWindow(WindowManager.LayoutParams params, int viewVisibility, boolean insetsPending)throws RemoteException {
-       //原来是调用 IWindowSession 的 relayout，暂且记住这个调用
+       //原来是调用 IWindowSession 的 relayout()，暂且记住这个调用
        int relayoutResult = sWindowSession.relayout(mWindow, params, (int) (mView.mMeasuredWidth * appScale + 0.5f),  (int) (mView.mMeasuredHeight * appScale + 0.5f), viewVisibility, insetsPending, mWinFrame, mPendingContentInsets, mPendingVisibleInsets, mPendingConfiguration, mSurface); //mSurface 做为参数传进去了。
        }
    ......
@@ -601,7 +601,25 @@ private void draw(boolean fullRedrawNeeded) {
 ```Java
 final Surface mSurface = new Surface();
 ```
-此时创建完的 Surface 是空的，什么都没有。接着继续分析 requestLayout()。
+此时创建完的 Surface 是空的，什么都没有。接着继续分析 relayoutWindow()，在 relayoutWindow() 中会调用 IWindowSession 的 relayout()，这是一个跨进程方法会调用到 WMS 中的 Session.relayout()，最后调用到 WindowManagerService.relayoutWindow()。
+```Java
+public int relayoutWindow(Session session,IWindow client,
+           WindowManager.LayoutParams attrs, int requestedWidth,
+           int requestedHeight, int viewVisibility, boolean insetsPending,
+           Rect outFrame, Rect outContentInsets, Rect outVisibleInsets,
+            Configuration outConfig, SurfaceoutSurface){
+        .....
+
+    try {
+         //win 就是 WinState，这里将创建一个本地的 Surface 对象
+        Surfacesurface = win.createSurfaceLocked();
+        if(surface != null) {
+            //先创建一个本地 surface，然后在 outSurface 的对象上调用 copyFrom
+            //将本地 Surface 的信息拷贝到 outSurface 中，为什么要这么麻烦呢？
+            outSurface.copyFrom(surface);
+        ......
+}
+```
 
 ## Surface 显示过程
 
