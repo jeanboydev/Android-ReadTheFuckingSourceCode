@@ -621,6 +621,188 @@ public int relayoutWindow(Session session,IWindow client,
 }
 ```
 
+WindowManagerService.java::WindowState：
+```Java
+Surface createSurfaceLocked() {
+    ......
+    try {
+        //mSurfaceSession 就是在 Session 上创建的 SurfaceSession 对象
+        //这里，以它为参数，构造一个新的 Surface 对象
+        mSurface = new Surface(mSession.mSurfaceSession, mSession.mPid, mAttrs.getTitle().toString(), 0, w, h, mAttrs.format, flags);
+    }
+    Surface.openTransaction();//打开一个事务处理
+    ......
+    Surface.closeTransaction();//关闭一个事务处理
+    ......
+}
+```
+
+构造 Surface 对象：
+```C
+ public Surface(SurfaceSession s,//传入一个SurfaceSession对象
+    int pid, String name, int display, int w, int h, int format, int flags) throws OutOfResourcesException {
+        ......
+        mCanvas = new CompatibleCanvas();
+        //又一个 native 函数
+        init(s,pid,name,display,w,h,format,flags);
+        mName = name;
+    }
+```
+
+```C
+static void Surface_init(JNIEnv*env, jobject clazz, jobject session, jint pid, jstring jname, jint dpy, jint w, jint h, jint format, jintflags) {
+
+    //从 SurfaceSession 对象中取出之前创建的那个 SurfaceComposerClient 对象
+    SurfaceComposerClient* client = (SurfaceComposerClient*)env->GetIntField(session, sso.client);
+    sp<SurfaceControl> surface;//注意它的类型是 SurfaceControl
+    if (jname == NULL) {
+        //调用 SurfaceComposerClient 的 createSurface 函数，返回的 surface 是一个 SurfaceControl 类型
+        surface = client->createSurface(pid, dpy, w, h, format, flags);
+    } else{
+        ......
+    }
+
+   //把这个 surfaceControl 对象设置到 Java 层的 Surface 对象中
+   setSurfaceControl(env, clazz, surface);
+}
+```
+
+在 createSurface 内部会使用 Binder 通信将请求发给 SurfaceFlinger：
+```C
+sp<ISurface>SurfaceFlinger::createSurface(ClientID clientId, int pid, const String8& name, ISurfaceFlingerClient::surface_data_t* params, DisplayID d, uint32_t w, uint32_t h, PixelFormat format, uint32_t flags) {
+    sp<LayerBaseClient> layer;//LayerBaseClient 是 Layer 家族的基类
+    //这里又冒出一个 LayerBaseClient 的内部类，它也叫Surface
+    sp<LayerBaseClient::Surface> surfaceHandle;
+    Mutex::Autolock _l(mStateLock);
+
+    //根据 clientId 找到 createConnection 时加入的那个 Client 对象
+    sp<Client> client = mClientsMap.valueFor(clientId);
+    ......
+    //注意这个 id，它的值表示 Client 创建的是第几个显示层
+    //同时也表示将使用 SharedBufferStatck 数组的第 id 个元素
+    int32_t id = client->generateId(pid);
+    
+    //一个 Client 不能创建多于 NUM_LAYERS_MAX 个的Layer
+    if(uint32_t(id) >= NUM_LAYERS_MAX) {
+       return surfaceHandle;
+    }
+
+    //根据 flags 参数来创建不同类型的显示层
+    switch(flags & eFXSurfaceMask) {
+        case eFXSurfaceNormal:
+           if (UNLIKELY(flags & ePushBuffers)) {
+             //创建 PushBuffer 类型的显示层
+            layer = createPushBuffersSurfaceLocked(client, d, id, w, h, flags);
+            } else {
+               //创建 Normal 类型的显示层
+               layer = createNormalSurfaceLocked(client, d, id, w, h, flags, format);
+           }
+           break;
+        case eFXSurfaceBlur:
+            //创建 Blur 类型的显示层
+           layer = createBlurSurfaceLocked(client, d, id, w, h, flags);
+           break;
+        case eFXSurfaceDim:
+            //创建 Dim 类型的显示层
+           layer = createDimSurfaceLocked(client, d, id, w, h, flags);
+           break;
+    }
+
+    if(layer != 0) {
+        layer->setName(name);
+        setTransactionFlags(eTransactionNeeded);
+        //从显示层对象中取出一个 ISurface 对象赋值给 SurfaceHandle
+        surfaceHandle = layer->getSurface();
+        if(surfaceHandle != 0) {
+           params->token = surfaceHandle->getToken();
+           params->identity = surfaceHandle->getIdentity();
+           params->width = w;
+           params->height = h;
+           params->format = format;
+        }
+    }
+    return surfaceHandle;//ISurface 的 Bn 端就是这个对象
+}
+```
+
+```C
+sp<LayerBaseClient>SurfaceFlinger::createNormalSurfaceLocked(const sp<Client>& client, DisplayID display, int32_t id, uint32_t w, uint32_t h, uint32_t flags, PixelFormat& format) {
+    switch(format) { //一些图像方面的参数设置，可以不去管它
+    case PIXEL_FORMAT_TRANSPARENT:
+    case PIXEL_FORMAT_TRANSLUCENT:
+       format = PIXEL_FORMAT_RGBA_8888;
+       break;
+    case PIXEL_FORMAT_OPAQUE:
+       format = PIXEL_FORMAT_RGB_565;
+       break;
+    }
+
+    //创建一个 Layer 类型的对象
+    sp<Layer> layer = new Layer(this, display,client, id);
+
+    //设置 Buffer
+    status_t err = layer->setBuffers(w, h, format, flags);
+    if (LIKELY(err == NO_ERROR)) {
+        //初始化这个新 layer 的一些状态
+        layer->initStates(w, h, flags);
+        //下面这个函数把这个 layer 加入到 Z 轴集合中
+        addLayer_l(layer);
+    }
+......
+    return layer;
+}
+```
+
+createNormalSurfaceLocked 函数有三个关键点，它们是：
+
+- 构造一个Layer对象。
+- 调用Layer对象的setBuffers函数。
+- 调用SF的addLayer_l函数。
+
+当跨进程的 createSurface() 执行完返回一个 ISurface 对象，接下来会创建 SurfaceControl 对象：
+```Java
+SurfaceControl::SurfaceControl(
+       const sp<SurfaceComposerClient>& client,
+       const sp<ISurface>& surface,
+       const ISurfaceFlingerClient::surface_data_t& data,
+       uint32_t w, uint32_t h, PixelFormat format, uint32_t flags)
+    //mClient 为 SurfaceComposerClient，而 mSurface 指向跨进程 createSurface() 调用返回的 ISurface 对象
+    :mClient(client), mSurface(surface),
+     mToken(data.token), mIdentity(data.identity),
+     mWidth(data.width), mHeight(data.height), mFormat(data.format),
+     mFlags(flags){
+     ......
+}
+```
+
+SurfaceControl 类可以看作是一个 wrapper 类，它封装了一些函数，通过这些函数可以方便地调用 mClient 或 ISurface 提供的函数。
+
+最后会执行 copyFrom() 返回给 App 客户端：
+```C
+static void Surface_copyFrom(JNIEnv* env,jobject clazz, jobject other) {
+    //根据JNI函数的规则，clazz 是 copyFrom 的调用对象，而 other 是 copyFrom 的参数。
+    //目标对象此时还没有设置 SurfaceControl，而源对象在前面已经创建了 SurfaceControl
+    constsp<SurfaceControl>& surface = getSurfaceControl(env, clazz);
+    constsp<SurfaceControl>& rhs = getSurfaceControl(env, other);
+    if (!SurfaceControl::isSameSurface(surface, rhs)) {
+        //把源 SurfaceControl 对象设置到目标 Surface 中
+        setSurfaceControl(env, clazz, rhs);
+    }
+}
+```
+
+copyFrom 期间一共有三个关键对象，它们分别是：
+
+- SurfaceComposerClient
+- SurfaceControl
+- Surface，这个 Surface 对象属于 Native 层，和 Java 层的 Surface 相对应
+
+其中转移到 ViewRoot 成员变量 mSurface 中的，就是最后这个 Surface 对象了。
+
+在 SurfaceFlinger 进程中，Client 的一个 Layer 将使用 SharedBufferStack 数组中的一个成员，并通过 SharedBufferServer 结构来控制这个成员，我们知道 SurfaceFlinger 是消费者，所以可由 SharedBufferServer 来控制数据的读取。
+
+与之相对应，客户端的进程也会有一个对象来使用这个 SharedBufferStack，可它是通过另外一个叫 SharedBufferClient 的结构来控制的。客户端为 SurfaceFlinger 提供数据，所以可由 SharedBufferClient 控制数据的写入。
+
 ## Surface 显示过程
 
 ## 参考资料
