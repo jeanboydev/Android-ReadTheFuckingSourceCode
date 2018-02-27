@@ -229,7 +229,7 @@ void SurfaceFlinger::handleMessageRefresh() {
 ## Surface 创建过程
 
 Surface 创建过程：
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_surfaceflinger/surface_create.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_surfaceflinger/surface_creat.png" alt=""/>
 
 Surface 创建的过程就是 Activity 显示的过程，在 ActivityThread.handleResumeActivity() 中调用了 Activity.makeVisible()，我们接着看下 Activity 是怎么显示出来的。
 
