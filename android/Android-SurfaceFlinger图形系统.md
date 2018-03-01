@@ -813,6 +813,10 @@ copyFrom 期间一共有三个关键对象，它们分别是：
 
 ## 参考资料
 
-- [资料标题](http://www.baidu.com)
+- [深入理解Surface系统](http://blog.csdn.net/innost/article/details/47208337)
+- [Android图形系统](http://gityuan.com/2017/02/05/graphic_arch/)
+- [SurfaceFlinger启动篇](http://gityuan.com/2017/02/05/graphic_arch/)
+- [SurfaceFlinger绘图篇](http://gityuan.com/2017/02/18/surface_flinger_2/)
+- 《深入理解 Android 内核设计思想》
 
 
