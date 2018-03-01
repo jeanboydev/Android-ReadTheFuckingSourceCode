@@ -36,7 +36,7 @@
 
 ## Java
 
-- 面向对象思想
+- [基础知识](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/java/java-基础知识.md)
 
 ## Git
 
