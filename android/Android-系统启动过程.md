@@ -66,7 +66,7 @@ init.rc 文件是 Android 系统的重要配置文件，位于 /system/core/root
 init.rc 脚本文件配置了一些重要的服务，init 进程通过创建子进程启动这些服务，这里创建的 service 都属于 native 服务，运行在 Linux 空间，通过 socket 向上层提供特定的服务，并以守护进程的方式运行在后台。
 
 通过 init.rc 脚本系统启动了以下几个重要的服务：
-- servic_emanager：启动 binder IPC，管理所有的 Android 系统服务
+- service_manager：启动 binder IPC，管理所有的 Android 系统服务
 - mountd：设备安装 Daemon，负责设备安装及状态通知
 - debuggerd：启动 debug system，处理调试进程的请求
 - rild：启动 radio interface layer daemon 服务，处理电话相关的事件和请求
@@ -86,7 +86,7 @@ ServiceManager 是 Binder IPC 通信过程中的守护进程，本身也是一�
 
 ## surface_flinger 进程
 
-SurfaceFlinger 负责图像绘制，是应用 UI 的和兴，其功能是合成所有 Surface 并渲染到显示设备。SurfaceFlinger 进程主要是启动 FrameBuffer，初始化显示系统。
+SurfaceFlinger 负责图像绘制，是应用 UI 的核心，其功能是合成所有 Surface 并渲染到显示设备。SurfaceFlinger 进程主要是启动 FrameBuffer，初始化显示系统。
 
 ## media_server 进程
 
