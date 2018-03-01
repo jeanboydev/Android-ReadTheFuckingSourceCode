@@ -805,6 +805,12 @@ copyFrom 期间一共有三个关键对象，它们分别是：
 
 ## Surface 显示过程
 
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_surfaceflinger/surface_display.png" alt=""/>
+
+如图所示，在 App 进程中创建 PhoneWindow 后会创建 ViewRoot。ViewRoot 的创建会创建一个 Surface，这个 Surface 其实是空的，通过与 WindowManagerService 通信 copyFrom() 一个 NativeSurface。在与 SurfaceFlinger 通信时，会创建 SharedClient 一段共享内存，里面存放的是 SharedBufferStack 对应 SurfaceFlinger 中的 SurfaceLayer 每个 Layer 其实是一个 FrameBuffer，每个 FrameBuffer 中有两个 GraphicBuffer 记作 FrontBuffer 和 BackBuffer。在 SurfaceFlinger 中 SharedBufferServer 来管理 FrameBuffer。同时在 App 端 copyFrom() 出来 NativeSurface 时会创建一个 SharedBufferClient 与 SharedClient 这块共享内存关联。当客户端 addView() 或者需要更新 View 时，会通过 SharedBufferClient 写入数据到 ShareClient 中，SurfaceFlinger 中的 SharedBufferServer 接收到通知会将 FrameBuffer 中的数据传输到屏幕上。HWComposer 是基于硬件来产生 VSync 信号的，来通知 SurfaceFlinger 重绘控制显示的帧率。
+
+以上理解属于个人观点，能力有限，若有错误欢迎指出，欢迎交流学习，共同进步。
+
 ## 参考资料
 
 - [资料标题](http://www.baidu.com)
