@@ -18,7 +18,15 @@
 
 # 目录
 
-## 网络知识
+## 面试知识点整理
+
+- [Java 基础知识](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/Java-基础知识.md)
+- [Android 基础知识](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/Android-基础知识.md)
+- 网络通信
+- 数据结构与算法
+- 人事相关问题
+
+## 网络通信知识
 
 - [一篇文章看明白 TCP/IP，TCP，UDP，IP，Socket 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/http/TCP_IP_UDP_Socket.md)
 - [一篇文章看明白 HTTP，HTTPS，SSL/TSL 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/http/HTTP_HTTPS_SSL_TSL.md)
@@ -33,10 +41,6 @@
 - 图
 - 查找
 - 排序
-
-## Java
-
-- [基础知识](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/java/java-基础知识.md)
 
 ## Git
 
