@@ -4,6 +4,9 @@
 ### Activity 生命周期？为什么 Activity 要这么设计？这样设计有什么好处？
 
 -------
+- [Activity 生命周期](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity生命周期.md)
+
+Activity 生命周期各种回调方法的设计，是为了确保提供一个流畅的用户体验，在 Activity 切换时，以及 Activity 停止或者销毁的意外中断情况下，保存好 Activity 状态。
 
 ### Activity 的 Launch mode（启动模式）以及使用场景 
 
@@ -12,14 +15,14 @@
 3. singleTask：栈内复用，本栈内只要用该类型 Activity 就会将其顶部的 Activity 出栈
 4. singleInstance：单例模式，除了 3 中特性，系统会单独给该 Activity 创建一个栈。
 
-设置了"singleTask"启动模式的Activity，它在启动的时候，会先在系统中查找属性值affinity等于它的属性值taskAffinity的Task存在； 如果存在这样的Task，它就会在这个Task中启动，否则就会在新的任务栈中启动。因此， 如果我们想要设置了"singleTask"启动模式的Activity在新的任务中启动，就要为它设置一个独立的taskAffinity属性值。
+设置了 singleTask 启动模式的 Activity，它在启动的时候，会先在系统中查找属性值 affinity 等于它的属性值 taskAffinity 的 Task 存在；如果存在这样的 Task，它就会在这个 Task 中启动，否则就会在新的任务栈中启动。因此， 如果我们想要设置了 singleTask 启动模式的 Activity 在新的任务中启动，就要为它设置一个独立的 taskAffinity 属性值。
 
-如果设置了"singleTask"启动模式的Activity不是在新的任务中启动时，它会在已有的任务中查看是否已经存在相应的Activity实例， 如果存在，就会把位于这个Activity实例上面的Activity全部结束掉，即最终这个Activity 实例会位于任务的Stack顶端中。
+如果设置了 singleTask 启动模式的 Activity 不是在新的任务中启动时，它会在已有的任务中查看是否已经存在相应的 Activity 实例，如果存在，就会把位于这个 Activity 实例上面的 Activity 全部结束掉，即最终这个 Activity 实例会位于任务的Stack顶端中。
 
-在一个任务栈中只有一个”singleTask”启动模式的Activity存在。他的上面可以有其他的Activity。这点与singleInstance是有区别的。
-singleInstance，回退栈中，只有这一个Activity，没有其他Activity。
+在一个任务栈中只有一个 singleTask 启动模式的 Activity 存在。他的上面可以有其他的Activity。这点与 singleInstance 是有区别的。
+singleInstance，回退栈中，只有这一个 Activity，没有其他 Activity。
 
-SingleTop适合接收通知启动的内容显示页面。
+SingleTop 适合接收通知启动的内容显示页面。
 
 例如，某个新闻客户端的新闻内容页面，如果收到10个新闻推送，每次都打开一个新闻内容页面是很烦人的。
 
@@ -40,6 +43,12 @@ singleInstance应用场景：
 
 -------
 
+Activity 传值给 Fragment：通过 Bundle 对象来传递，Activity 中构造 bundle 数据包，调用 Fragment 对象的 setArguments(Bundle b) 方法，Fragment 中使用 getArguments() 方法获取 Activity 传递过来的数据包取值。
+
+Fragment 传值给 Activity：在 Fragment 中定义一个内部回调接口，Activity 实现该回调接口， Fragment 中获取 Activity 的引用，调用 Activity 实现的业务方法。接口回调机制式 Java 不同对象之间数据交互的通用方法。
+
+Fragment 传值给 Fragment：一个 Fragment 通过 Activity 获取到另外一个 Fragment 直接调用方法传值。
+
 ### Android Service与Activity之间通信的几种方式？
 
 -------
@@ -53,55 +62,49 @@ singleInstance应用场景：
 
 - onStartCommand方法，返回START_STICKY
 
-START_STICKY 在运行onStartCommand后service进程被kill后，那将保留在开始状态，但是不保留那些传入的intent。不久后service就会再次尝试重新创建，因为保留在开始状态，在创建     service后将保证调用onstartCommand。如果没有传递任何开始命令给service，那将获取到null的intent。
+START_STICKY 在运行 onStartCommand 后 service 进程被 kill 后，那将保留在开始状态，但是不保留那些传入的 intent。不久后 service 就会再次尝试重新创建，因为保留在开始状态，在创建      service 后将保证调用 onstartCommand。如果没有传递任何开始命令给 service，那将获取到 null 的 intent。
 
-START_NOT_STICKY 在运行onStartCommand后service进程被kill后，并且没有新的intent传递给它。Service将移出开始状态，并且直到新的明显的方法（startService）调用才重新创建。因为如果没有传递任何未决定的intent那么service是不会启动，也就是期间onstartCommand不会接收到任何null的intent。
+START_NOT_STICKY 在运行 onStartCommand 后 service 进程被 kill 后，并且没有新的 intent 传递给它。Service 将移出开始状态，并且直到新的明显的方法 startService() 调用才重新创建。因为如果没有传递任何未决定的 intent 那么 service 是不会启动，也就是期间 onstartCommand() 不会接收到任何 null 的 intent。
 
-START_REDELIVER_INTENT 在运行onStartCommand后service进程被kill后，系统将会再次启动service，并传入最后一个intent给onstartCommand。直到调用stopSelf(int)才停止传递intent。如果在被kill后还有未处理好的intent，那被kill后服务还是会自动启动。因此onstartCommand不会接收到任何null的intent。
+START_REDELIVER_INTENT 在运行 onStartCommand() 后 service 进程被 kill 后，系统将会再次启动 service，并传入最后一个 intent 给 onStartCommand()。直到调用 stopSelf(int) 才停止传递 intent。如果在被 kill 后还有未处理好的 intent，那被 kill 后服务还是会自动启动。因此 onStartCommand 不会接收到任何 null 的 intent。
 
-- 提升service优先级
+- 提升 service 优先级
 
-在AndroidManifest.xml文件中对于intent-filter可以通过android:priority="1000"这个属性设置最高优先级，1000是最高值，如果数字越小则优先级越低，同时适用于广播。
+在 AndroidManifest.xml 文件中对于 intent-filter 可以通过 android:priority="1000" 这个属性设置最高优先级，1000 是最高值，如果数字越小则优先级越低，同时适用于广播。
 
-提升service进程优先级
+- 提升 service 进程优先级
 
-Android中的进程是托管的，当系统进程空间紧张的时候，会依照优先级自动进行进程的回收。Android将进程分为6个等级,它们按优先级顺序由高到低依次是:
+Android 中的进程是托管的，当系统进程空间紧张的时候，会依照优先级自动进行进程的回收。Android 将进程分为 6 个等级,它们按优先级顺序由高到低依次是:
 
-前台进程( FOREGROUND_APP)
+1. 前台进程( FOREGROUND_APP)
+2. 可视进程(VISIBLE_APP )
+3. 次要服务进程(SECONDARY_SERVER )
+4. 后台进程 (HIDDEN_APP)
+5. 内容供应节点(CONTENT_PROVIDER)
+6. 空进程(EMPTY_APP)
 
-可视进程(VISIBLE_APP )
+当 service 运行在低内存的环境时，将会 kill 掉一些存在的进程。因此进程的优先级将会很重要，可以使用 startForeground 将 service 放到前台状态。这样在低内存时被 kill 的几率会低一些。
 
-次要服务进程(SECONDARY_SERVER )
+- onDestroy 方法里重启 service
 
-后台进程 (HIDDEN_APP)
+service + broadcast 方式，就是当 service 走 onDestroy() 的时候，发送一个自定义的广播，当收到广播的时候，重新启动 service；
 
-内容供应节点(CONTENT_PROVIDER)
-
-空进程(EMPTY_APP)
-
-当service运行在低内存的环境时，将会kill掉一些存在的进程。因此进程的优先级将会很重要，可以使用startForeground 将service放到前台状态。这样在低内存时被kill的几率会低一些。
-
-- onDestroy方法里重启service
-
-service+broadcast方式，就是当service走ondestory的时候，发送一个自定义的广播，当收到广播的时候，重新启动service；
-
-- Application加上Persistent属性
-
+- Application 加上 Persistent 属性
 - 监听系统广播判断Service状态
 
 ### Service 的生命周期，两种启动方法（start，bind），有什么区别?
 
 -------
 
-- context.startService() ->onCreate()- >onStart()->Service running-->(如果调用context.stopService() )->onDestroy() ->Service shut down
+- context.startService() -> onCreate() -> onStart() -> Service running --> (如果调用 context.stopService()) -> onDestroy() -> Service shut down
 1. 如果 Service 还没有运行，则调用 onCreate() 然后调用 onStart()；
 2. 如果 Service 已经运行，则只调用 onStart()，所以一个 Service 的 onStart 方法可能会重复调用多次。
 3. 调用 stopService 的时候直接 onDestroy，
 4. 如果是调用者自己直接退出而没有调用 stopService 的话，Service 会一直在后台运行。该 Service 的调用者再启动起来后可以通过 stopService 关闭 Service。
 
-- context.bindService()->onCreate()->onBind()->Service running-->onUnbind() -> onDestroy() ->Service stop
+- context.bindService() -> onCreate() -> onBind() -> Service running --> onUnbind() -> onDestroy() -> Service stop
 1. onBind 将返回给客户端一个 IBind 接口实例，IBind 允许客户端回调服务的方法，比如得到 Service 运行的状态或其他操作。
-2. 这个时候会把调用者和 Service 绑定在一起，Context 退出了，Service 就会调用 onUnbind->onDestroy 相应退出。
+2. 这个时候会把调用者和 Service 绑定在一起，Context 退出了，Service 就会调用 onUnbind -> onDestroy 相应退出。
 3. 所以调用 bindService 的生命周期为：onCreate --> onBind(只一次，不可多次绑定) --> onUnbind --> onDestory。
 
 ### 静态的 Broadcast 和动态的有什么区别？
@@ -119,7 +122,7 @@ service+broadcast方式，就是当service走ondestory的时候，发送一个�
 -------
 
 1. Serializable
-2. charsequence: 主要用来传递String，char等
+2. charSequence: 主要用来传递String，char等
 3. parcelable
 4. Bundle
 
@@ -127,32 +130,28 @@ service+broadcast方式，就是当service走ondestory的时候，发送一个�
 
 -------
 
-生成一个默认的且与主线程互相独立的工作者线程来执行所有传送至onStartCommand() 方法的Intetnt。
+IntentService 使用队列的方式将请求的 Intent 加入队列，然后开启一个线程来处理队列中的 Intent，对于异步的 startService 请求，IntentService 会处理完成一个之后再处理第二个，每一个请求都会在一个单独的 worker thread 中处理，不会阻塞应用程序的主线程。只需重写 onHandIntent，工作线程会处理该方法实现的代码，完成请求后自动停止，解决了 service 不会专门启动一个单独的进程，不能直接处理耗时任务的问题。
 
-生成一个工作队列来传送Intent对象给你的onHandleIntent()方法，同一时刻只传送一个Intent对象，这样一来，你就不必担心多线程的问题。在所有的请求(Intent)都被执行完以后会自动停止服务，所以，你不需要自己去调用stopSelf()方法来停止。
+Service 是依附于主线程的，也就是说不能进行耗时操作，而继承于它的子类 IntentService 说白了 IntentService 就是为了实现让 Service 能够进行耗时操作的功能。
 
-该服务提供了一个onBind()方法的默认实现，它返回null
-
-提供了一个onStartCommand()方法的默认实现，它将Intent先传送至工作队列，然后从工作队列中每次取出一个传送至onHandleIntent()方法，在该方法中对Intent对相应的处理。
-
-AIDL (Android Interface Definition Language) 是一种IDL 语言，用于生成可以在Android设备上两个进程之间进行进程间通信(interprocess communication, IPC)的代码。如果在一个进程中（例如Activity）要调用另一个进程中（例如Service）对象的操作，就可以使用AIDL生成可序列化的参数。 AIDL IPC机制是面向接口的，像COM或Corba一样，但是更加轻量级。它是使用代理类在客户端和实现端传递数据。
+https://www.cnblogs.com/raomengyang/p/5824327.html
 
 ### Activity、Window、View 三者的差别？
 
 -------
 
-Activity像一个工匠（控制单元），Window像窗户（承载模型），View像窗花（显示视图） LayoutInflater像剪刀，Xml配置像窗花图纸。
+Activity 像一个工匠（控制单元），Window 像窗户（承载模型），View 像窗花（显示视图）  LayoutInflater 像剪刀，Xml 配置像窗花图纸。
 
-在Activity中调用attach，创建了一个Window，创建的window是其子类PhoneWindow，在attach中创建PhoneWindow。在Activity中调用setContentView(R.layout.xxx)，其中实际上是调用的getWindow().setContentView()。调用PhoneWindow中的setContentView方法。
+在 Activity 中调用 attach()，创建了一个 Window，创建的 window 是其子类 PhoneWindow，在 attach 中创建 PhoneWindow。在 Activity 中调用 setContentView(R.layout.xxx)，其中实际上是调用的 getWindow().setContentView()。调用 PhoneWindow 中的 setContentView() 方法。
 
-创建ParentView： 作为ViewGroup的子类，实际是创建的DecorView(作为FramLayout的子类）。将指定的R.layout.xxx进行填充，通过布局填充器进行填充【其中的parent指的就是DecorView】。调用到ViewGroup，调用ViewGroup的removeAllView()，先将所有的view移除掉，添加新的view：addView()
+创建 ParentView： 作为 ViewGroup 的子类，实际是创建的 DecorView(作为 FrameLayout 的子类）。将指定的 R.layout.xxx 进行填充，通过布局填充器进行填充(其中的 parent 指的就是 DecorView)。调用到 ViewGroup，调用 ViewGroup 的 removeAllView()，先将所有的view移除掉，添加新的 view.addView()。
 
 ### Fragment 特点
 
-Fragment可以作为Activity界面的一部分组成出现；
-可以在一个Activity中同时出现多个Fragment，并且一个Fragment也可以在多个Activity中使用；
-在Activity运行过程中，可以添加、移除或者替换Fragment；
-Fragment可以响应自己的输入事件，并且有自己的生命周期，它们的生命周期会受宿主Activity的生命周期影响。
+Fragment 可以作为 Activity界面的一部分组成出现；
+可以在一个 Activity 中同时出现多个 Fragment，并且一个 Fragment 也可以在多个 Activity 中使用；
+在 Activity 运行过程中，可以添加、移除或者替换 Fragment；
+Fragment 可以响应自己的输入事件，并且有自己的生命周期，它们的生命周期会受宿主 Activity 的生命周期影响。
 
 ### Handler、Thread 和 HandlerThread 的差别？
 
@@ -160,21 +159,21 @@ http://blog.csdn.net/guolin_blog/article/details/9991569
 
 http://droidyue.com/blog/2015/11/08/make-use-of-handlerthread/
 
-从Android中Thread（java.lang.Thread -> java.lang.Object）描述可以看出，Android的Thread没有对Java的Thread做任何封装，但是Android提供了一个继承自Thread的类HandlerThread（android.os.HandlerThread -> java.lang.Thread），这个类对Java的Thread做了很多便利Android系统的封装。
+从 Android 中 Thread（java.lang.Thread -> java.lang.Object）描述可以看出，Android的 Thread 没有对 Java 的 Thread 做任何封装，但是 Android 提供了一个继承自 Thread 的类 HandlerThread（android.os.HandlerThread -> java.lang.Thread），这个类对 Java 的 Thread 做了很多便利 Android 系统的封装。
 
-android.os.Handler可以通过Looper对象实例化，并运行于另外的线程中，Android提供了让Handler运行于其它线程的线程实现，也就是HandlerThread。HandlerThread对象start后可以获得其Looper对象，并且使用这个Looper对象实例Handler。
+android.os.Handler 可以通过 Looper 对象实例化，并运行于另外的线程中，Android 提供了让 Handler 运行于其它线程的线程实现，也就是 HandlerThread。HandlerThread 对象 start 后可以获得其 Looper 对象，并且使用这个 Looper 对象实例 Handler。
 
 ### RequestLayout，onLayout，onDraw，DrawChild 区别与联系
 
 -------
 
-requestLayout()方法 ：会导致调用measure()过程 和 layout()过程 。说明：只是对View树重新布局layout过程包括measure()和layout()过程，不会调用draw()过程，但不会重新绘制 任何视图包括该调用者本身。
+requestLayout() 方法 ：会导致调用 measure() 过程和 layout() 过程 。说明：只是对 View 树重新布局 layout 过程包括 measure() 和 layout() 过程，不会调用 draw() 过程，但不会重新绘制任何视图包括该调用者本身。
 
-onLayout()方法(如果该View是ViewGroup对象，需要实现该方法，对每个子视图进行布局)
+onLayout() 方法(如果该 View 是 ViewGroup 对象，需要实现该方法，对每个子视图进行布局)。
 
-调用onDraw()方法绘制视图本身(每个View都需要重载该方法，ViewGroup不需要实现该方法)
+调用 onDraw() 方法绘制视图本身(每个 View 都需要重载该方法，ViewGroup 不需要实现该方法)。
 
-drawChild()去重新回调每个子视图的draw()方法
+drawChild() 去重新回调每个子视图的 draw() 方法。
 
 ### invalidate() 和 postInvalidate() 的区别及使用
 
@@ -186,11 +185,11 @@ http://blog.csdn.net/mars2639/article/details/6650876
 
 -------
 
-RelativeLayout会让子View调用2次onMeasure，LinearLayout 在有weight时，也会调用子View2次onMeasure
+RelativeLayout 会让子 View 调用 2 次 onMeasure；LinearLayout 在有 weight 时，也会调用子 View 2次 onMeasure
 
-RelativeLayout的子View如果高度和RelativeLayout不同，则会引发效率问题，当子View很复杂时，这个问题会更加严重。如果可以，尽量使用padding代替margin。
+RelativeLayout 的子 View 如果高度和 RelativeLayout 不同，则会引发效率问题，当子 View 很复杂时，这个问题会更加严重。如果可以，尽量使用 padding 代替 margin。
 
-在不影响层级深度的情况下,使用LinearLayout和FrameLayout而不是RelativeLayout。
+在不影响层级深度的情况下,使用 LinearLayout 和 FrameLayout 而不是 RelativeLayout。
 
 ### ContentProvider
 
@@ -205,9 +204,9 @@ https://www.jianshu.com/p/ea8bc4aaf057
 -------
 
 1. 动画的基本原理：其实就是利用插值器和估值器，来计算出各个时刻View的属性，然后通过改变 View 的属性来，实现View的动画效果。
-2. View动画：只是影像变化，view 的实际位置还在原来的地方。
+2. View 动画：只是影像变化，view 的实际位置还在原来的地方。
 3. 帧动画是在 xml 中定义好一系列图片之后，使用 AnimationDrawable 来播放的动画。
-4. View的属性动画：
+4. View 的属性动画：
 - 插值器：作用是根据时间的流逝的百分比来计算属性改变的百分比
 - 估值器：在 1 的基础上由这个东西来计算出属性到底变化了多少数值的类
 
@@ -264,13 +263,26 @@ https://www.jianshu.com/p/ea8bc4aaf057
 
 -------
 
-### java 虚拟机和 Dalvik 虚拟机的区别？
+- [Activity 创建过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity启动过程.md)
+
+### Java 虚拟机和 Dalvik 虚拟机的区别？
 
 -------
+
+Dalvik 和标准 Java虚拟机（JVM）之间的首要差别之一，就是 Dalvik 基于寄存器，而 JVM 基于栈。 
+Dalvik 和 Java 之间的另外一大区别就是运行环境 —— Dalvik 经过优化，允许在有限的内存中同时运行多个虚拟机的实例，并且每一个 Dalvik 应用作为一个独立的 Linux 进程执行。 
+
+1. 虚拟机很小，使用的空间也小； 
+2. Dalvik 没有 JIT 编译器； 
+3. 常量池已被修改为只使用 32 位的索引，以简化解释器； 
+4. 它使用自己的字节码，而非 Java 字节码。
+
 
 ### Binder 机制
 
 -------
+
+- [一篇文章了解相见恨晚的 Android Binder 进程间通讯](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Binder进程间通讯.md)
 
 ### Android 事件分发机制，请详细说下整个流程
 
@@ -290,28 +302,25 @@ https://www.jianshu.com/p/bb7977990baa
 
 -------
 
-### 如何自定义 View？
-
--------
 
 ### 优化自定义 view
 
 -------
 
-为了加速你的view，对于频繁调用的方法，需要尽量减少不必要的代码。先从onDraw开始，需要特别注意不应该在这里做内存分配的事情，因为它会导致GC，从而导致卡顿。在初始化或者动画间隙期间做分配内存的动作。不要在动画正在执行的时候做内存分配的事情。
+为了加速你的 view，对于频繁调用的方法，需要尽量减少不必要的代码。先从 onDraw() 开始，需要特别注意不应该在这里做内存分配的事情，因为它会导致 GC，从而导致卡顿。在初始化或者动画间隙期间做分配内存的动作。不要在动画正在执行的时候做内存分配的事情。
 
-你还需要尽可能的减少onDraw被调用的次数，大多数时候导致onDraw都是因为调用了invalidate().因此请尽量减少调用invaildate()的次数。如果可能的话，尽量调用含有4个参数的invalidate()方法而不是没有参数的invalidate()。没有参数的invalidate会强制重绘整个view。
+你还需要尽可能的减少 onDraw() 被调用的次数，大多数时候导致 onDraw 都是因为调用了 invalidate()。因此请尽量减少调用 invaildate() 的次数。如果可能的话，尽量调用含有 4 个参数的 invalidate() 方法而不是没有参数的 invalidate()。没有参数的 invalidate 会强制重绘整个 view。
 
-另外一个非常耗时的操作是请求layout。任何时候执行requestLayout()，会使得Android UI系统去遍历整个View的层级来计算出每一个view的大小。如果找到有冲突的值，它会需要重新计算好几次。另外需要尽量保持View的层级是扁平化的，这样对提高效率很有帮助。
+另外一个非常耗时的操作是请求 layout。任何时候执行 requestLayout()，会使得 Android UI 系统去遍历整个 View 的层级来计算出每一个 view 的大小。如果找到有冲突的值，它会需要重新计算好几次。另外需要尽量保持 View 的层级是扁平化的，这样对提高效率很有帮助。
 
-如果你有一个复杂的UI，你应该考虑写一个自定义的ViewGroup来执行他的layout操作。与内置的view不同，自定义的view可以使得程序仅仅测量这一部分，这避免了遍历整个view的层级结构来计算大小。这个PieChart 例子展示了如何继承ViewGroup作为自定义view的一部分。PieChart 有子views，但是它从来不测量它们。而是根据他自身的layout法则，直接设置它们的大小。
+如果你有一个复杂的 UI，你应该考虑写一个自定义的 ViewGroup 来执行他的 layout 操作。与内置的 view 不同，自定义的 view 可以使得程序仅仅测量这一部分，这避免了遍历整个 view 的层级结构来计算大小。这个 PieChart 例子展示了如何继承 ViewGroup 作为自定义 view 的一部分。PieChart  有子 views，但是它从来不测量它们。而是根据他自身的 layout 法则，直接设置它们的大小。
 
 
 ### Zygote 进程启动过程
 
 -------
 
-
+- [一篇文章看明白 Android 系统启动时都干了什么](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-系统启动过程.md)
 
 
 ## 性能优化
@@ -328,23 +337,23 @@ https://www.jianshu.com/p/bb7977990baa
 
 -------
 
-- 如果开发机器上出现问题，我们可以通过查看/data/anr/traces.txt即可，最新的ANR信息在最开始部分。
-- 主线程被IO操作（从4.0之后网络IO不允许在主线程中）阻塞。
-- 主线程中存在耗时的计算
-- 主线程中错误的操作，比如Thread.wait或者Thread.sleep等 Android系统会监控程序的响应状况，一旦出现下面两种情况，则弹出ANR对话框
-- 应用在5秒内未响应用户的输入事件（如按键或者触摸）
-- BroadcastReceiver未在10秒内完成相关的处理
-- Service在特定的时间内无法处理完成 20秒
+- 如果开发机器上出现问题，我们可以通过查看 /data/anr/traces.txt 即可，最新的 ANR 信息在最开始部分。
+- 主线程被 IO 操作（从 4.0 之后网络 IO 不允许在主线程中）阻塞。
+- 主线程中存在耗时的计算。
+- 主线程中错误的操作，比如 Thread.wait 或者 Thread.sleep 等 Android 系统会监控程序的响应状况，一旦出现下面两种情况，则弹出 ANR 对话框。
+- 应用在 5 秒内未响应用户的输入事件（如按键或者触摸）。
+- BroadcastReceiver 未在 10 秒内完成相关的处理。
+- Service 在特定的时间内无法处理完成 20 秒。
 
 避免:
 
-- 使用AsyncTask处理耗时IO操作。
-- 使用Thread或者HandlerThread时，调用Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)设置优先级，否则仍然会降低程序响应，因为默认Thread的优先级和主线程相同。
-- 使用Handler处理工作线程结果，而不是使用Thread.wait()或者Thread.sleep()来阻塞主线程。
-- Activity的onCreate和onResume回调中尽量避免耗时的代码
-- BroadcastReceiver中onReceive代码也要尽量减少耗时，建议使用IntentService处理。
+- 使用 AsyncTask 处理耗时 IO 操作。
+- 使用 Thread 或者 HandlerThread 时，调用Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND) 设置优先级，否则仍然会降低程序响应，因为默认 Thread 的优先级和主线程相同。
+- 使用 Handler 处理工作线程结果，而不是使用 Thread.wait() 或者 Thread.sleep() 来阻塞主线程。
+- Activity 的 onCreate 和 onResume 回调中尽量避免耗时的代码
+- BroadcastReceiver 中 onReceive 代码也要尽量减少耗时，建议使用 IntentService 处理。
 
-### 什么情况导致OOM以及如何避免?
+### 什么情况导致 OOM 以及如何避免?
 
 -------
 
@@ -358,14 +367,14 @@ http://blog.csdn.net/ljx19900116/article/details/50037627
 
 - 资源对象没关闭造成的内存泄漏
 
-描述： 资源性对象比如(Cursor，File文件等)往往都用了一些缓冲，我们在不使用的时候，应该及时关闭它们，以便它们的缓冲及时回收内存。它们的缓冲不仅存在于 java虚拟机内，还存在于java虚拟机外。如果我们仅仅是把它的引用设置为null,而不关闭它们，往往会造成内存泄漏。因为有些资源性对象，比如 SQLiteCursor(在析构函数finalize(),如果我们没有关闭它，它自己会调close()关闭)，如果我们没有关闭它，系统在回收它时也会关闭它，但是这样的效率太低了。因此对于资源性对象在不使用的时候，应该调用它的close()函数，将其关闭掉，然后才置为null.在我们的程序退出时一定要确保我们的资源性对象已经关闭。 程序中经常会进行查询数据库的操作，但是经常会有使用完毕Cursor后没有关闭的情况。如果我们的查询结果集比较小，对内存的消耗不容易被发现，只有在常时间大量操作的情况下才会复现内存问题，这样就会给以后的测试和问题排查带来困难和风险。
+描述：资源性对象比如：Cursor，File 文件等，往往都用了一些缓冲，我们在不使用的时候，应该及时关闭它们，以便它们的缓冲及时回收内存。它们的缓冲不仅存在于 java 虚拟机内，还存在于 java 虚拟机外。如果我们仅仅是把它的引用设置为 null，而不关闭它们，往往会造成内存泄漏。因为有些资源性对象，比如：SQLiteCursor(在析构函数 finalize()，如果我们没有关闭它，它自己会调 close() 关闭)，如果我们没有关闭它，系统在回收它时也会关闭它，但是这样的效率太低了。因此对于资源性对象在不使用的时候，应该调用它的 close() 函数，将其关闭掉，然后才置为null。在我们的程序退出时一定要确保我们的资源性对象已经关闭。程序中经常会进行查询数据库的操作，但是经常会有使用完毕 Cursor 后没有关闭的情况。如果我们的查询结果集比较小，对内存的消耗不容易被发现，只有在常时间大量操作的情况下才会复现内存问题，这样就会给以后的测试和问题排查带来困难和风险。
 
-- 构造Adapter时，没有使用缓存的convertView
+- 构造 Adapter 时，没有使用缓存的 convertView
 
-以构造ListView的BaseAdapter为例，在BaseAdapter中提供了方法： public View getView(int position, ViewconvertView, ViewGroup parent) 来向ListView提供每一个item所需要的view对象。初始时ListView会从BaseAdapter中根据当前的屏幕布局实例化一定数量的 view对象，同时ListView会将这些view对象缓存起来。当向上滚动ListView时，原先位于最上面的list item的view对象会被回收，然后被用来构造新出现的最下面的list item。这个构造过程就是由getView()方法完成的，getView()的第二个形参View convertView就是被缓存起来的list item的view对象(初始化时缓存中没有view对象则convertView是null)。由此可以看出，如果我们不去使用 convertView，而是每次都在getView()中重新实例化一个View对象的话，即浪费资源也浪费时间，也会使得内存占用越来越大。 ListView回收list item的view对象的过程可以查看: android.widget.AbsListView.java --> voidaddScrapView(View scrap) 方法。 示例代码：
+以构造 ListView 的 BaseAdapter 为例，在 BaseAdapter 中提供了方法： public View getView(int position, View convertView, ViewGroup parent) 来向 ListView 提供每一个 item 所需要的 view 对象。初始时 ListView 会从 BaseAdapter 中根据当前的屏幕布局实例化一定数量的 view 对象，同时 ListView 会将这些 view 对象缓存起来。当向上滚动 ListView 时，原先位于最上面的 list item 的 view 对象会被回收，然后被用来构造新出现的最下面的 list item。这个构造过程就是由 getView() 方法完成的，getView() 的第二个形参 View convertView 就是被缓存起来的 list item 的 view 对象(初始化时缓存中没有 view 对象则 convertView 是null)。由此可以看出，如果我们不去使用 convertView，而是每次都在 getView() 中重新实例化一个 View 对象的话，即浪费资源也浪费时间，也会使得内存占用越来越大。 ListView 回收 list item 的 view 对象的过程可以查看: android.widget.AbsListView.java --> void addScrapView(View scrap) 方法。 示例代码：
 
 ```Java
-public View getView(int position, ViewconvertView, ViewGroup parent) {
+public View getView(int position, View convertView, ViewGroup parent) {
     View view = new Xxx(...); 
     ... ... 
     return view; 
@@ -375,7 +384,7 @@ public View getView(int position, ViewconvertView, ViewGroup parent) {
 修正示例代码：
 
 ```Java
-public View getView(int position, ViewconvertView, ViewGroup parent) {
+public View getView(int position, View convertView, ViewGroup parent) {
     View view = null; 
     if (convertView != null) { 
         view = convertView; 
@@ -389,30 +398,33 @@ public View getView(int position, ViewconvertView, ViewGroup parent) {
 } 
 ```
 
-- Bitmap对象不在使用时调用recycle()释放内存
+- Bitmap 对象不在使用时调用 recycle() 释放内存
 
-有时我们会手工的操作Bitmap对象，如果一个Bitmap对象比较占内存，当它不在被使用的时候，可以调用Bitmap.recycle()方法回收此对象的像素所占用的内存，但这不是必须的，视情况而定。
+有时我们会手工的操作 Bitmap 对象，如果一个 Bitmap 对象比较占内存，当它不在被使用的时候，可以调用 Bitmap.recycle() 法回收此对象的像素所占用的内存，但这不是必须的，视情况而定。
 
-- 试着使用关于application的context来替代和activity相关的context
+- 试着使用关于 application 的 context 来替代和 activity 相关的 context
 
-这是一个很隐晦的内存泄漏的情况。有一种简单的方法来避免context相关的内存泄漏。最显著地一个是避免context逃出他自己的范围之外。使用Application context。这个context的生存周期和你的应用的生存周期一样长，而不是取决于activity的生存周期。如果你想保持一个长期生存的对象，并且这个对象需要一个context,记得使用application对象。你可以通过调用 Context.getApplicationContext() or Activity.getApplication()来获得。更多的请看这篇文章如何避免 Android内存泄漏。
+这是一个很隐晦的内存泄漏的情况。有一种简单的方法来避免 context 相关的内存泄漏。最显著地一个是避免 context 逃出他自己的范围之外。使用 Application context。这个 context 的生存周期和你的应用的生存周期一样长，而不是取决于 activity 的生存周期。如果你想保持一个长期生存的对象，并且这个对象需要一个 context,记得使用 application 对象。你可以通过调用 Context.getApplicationContext() or Activity.getApplication() 来获得。
 
 - 注册没反注册造成的内存泄漏
 
-一些Android程序可能引用我们的Anroid程序的对象(比如注册机制)。即使我们的Android程序已经结束了，但是别的引用程序仍然还有对我们的Android程序的某个对象的引用，泄漏的内存依然不能被垃圾回收。调用registerReceiver后未调用unregisterReceiver。 比如:假设我们希望在锁屏界面(LockScreen)中，监听系统中的电话服务以获取一些信息(如信号强度等)，则可以在LockScreen中定义一个 PhoneStateListener的对象，同时将它注册到TelephonyManager服务中。对于LockScreen对象，当需要显示锁屏界面的时候就会创建一个LockScreen对象，而当锁屏界面消失的时候LockScreen对象就会被释放掉。 但是如果在释放 LockScreen对象的时候忘记取消我们之前注册的PhoneStateListener对象，则会导致LockScreen无法被垃圾回收。如果不断的使锁屏界面显示和消失，则最终会由于大量的LockScreen对象没有办法被回收而引起OutOfMemory,使得system_process 进程挂掉。 虽然有些系统程序，它本身好像是可以自动取消注册的(当然不及时)，但是我们还是应该在我们的程序中明确的取消注册，程序结束时应该把所有的注册都取消掉。
+一些 Android 程序可能引用我们的 Anroid 程序的对象(比如：注册机制)。即使我们的 Android 程序已经结束了，但是别的引用程序仍然还有对我们的 Android 程序的某个对象的引用，泄漏的内存依然不能被垃圾回收。调用 registerReceiver 后未调用 unregisterReceiver。 比如:假设我们希望在锁屏界面 LockScreen 中，监听系统中的电话服务以获取一些信息(如：信号强度等)，则可以在 LockScreen 中定义一个 PhoneStateListener 的对象，同时将它注册到 TelephonyManager 服务中。对于 LockScreen 对象，当需要显示锁屏界面的时候就会创建一个 LockScreen 对象，而当锁屏界面消失的时候 LockScreen 对象就会被释放掉。 但是如果在释放 LockScreen 对象的时候忘记取消我们之前注册的 PhoneStateListener 对象，则会导致 LockScreen 无法被垃圾回收。如果不断的使锁屏界面显示和消失，则最终会由于大量的 LockScreen 对象没有办法被回收而引起 OutOfMemory，使得 system_process 进程挂掉。 虽然有些系统程序，它本身好像是可以自动取消注册的(当然不及时)，但是我们还是应该在我们的程序中明确的取消注册，程序结束时应该把所有的注册都取消掉。
 
 - 集合中对象没清理造成的内存泄漏
 
-我们通常把一些对象的引用加入到了集合中，当我们不需要该对象时，并没有把它的引用从集合中清理掉，这样这个集合就会越来越大。如果这个集合是static的话，那情况就更严重了。
+我们通常把一些对象的引用加入到了集合中，当我们不需要该对象时，并没有把它的引用从集合中清理掉，这样这个集合就会越来越大。如果这个集合是 static 的话，那情况就更严重了。
 
 ### Merge 与 ViewStub 布局标签，布局优化
 
 -------
 
-### 如何加速启动 Activity
+- [Android 性能优化 - UI优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-UI优化.md)
+
+### 内存优化
 
 -------
 
+- [Android 性能优化 - 内存优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-内存优化.md)
 
 
 
@@ -422,10 +434,9 @@ public View getView(int position, ViewconvertView, ViewGroup parent) {
 
 -------
 
-### 为什么 Android 用起来没有 iOS 流畅？为了让 Android 系统更流畅，应该从哪些方面做好？
+Android：沙盒运行机制，采用真后台运行，将所有的应用都保存在 RAM 中，按 Home 键，程序被挂在了后台，实际未退出，因程序在后台运行，所以可以收到推送消息，导致内存越用越低，越用越卡。
 
--------
-
+iOS：虚拟机运行机制，采用伪后台运行，按 Home 键，程序进入到后台会自动进入到休眠状态，Home 键调出多任务管理器，所有的应用都处于停止状态，iPhone 默认将应用的最后的运行记录在 RAM 中， iOS 得到推动消息，是因为当你开启应用的消息推送时，系统会增加一些进程，这些进程从苹果的服务器接收消息，然后在通过服务器发送到手机，苹果服务器起到了中转的作用，因此 IOS 运行流畅。
 
 
 
@@ -433,6 +444,10 @@ public View getView(int position, ViewconvertView, ViewGroup parent) {
 ### 如果一个应用要升级需要注意哪些方面？
 
 -------
+
+1. 接口 API 兼容性
+2. 本地数据兼容性
+3. 签名
 
 ### Volley 框架原理？
 
@@ -446,18 +461,73 @@ public View getView(int position, ViewconvertView, ViewGroup parent) {
 
 -------
 
+Android 5.0新特性：
+
+- Material Design
+- 支持多种设备
+- 全新通知中心设计
+- 支持64位ART虚拟机
+- Project Volta电池续航改进计划
+- 全新的“最近应用程序”
+- 改进安全性
+- 不同数据独立保存
+- 改进搜索
+- 支持蓝牙4.1、USB Audio、多人分享等其它特性
+
+Android 6.0 新特性：
+
+- 动态权限管理
+- 指纹识别（Fingerprint Support）
+- APP关联（App Links）
+- Android pay
+- 电源管理
+- 存储
+
+Android 7.0 新特性：
+
+- Android7.0提供新功能以提升性能、生产效率和安全性。
+
+关于Android N的性能改进，Android N建立了先进的图形处理Vulkan系统，能少的减少对CPU的占用。与此同时，Android N加入了JIT编译器，安装程序快了75%，所占空间减少了50%。
+
+- 分屏多任务
+- 全新下拉快捷开关页
+- 新通知消息
+- 通知消息归拢
+- 夜间模式
+- 流量保护模式
+- 全新设置样式
+- 改进的 Doze 休眠机制
+- 系统级电话黑名单功能
+- 菜单键快速应用切换
+
+Android 8.0 新特性：
+
+- 通知功能
+- 新表情符号
+- 智能复制和粘贴
+- 画中画功能
+- 自动填充功能
+- Vitals
+- Google Play Protect
+- 系统/应用启动程序加速
+- Play Console Dashboard
+- 自适应图标（Adaptive icons）
+- 后台进程限制
+- 字体
+
 ### Android 长连接，怎么处理心跳机制
 
 -------
 
+http://blog.csdn.net/rabbit_in_android/article/details/50119809
 
 ### UniversalImageLoader 原理解析，三级缓存
 
 -------
 
-内存缓存，本地缓存，网络 
+内存缓存，本地缓存，网络。
 
-
+[UniversalImageLoader 源码分析](http://a.codekk.com/detail/Android/huxian99/Android%20Universal%20Image%20Loader%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
 
 
 ## 参考资料
