@@ -422,11 +422,13 @@ String a = "abc"
 -------
 
 - [JVM 内存分配机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/JVM/JVM-内存分配机制.md)
+
 如何确定某个对象是垃圾：
 1. 引用计数法
 2. 可达性分析
 
 - [JVM 垃圾回收机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/JVM/JVM-垃圾回收机制.md)
+
 典型的垃圾回收算法：
 1. 标记-清除算法(Mark-Sweep)
 2. 复制算法(Copying)
