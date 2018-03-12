@@ -249,7 +249,7 @@ String，Match
 
 
 ## 线程相关
-### 关键字 synchronized 的作用是什么？Lock 相关
+### 关键字 synchronized 的作用是什么？与 Lock 区别
 
 -------
 
@@ -534,5 +534,18 @@ Java NIO 是在 jdk1.4 开始使用的，它既可以说成“新 I/O”，也�
 3. 线程通讯：线程之间通过 wait,notify 等方式通讯。保证每次上下文切换都是有意义的。减少无谓的线程切换。
 
 
+### 说说你对 Java 反射的理解
+
+-------
+
+Java 中的反射首先是能够获取到 Java 中要反射类的字节码， 获取字节码有三种方法：
+
+1. .Class.forName(className) 
+2. .类名.class
+3. .this.getClass()
+
+然后将字节码中的方法，变量，构造函数等映射成相应的 Method、Filed、Constructor 等类，这些类提供了丰富的方法可以被我们所使用。
+
+### 说说你对泛型的了解
 
 

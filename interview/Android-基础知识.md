@@ -8,6 +8,14 @@
 
 Activity 生命周期各种回调方法的设计，是为了确保提供一个流畅的用户体验，在 Activity 切换时，以及 Activity 停止或者销毁的意外中断情况下，保存好 Activity 状态。
 
+### 下拉状态栏是不是影响 Activity 的生命周期，如果在 onStop 的时候做了网络请求，onResume 的时候怎么恢复
+
+### 屏幕旋转过程中 Activity 的生命周期
+
+### 弹出 Dialog 然后关闭过程中 Activity 的生命周期
+
+### Activity 上有 Dialog 的时候按 home 键时的生命周期
+
 ### Activity 的 Launch mode（启动模式）以及使用场景 
 
 1. standard：默认标准模式，每启动一个都会创建一个实例，
@@ -49,7 +57,7 @@ Fragment 传值给 Activity：在 Fragment 中定义一个内部回调接口，A
 
 Fragment 传值给 Fragment：一个 Fragment 通过 Activity 获取到另外一个 Fragment 直接调用方法传值。
 
-### Android Service与Activity之间通信的几种方式？
+### Android Service 与 Activity 之间通信的几种方式？
 
 -------
 
@@ -197,6 +205,10 @@ RelativeLayout 的子 View 如果高度和 RelativeLayout 不同，则会引发�
 
 https://www.jianshu.com/p/ea8bc4aaf057
 
+### Application 和 Activity 的 context 对象的区别
+
+### AsyncTask 原理及缺陷
+
 
 ## 动画
 ### 动画有哪几类，各有什么特点？
@@ -241,7 +253,10 @@ https://www.jianshu.com/p/ea8bc4aaf057
 		- 异步加载使用线程池，让存在的加载任务都处于不同线程
 		- 为了不开启过多的异步任务，只在列表静止的时候开启图片加载
 
+		
+### 图片加载原理
 
+### 图片压缩原理
 
 
 ## 核心机制
@@ -321,6 +336,21 @@ https://www.jianshu.com/p/bb7977990baa
 -------
 
 - [一篇文章看明白 Android 系统启动时都干了什么](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-系统启动过程.md)
+
+### ThreadLocal 原理
+
+### ClassLoader 加载过程，双亲委派模型
+
+### 介绍下 SurfaceView
+
+### 描述下点击 Android Studio 的 build 按钮后发生了什么？
+
+### 描述下一个应用程序安装到手机上时发生了什么？
+
+### App 是如何沙箱化，为什么要这么做？
+
+### 权限管理系统（底层的权限是如何进行 grant 的）
+
 
 
 ## 性能优化
@@ -420,12 +450,15 @@ public View getView(int position, View convertView, ViewGroup parent) {
 
 - [Android 性能优化 - UI优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-UI优化.md)
 
+### 怎么去除重复代码？
+
 ### 内存优化
 
 -------
 
 - [Android 性能优化 - 内存优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-内存优化.md)
 
+### HashMap 源码，SpareArray 原理
 
 
 
@@ -441,6 +474,12 @@ iOS：虚拟机运行机制，采用伪后台运行，按 Home 键，程序进�
 
 
 ## 其他
+
+### 模块化怎么实现，好处，原因？
+
+### 视频加密传输
+
+
 ### 如果一个应用要升级需要注意哪些方面？
 
 -------
@@ -521,13 +560,22 @@ Android 8.0 新特性：
 
 http://blog.csdn.net/rabbit_in_android/article/details/50119809
 
-### UniversalImageLoader 原理解析，三级缓存
+### UniversalImageLoader 原理解析，三级缓存，LRUCache 原理
 
 -------
 
 内存缓存，本地缓存，网络。
 
 [UniversalImageLoader 源码分析](http://a.codekk.com/detail/Android/huxian99/Android%20Universal%20Image%20Loader%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+
+### Glide 原理解析
+
+### RecycleView 与 ListView 的区别，性能
+
+### EventBus 实现原理
+
+### OkHttp 实现原理
+
 
 
 ## 参考资料
