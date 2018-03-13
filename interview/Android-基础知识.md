@@ -8,13 +8,43 @@
 
 Activity 生命周期各种回调方法的设计，是为了确保提供一个流畅的用户体验，在 Activity 切换时，以及 Activity 停止或者销毁的意外中断情况下，保存好 Activity 状态。
 
-### 下拉状态栏是不是影响 Activity 的生命周期，如果在 onStop 的时候做了网络请求，onResume 的时候怎么恢复
+### 下拉状态栏会影响 Activity 的生命周期吗？
 
-### 屏幕旋转过程中 Activity 的生命周期
+不会
 
 ### 弹出 Dialog 然后关闭过程中 Activity 的生命周期
 
+不变（全屏的 Dialog 或透明的 Activity 会影响生命周期）
+
+### 屏幕旋转过程中 Activity 的生命周期
+
+没有配置 configChange：
+
+- onCreate
+- onStart
+- onResume
+- onPause
+- onStop
+- onDestroy
+- onCreate
+- onStart
+- onResume
+
+配置configChange：
+
+- onCreate
+- onStart
+- onResume
+- onConfigurationChanged
+
+
 ### Activity 上有 Dialog 的时候按 home 键时的生命周期
+
+- onCreate
+- onStart
+- onResume
+- onPause
+- onStop
 
 ### Activity 的 Launch mode（启动模式）以及使用场景 
 
@@ -70,9 +100,9 @@ Fragment 传值给 Fragment：一个 Fragment 通过 Activity 获取到另外一
 
 - onStartCommand方法，返回START_STICKY
 
-START_STICKY 在运行 onStartCommand 后 service 进程被 kill 后，那将保留在开始状态，但是不保留那些传入的 intent。不久后 service 就会再次尝试重新创建，因为保留在开始状态，在创建      service 后将保证调用 onstartCommand。如果没有传递任何开始命令给 service，那将获取到 null 的 intent。
+START_STICKY 在运行 onStartCommand 后 service 进程被 kill 后，那将保留在开始状态，但是不保留那些传入的 intent。不久后 service 就会再次尝试重新创建，因为保留在开始状态，在创建 service 后将保证调用 onStartCommand。如果没有传递任何开始命令给 service，那将获取到 null 的 intent。
 
-START_NOT_STICKY 在运行 onStartCommand 后 service 进程被 kill 后，并且没有新的 intent 传递给它。Service 将移出开始状态，并且直到新的明显的方法 startService() 调用才重新创建。因为如果没有传递任何未决定的 intent 那么 service 是不会启动，也就是期间 onstartCommand() 不会接收到任何 null 的 intent。
+START_NOT_STICKY 在运行 onStartCommand 后 service 进程被 kill 后，并且没有新的 intent 传递给它。Service 将移出开始状态，并且直到新的明显的方法 startService() 调用才重新创建。因为如果没有传递任何未决定的 intent 那么 service 是不会启动，也就是期间 onStartCommand() 不会接收到任何 null 的 intent。
 
 START_REDELIVER_INTENT 在运行 onStartCommand() 后 service 进程被 kill 后，系统将会再次启动 service，并传入最后一个 intent 给 onStartCommand()。直到调用 stopSelf(int) 才停止传递 intent。如果在被 kill 后还有未处理好的 intent，那被 kill 后服务还是会自动启动。因此 onStartCommand 不会接收到任何 null 的 intent。
 
@@ -206,6 +236,8 @@ RelativeLayout 的子 View 如果高度和 RelativeLayout 不同，则会引发�
 https://www.jianshu.com/p/ea8bc4aaf057
 
 ### Application 和 Activity 的 context 对象的区别
+
+首先 Activity.this 和 getApplicationContext() 返回的不是同一个对象，一个是当前 Activity 的实例，一个是项目的 Application 的实例，这两者的生命周期是不同的，它们各自的使用场景不同，this.getApplicationContext() 取的是这个应用程序的 Context，它的生命周期伴随应用程序的存在而存在；而 Activity.this 取的是当前 Activity 的 Context，它的生命周期则只能存活于当前 Activity，这两者的生命周期是不同的。getApplicationContext() 生命周期是整个应用，当应用程序摧毁的时候，它才会摧毁；Activity.this 的 context 是属于当前 Activity 的，当前 Activity 摧毁的时候，它就摧毁。
 
 ### AsyncTask 原理及缺陷
 
