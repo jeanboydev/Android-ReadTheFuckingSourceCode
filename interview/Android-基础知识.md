@@ -10,13 +10,19 @@ Activity 生命周期各种回调方法的设计，是为了确保提供一个�
 
 ### 下拉状态栏会影响 Activity 的生命周期吗？
 
+----------
+
 不会
 
 ### 弹出 Dialog 然后关闭过程中 Activity 的生命周期
 
+----------
+
 不变（全屏的 Dialog 或透明的 Activity 会影响生命周期）
 
 ### 屏幕旋转过程中 Activity 的生命周期
+
+----------
 
 没有配置 configChange：
 
@@ -40,6 +46,8 @@ Activity 生命周期各种回调方法的设计，是为了确保提供一个�
 
 ### Activity 上有 Dialog 的时候按 home 键时的生命周期
 
+----------
+
 - onCreate
 - onStart
 - onResume
@@ -47,6 +55,8 @@ Activity 生命周期各种回调方法的设计，是为了确保提供一个�
 - onStop
 
 ### Activity 的 Launch mode（启动模式）以及使用场景 
+
+----------
 
 1. standard：默认标准模式，每启动一个都会创建一个实例，
 2. singleTop：栈顶复用，如果在栈顶就调用 onNewIntent 复用，从 onResume() 开始
@@ -73,6 +83,8 @@ singleInstance应用场景：
 闹铃的响铃界面。 你以前设置了一个闹铃：上午6点。在上午5点58分，你启动了闹铃设置界面，并按 Home 键回桌面；在上午5点59分时，你在微信和朋友聊天；在6点时，闹铃响了，并且弹出了一个对话框形式的 Activity(名为 AlarmAlertActivity) 提示你到6点了(这个 Activity 就是以 SingleInstance 加载模式打开的)，你按返回键，回到的是微信的聊天界面，这是因为 AlarmAlertActivity 所在的 Task 的栈只有他一个元素， 因此退出之后这个 Task 的栈空了。如果是以 SingleTask 打开 AlarmAlertActivity，那么当闹铃响了的时候，按返回键应该进入闹铃设置界面。
 
 ### Activity 缓存方法
+
+----------
 
 1. 配置改变导致 Activity 被杀死，横屏变竖屏：在 onStop 之前会调用 onSaveInstanceState() 保存数据在重建 Activity 之后，会在 onStart() 之后调用onRestoreInstanceState()，并把保存下来的 Bundle 传给 onCreate() 和它会默认重建 Activity 当前的视图，我们可以在 onCreate() 中，回复自己的数据。
 2. 内存不足杀掉 Activity，优先级分别是：前台可见，可见非前台，后台。
@@ -237,9 +249,22 @@ https://www.jianshu.com/p/ea8bc4aaf057
 
 ### Application 和 Activity 的 context 对象的区别
 
+----------
+
 首先 Activity.this 和 getApplicationContext() 返回的不是同一个对象，一个是当前 Activity 的实例，一个是项目的 Application 的实例，这两者的生命周期是不同的，它们各自的使用场景不同，this.getApplicationContext() 取的是这个应用程序的 Context，它的生命周期伴随应用程序的存在而存在；而 Activity.this 取的是当前 Activity 的 Context，它的生命周期则只能存活于当前 Activity，这两者的生命周期是不同的。getApplicationContext() 生命周期是整个应用，当应用程序摧毁的时候，它才会摧毁；Activity.this 的 context 是属于当前 Activity 的，当前 Activity 摧毁的时候，它就摧毁。
 
 ### AsyncTask 原理及缺陷
+
+----------
+
+AsyncTask 是对 Handler 与线程池的封装。使用它的方便之处在于能够更新用户界面，当然这里更新用户界面的操作还是在主线程中完成的，但是由于 AsyncTask 内部包含一个 Handler，所以可以发送消息给主线程让它更新 UI。另外，AsyncTask 内还包含了一个线程池。使用线程池的主要原因是避免不必要的创建及销毁线程的开销。
+
+AsyncTask的优点在于执行完后台任务后可以很方便的更新UI，然而使用它存在着诸多的限制。先抛开内存泄漏问题，使用AsyncTask主要存在以下局限性：
+
+1. 在 Android 4.1 版本之前，AsyncTask 类必须在主线程中加载，这意味着对 AsyncTask 类的第一次访问必须发生在主线程中；在 Android 4.1 以及以上版本则不存在这一限制，因 为ActivityThread（代表了主线程）的 main 方法中会自动加载 AsyncTask。
+2. AsyncTask 对象必须在主线程中创建 
+3. AsyncTask 对象的 execute 方法必须在主线程中调用 
+4. 一个 AsyncTask 对象只能调用一次 execute 方法
 
 
 ## 动画
@@ -288,7 +313,17 @@ https://www.jianshu.com/p/ea8bc4aaf057
 		
 ### 图片加载原理
 
+----------
+
+http://b.codekk.com/detail/Trinea/Android%20%E4%B8%89%E5%A4%A7%E5%9B%BE%E7%89%87%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86%E3%80%81%E7%89%B9%E6%80%A7%E5%AF%B9%E6%AF%94
+
+
 ### 图片压缩原理
+
+----------
+
+http://blog.csdn.net/newchenxf/article/details/51693753
+
 
 
 ## 核心机制
@@ -303,6 +338,8 @@ https://www.jianshu.com/p/ea8bc4aaf057
 5. MessageQueue 和 Looper 是一对一关系，Handler 和 Looper 是多对一
 
 ### 怎样退出终止 App
+
+----------
 
 自己设置一个 Activity 的栈，然后一个个 finish()。
 
@@ -371,18 +408,47 @@ https://www.jianshu.com/p/bb7977990baa
 
 ### ThreadLocal 原理
 
+----------
+
+https://droidyue.com/blog/2016/03/13/learning-threadlocal-in-java/
+
+
 ### ClassLoader 加载过程，双亲委派模型
 
 ### 介绍下 SurfaceView
 
+----------
+
+https://www.jianshu.com/p/b037249e6d31
+
+
 ### 描述下点击 Android Studio 的 build 按钮后发生了什么？
+
+----------
+
+http://blog.csdn.net/yangxi_pekin/article/details/78612741
+
 
 ### 描述下一个应用程序安装到手机上时发生了什么？
 
+----------
+
+http://www.androidchina.net/6667.html
+
+
 ### App 是如何沙箱化，为什么要这么做？
+
+----------
+
+Android 中的沙箱化可以提升系统安全性和效率。
+Android 的底层内核为 Linux，因此继承了 Linux 良好的安全性，并对其进行了优化。在 Linux 中，一个用户对应一个 uid，而在 Android 中，（通常）一个 App 对应一个 uid，拥有独立的资源和空间，与其他 App 互不干扰。如有两个App: A 和 B，A 并不能访问 B 的资源，A 的崩溃也不会对 B 造成影响，从而保证了安全性和效率。
+
 
 ### 权限管理系统（底层的权限是如何进行 grant 的）
 
+----------
+
+http://tbfungeek.github.io/2016/04/06/Android-%E5%88%9D%E6%AD%A5%E4%B9%8BAndroid-%E5%AE%89%E5%85%A8%E6%9C%BA%E5%88%B6/
 
 
 ## 性能优化
@@ -602,12 +668,27 @@ http://blog.csdn.net/rabbit_in_android/article/details/50119809
 
 ### Glide 原理解析
 
+----------
+
+http://blog.csdn.net/guolin_blog/article/details/53939176
+
 ### RecycleView 与 ListView 的区别，性能
+
+----------
+
+https://zhuanlan.zhihu.com/p/23339185
 
 ### EventBus 实现原理
 
+----------
+
+http://blog.csdn.net/HaveFerrair/article/details/50618346
+
 ### OkHttp 实现原理
 
+----------
+
+https://www.jianshu.com/p/7b29b89cd7b5
 
 
 ## 参考资料
