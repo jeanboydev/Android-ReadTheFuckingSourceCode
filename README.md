@@ -68,6 +68,16 @@
 - [Android 项目架构探索](https://github.com/jeanboydev/Android-Architecture)
 - [Android 性能优化 - UI优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-UI优化.md)
 - [Android 性能优化 - 内存优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-内存优化.md)
+- [*Android Service 启动过程]
+- [*Android Broadcast 启动过程]
+- [*Android ContentProvider 启动过程]
+- [*Android App 自动化测试]
+- [*Android Gradle 构建系统]
+- [*Android PackageManagerService 分析]
+- [*Android PowerManagerService 分析]
+- [*Android Input 系统]
+
+
 
 ## 设计模式
 
