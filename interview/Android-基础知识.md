@@ -110,7 +110,7 @@ Fragment 传值给 Fragment：一个 Fragment 通过 Activity 获取到另外一
 
 -------
 
-- onStartCommand方法，返回START_STICKY
+- onStartCommand 方法，返回 START_STICKY
 
 START_STICKY 在运行 onStartCommand 后 service 进程被 kill 后，那将保留在开始状态，但是不保留那些传入的 intent。不久后 service 就会再次尝试重新创建，因为保留在开始状态，在创建 service 后将保证调用 onStartCommand。如果没有传递任何开始命令给 service，那将获取到 null 的 intent。
 
@@ -146,9 +146,9 @@ service + broadcast 方式，就是当 service 走 onDestroy() 的时候，发�
 
 -------
 
-- context.startService() -> onCreate() -> onStart() -> Service running --> (如果调用 context.stopService()) -> onDestroy() -> Service shut down
-1. 如果 Service 还没有运行，则调用 onCreate() 然后调用 onStart()；
-2. 如果 Service 已经运行，则只调用 onStart()，所以一个 Service 的 onStart 方法可能会重复调用多次。
+- context.startService() -> onCreate() -> onStartCommand() -> Service running --> (如果调用 context.stopService()) -> onDestroy() -> Service shut down
+1. 如果 Service 还没有运行，则调用 onCreate() 然后调用 onStartCommand()；
+2. 如果 Service 已经运行，则只调用 onStartCommand()，所以一个 Service 的 onStartCommand 方法可能会重复调用多次。
 3. 调用 stopService 的时候直接 onDestroy，
 4. 如果是调用者自己直接退出而没有调用 stopService 的话，Service 会一直在后台运行。该 Service 的调用者再启动起来后可以通过 stopService 关闭 Service。
 
