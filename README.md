@@ -119,10 +119,10 @@
 ## 开源库源码分析
 
 - [Lottie 动画开源库使用 & 源码分析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Lottie动画开源库使用&源码分析.md)
-- [Universal-Image-Loader 源码分析 from codeKK](http://a.codekk.com/detail/Android/huxian99/Android%20Universal%20Image%20Loader%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-- [Glide 源码分析 from 郭霖](http://blog.csdn.net/column/details/15318.html)
-- [EventBus 源码分析 from codeKK](http://a.codekk.com/detail/Android/Trinea/EventBus%20%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90)
-- [OkHttp 源码分析 from Piasy](https://blog.piasy.com/2016/07/11/Understand-OkHttp/)
-- [Volley 源码分析 from codeKK](http://a.codekk.com/detail/Android/grumoon/Volley%20%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90)
+- [Universal-Image-Loader 源码分析 from 【codeKK】](http://a.codekk.com/detail/Android/huxian99/Android%20Universal%20Image%20Loader%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+- [Glide 源码分析 from 【郭霖】](http://blog.csdn.net/column/details/15318.html)
+- [EventBus 源码分析 from 【codeKK】](http://a.codekk.com/detail/Android/Trinea/EventBus%20%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90)
+- [OkHttp 源码分析 from 【Piasy】](https://blog.piasy.com/2016/07/11/Understand-OkHttp/)
+- [Volley 源码分析 from 【codeKK】](http://a.codekk.com/detail/Android/grumoon/Volley%20%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90)
 
 
