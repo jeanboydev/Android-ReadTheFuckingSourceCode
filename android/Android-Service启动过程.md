@@ -6,6 +6,8 @@ Service 启动过程与 Activity 启动过程比较相似，不了解 Activity �
 
 Service 的启动分两种情况：startService，bindService。
 
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_service/service_start.png" alt=""/>
+
 ## startService
 
 通常情况我们在调用 startService 启动 Service 是运行在 App 进程中的。下面主要讨论下运行在单独进程中的情况。
@@ -117,7 +119,7 @@ ComponentName startServiceInnerLocked(ServiceMap smap, Intent service,
 
 首先通过 retrieveServiceLocked 方法来解析 service 这个 Intent，就是解析前面我们在 AndroidManifest.xml 定义的 Service 标签的 intent-filter 相关内容，然后将解析结果放在 res.record 中，再调用 startServiceInnerLocked 方法。startServiceInnerLocked 方法中会调用 bringUpServiceLocked 方法。
 
-- ActiveServices.startServiceInnerLocked()
+- ActiveServices.bringUpServiceLocked()
 
 ```Java
 
@@ -526,8 +528,8 @@ private final void realStartServiceLocked(ServiceRecord r, ProcessRecord app,
 
     } 
     //...
-    // 第二步，调用 requestServiceBindingsLocked
-    requestServiceBindingsLocked(r, execInFg);
+    // 第二步，调用 requestServiceBindingLocked
+    requestServiceBindingLocked(r, execInFg);
     updateServiceClientActivitiesLocked(app, null, true);
 
     // 第三步
