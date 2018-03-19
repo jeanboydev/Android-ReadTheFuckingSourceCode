@@ -27,7 +27,9 @@ private ComponentName startServiceCommon(Intent service, UserHandle user) {
     try {
         validateServiceIntent(service);
         service.prepareToLeaveProcess();
-        ComponentName cn = ActivityManagerNative.getDefault().startService(mMainThread.getApplicationThread(), service,service.resolveTypeIfNeeded(getContentResolver()),user.getIdentifier());
+        ComponentName cn = ActivityManagerNative.getDefault().
+			startService(mMainThread.getApplicationThread(),
+			service,service.resolveTypeIfNeeded(getContentResolver()), user.getIdentifier());
         //......
         return cn;
     } catch (RemoteException e) {
@@ -86,10 +88,12 @@ public ComponentName startService(IApplicationThread caller, Intent service,
 - ActiveServices.startServiceLocked()
 
 ```Java
-ComponentName startServiceLocked(IApplicationThread caller, Intent service, String resolvedType, int callingPid, int callingUid, int userId) {
+ComponentName startServiceLocked(IApplicationThread caller, Intent service, 
+	String resolvedType, int callingPid, int callingUid, int userId) {
 
     //......
-    ServiceLookupResult res = retrieveServiceLocked(service, resolvedType, callingPid, callingUid, userId, true, callerFg);
+    ServiceLookupResult res = retrieveServiceLocked(service, resolvedType, 
+		callingPid, callingUid, userId, true, callerFg);
     ServiceRecord r = res.record;
     //......
     //这里紧接着会调用 startServiceInnerLocked 方法
@@ -120,7 +124,8 @@ ComponentName startServiceInnerLocked(ServiceMap smap, Intent service,
 private final String bringUpServiceLocked(ServiceRecord r,
             int intentFlags, boolean execInFg, boolean whileRestarting) {
 
-    //（1）这里如果当前的 ProcessRecord 不为 null，那就不需要重新创建进程，而是调用 realStartServiceLocked 方法来启动 Service
+    //（1）这里如果当前的 ProcessRecord 不为 null，那就不需要重新创建进程，
+	//而是调用 realStartServiceLocked 方法来启动 Service
     if (app != null && app.thread != null) {
                 try {
                     app.addPackage(r.appInfo.packageName, r.appInfo.versionCode, mAm.mProcessStats);
@@ -159,14 +164,18 @@ private final String bringUpServiceLocked(ServiceRecord r,
 - ActivityManagerService.startProcessLocked()
 
 ```Java
-private final void startProcessLocked(ProcessRecord app, String hostingType, String hostingNameStr, String abiOverride, String entryPoint, String[] entryPointArgs) {
+private final void startProcessLocked(ProcessRecord app, String hostingType, 
+	String hostingNameStr, String abiOverride, String entryPoint, String[] entryPointArgs) {
 
     boolean isActivityProcess = (entryPoint == null);
     if (entryPoint == null) 
         entryPoint = "android.app.ActivityThread";
     checkTime(startTime, "startProcess: asking zygote to start proc");
     //通过 processName，uid 等启动新进程
-    Process.ProcessStartResult startResult = Process.start(entryPoint, app.processName, uid, uid, gids, debugFlags, mountExternal, app.info.targetSdkVersion, app.info.seinfo, requiredAbi, instructionSet, app.info.dataDir, entryPointArgs);
+    Process.ProcessStartResult startResult = Process.start(entryPoint, 
+			app.processName, uid, uid, gids, debugFlags, mountExternal, 
+			app.info.targetSdkVersion, app.info.seinfo, requiredAbi, 
+			instructionSet, app.info.dataDir, entryPointArgs);
 }
 ```
 
@@ -297,7 +306,9 @@ mAm.compatibilityInfoForPackageLocked(r.serviceInfo.applicationInfo),
 - ApplicationThreadProxy.scheduleCreateService()
 
 ```Java
-public final void scheduleCreateService(IBinder token, ServiceInfo info, CompatibilityInfo compatInfo, int processState) throws RemoteException {
+public final void scheduleCreateService(IBinder token, ServiceInfo info, 
+	CompatibilityInfo compatInfo, int processState) throws RemoteException {
+
     Parcel data = Parcel.obtain();
     data.writeInterfaceToken(IApplicationThread.descriptor);
     data.writeStrongBinder(token);
@@ -315,7 +326,9 @@ public final void scheduleCreateService(IBinder token, ServiceInfo info, Compati
 - ApplicationThread.scheduleCreateService()
 
 ```Java
-public final void scheduleCreateService(IBinder token,  ServiceInfo info, CompatibilityInfo compatInfo, int processState) {
+public final void scheduleCreateService(IBinder token,  ServiceInfo info, 
+	CompatibilityInfo compatInfo, int processState) {
+
     updateProcessState(processState, false);
     CreateServiceData s = new CreateServiceData();
     s.token = token;
@@ -412,7 +425,9 @@ public boolean bindService(Intent service, ServiceConnection conn,
             Process.myUserHandle());
 }
 
-private boolean bindServiceCommon(Intent service, ServiceConnection conn, int flags, Handler handler, UserHandle user) {
+private boolean bindServiceCommon(Intent service, ServiceConnection conn, 
+	int flags, Handler handler, UserHandle user) {
+
     IServiceConnection sd;
     //...
     if (mPackageInfo != null) {
@@ -440,7 +455,9 @@ private boolean bindServiceCommon(Intent service, ServiceConnection conn, int fl
 LoadedApk 对象是 Apk 文件在内存中的表示。 Apk 文件的相关信息，诸如 Apk 文件的代码和资源，甚至代码里面的 Activity，Service 等组件的信息我们都可以通过此对象获取。
 
 ```Java
-public final IServiceConnection getServiceDispatcher(ServiceConnection c, Context context, Handler handler, int flags) {
+public final IServiceConnection getServiceDispatcher(ServiceConnection c, 
+	Context context, Handler handler, int flags) {
+
     synchronized (mServices) {
         LoadedApk.ServiceDispatcher sd = null;
         // private final ArrayMap<Context,
@@ -452,7 +469,8 @@ public final IServiceConnection getServiceDispatcher(ServiceConnection c, Contex
             sd = map.get(c);
         }
         if (sd == null) {
-            // 如果与 ServiceConnection 对应的 ServiceDispatcher 不存在，创建一个保存了当前 ServiceConnection 的 ServiceDispatcher 对象，
+            // 如果与 ServiceConnection 对应的 ServiceDispatcher 不存在，创建一个保存了当前 
+			// ServiceConnection 的 ServiceDispatcher 对象，
             // 并将之前传入的主线的 Handle 保存，同时创建一个 InnerConnection 对象保存
             sd = new ServiceDispatcher(c, context, handler, flags);
             if (map == null) {
@@ -464,7 +482,9 @@ public final IServiceConnection getServiceDispatcher(ServiceConnection c, Contex
         } else {
             // 如果最开始就获取到 ServiceDispatcher，比如多次 bindService，
             // 就会调用 ServiceDispatcher 的 validate 判断此次 bindService 是否合法
-            // validate 的判断逻辑比较简单，1.判断当前的 context 是否和之前 bindService 的一样 2.判断当前 handler 是否是主线程的 handle
+            // validate 的判断逻辑比较简单：
+			// 1.判断当前的 context 是否和之前 bindService 的一样 
+			// 2.判断当前 handler 是否是主线程的 handle
             // 以上两个条件都满足的情况下正常执行，反之抛出相应的异常
             sd.validate(context, handler);
         }
@@ -476,7 +496,10 @@ public final IServiceConnection getServiceDispatcher(ServiceConnection c, Contex
 - ActivityManagerService.bindService()
 
 ```Java
-public int bindService(IApplicationThread caller, IBinder token, Intent service, String resolvedType, IServiceConnection connection, int flags, String callingPackage, int userId) throws TransactionTooLargeException {
+public int bindService(IApplicationThread caller, IBinder token, Intent service, 
+	String resolvedType, IServiceConnection connection, 
+	int flags, String callingPackage, int userId) throws TransactionTooLargeException {
+
     //...
     synchronized(this) {
         // 调用 ActiveServices 的 bindServiceLocked 方法
@@ -489,13 +512,16 @@ public int bindService(IApplicationThread caller, IBinder token, Intent service,
 - ActiveServices.bindServiceLocked() -> bringUpServiceLocked() -> realStartServiceLocked()
 
 ```Java
-private final void realStartServiceLocked(ServiceRecord r, ProcessRecord app, boolean execInFg) throws RemoteException {
+private final void realStartServiceLocked(ServiceRecord r, ProcessRecord app, 
+	boolean execInFg) throws RemoteException {
     //...
     try {
         //...
-        // 第一步，调用 ApplicationThread 的 scheduleCreateService 方法，之后会实例化 Service 并调用 Service 的 onCreate 方法，这里的过程跟上面 startService 中一样。
+        // 第一步，调用 ApplicationThread 的 scheduleCreateService 方法，
+		// 之后会实例化 Service 并调用 Service 的 onCreate 方法，这里的过程跟上面 startService 中一样。
         // 不会调用 onStartCommand
-        app.thread.scheduleCreateService(r, r.serviceInfo, mAm.compatibilityInfoForPackageLocked(r.serviceInfo.applicationInfo),
+        app.thread.scheduleCreateService(r, r.serviceInfo, 
+				mAm.compatibilityInfoForPackageLocked(r.serviceInfo.applicationInfo),
                 app.repProcState);
 
     } 
@@ -509,14 +535,19 @@ private final void realStartServiceLocked(ServiceRecord r, ProcessRecord app, bo
     // pending arguments, then fake up one so its onStartCommand() will
     // be called.
     if (r.startRequested && r.callStart && r.pendingStarts.size() == 0) {
-        r.pendingStarts.add(new ServiceRecord.StartItem(r, false, r.makeNextStartId(), null, null));
+        r.pendingStarts.add(new ServiceRecord.StartItem(r, false, 
+			r.makeNextStartId(), null, null));
     }
-    // StartItem 的 taskRemoved 如果是 false 的话，调用下面方法会调用 Service 的 onStartCommand
+    // StartItem 的 taskRemoved 如果是 false 的话，
+	// 调用下面方法会调用 Service 的 onStartCommand
     sendServiceArgsLocked(r, execInFg, true);
     //...
 }
 
-private final boolean requestServiceBindingLocked(ServiceRecord r, IntentBindRecord i, boolean execInFg, boolean rebind) throws TransactionTooLargeException {
+private final boolean requestServiceBindingLocked(ServiceRecord r, 
+	IntentBindRecord i, boolean execInFg, boolean rebind) 
+	throws TransactionTooLargeException {
+
     //...
     if ((!i.requested || rebind) && i.apps.size() > 0) {
         try {
