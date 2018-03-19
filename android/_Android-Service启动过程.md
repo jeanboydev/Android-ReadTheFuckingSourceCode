@@ -562,32 +562,30 @@ private void handleBindService(BindServiceData data) {
 
 调用 ApplicationThread 的 scheduleBindService，scheduleBindService 通过 mH 发送一个 H.BIND_SERVICE 消息，mH 收到该消息调用 handleBindService(BindServiceData data)。
 
-## 小标题
+## 总结
 
-- startService()
-- ContextImpl.startService()->startServiceCommon()
-- ActivityManagerNative.getDefault()->startService()
-- 进行进程间通讯
-- ActivityManagerService.startService()
-- ActiveServices.startServiceLocked()->startServiceInnerLocked()->bringUpServiceLocked()
-//判断ProcessRecord是否为null来处理是否创建新进程，不为null调用realStartServiceLocked()来启动Service()，为null调用ActivityManagerService.startProcessLocked()启动新进程。
-- ActiveServices.realStartServiceLocked()//稍后分析
+- startService
 
+使用这种 start 方式启动的 Service 的生命周期如下：
+onCreate() -> onStartCommand()（onStart()方法已过时） -> onDestory()
 
-启动新进程：
+说明：如果服务已经开启，不会重复的执行 onCreate()， 而是会调用 onStart() 和onStartCommand()。
+服务停止的时候调用 onDestory()。服务只会被停止一次。
 
-- ActivityManagerService.startProcessLocked()//启动新进程，进入新进程
-- ActivityThread.main()->attach()->ActivityManagerProxy.attachApplication()
-//创建ActivityThread调用attach
-- 进程间通讯
-- ActivityManagerService.attachApplication()->attachApplicationLocked()////这里会调用ActiveServices对象的attachApplicationLocked方法
-- ActiveServices.attachApplicationLocked()
-- ActiveServices.realStartServiceLocked()//开始启动Service
-- 进程间通讯回到
-- ApplicationThreadProxy.scheduleCreateService()
-- ApplicationThread.scheduleCreateService()
-- ApplicationThread.handleCreateService()
-//通过类加载器来加载Service对象，创建ContextImpl对象，这里调用Service的onCreate方法
+特点：一旦服务开启跟调用者(开启者)就没有任何关系了。
+开启者退出了，开启者挂了，服务还在后台长期的运行。
+开启者不能调用服务里面的方法。
+
+- bindService
+
+使用这种 start 方式启动的 Service 的生命周期如下：
+onCreate() -> onBind() -> onUnbind() -> onDestory()
+
+注意：绑定服务不会调用 onStart() 或者 onStartCommand() 方法
+
+特点：bind 的方式开启服务，绑定服务，调用者挂了，服务也会跟着挂掉。
+绑定者可以调用服务里面的方法。
+
 
 ## 参考资料
 
