@@ -1019,42 +1019,38 @@ public void handleMessage(Message msg) {
 }
 
 void doHandleMessage(Message msg) {
-	switch(msg.what) {
-		case INIT_COPY: {
-			//这里记录的是 params 的基类类型 HandlerParams，实际类型为 InstallParams
-			HandlerParams params = (HandlerParams) msg.obj;
-	
-			//idx为当前等待处理的安装请求的个数
-			int idx = mPendingInstalls.size();
-	
-			if(!mBound) {
-				/*
-				APK 的安装居然需要使用另外一个 APK 提供的服务，该服务就是
-				DefaultContainerService，由 DefaultCotainerService.apk 提供，
-				下面的 connectToService 函数将调用 bindService 来启动该服务
-				*/
-				if(!connectToService()) {
-				 	return;
-				}else {
-					//如果已经连上，则以 idx 为索引，将 params 保存到 mPendingInstalls 中
-					mPendingInstalls.add(idx, params);
-				}
-			} else {
-				mPendingInstalls.add(idx, params);
-	
-				if(idx == 0) {
-					//如果安装请求队列之前的状态为空，则表明要启动安装
-					mHandler.sendEmptyMessage(MCS_BOUND);
-				}
-			}
-			break;
-		}
-		case MCS_BOUND: {
-			//稍后分析
-		}
-	}
-	......
-}
+        switch (msg.what) {
+            case INIT_COPY: {
+                //这里记录的是 params 的基类类型 HandlerParams，实际类型为 InstallParams
+                HandlerParams params = (HandlerParams) msg.obj;
+                //idx为当前等待处理的安装请求的个数
+                int idx = mPendingInstalls.size();
+
+                if (!mBound) {
+                    //APK 的安装居然需要使用另外一个 APK 提供的服务，该服务就是
+                    //DefaultContainerService，由 DefaultCotainerService.apk 提供，
+                    //下面的 connectToService 函数将调用 bindService 来启动该服务
+                    if (!connectToService()) {
+                        params.serviceError();
+                        return;
+                    } else {
+                        ////如果已经连上，则以 idx 为索引，将 params 保存到 mPendingInstalls 中
+                        mPendingInstalls.add(idx, params);
+                    }
+                } else {
+                    mPendingInstalls.add(idx, params);
+                    if (idx == 0) {
+                        //如果安装请求队列之前的状态为空，则表明要启动安装
+                        mHandler.sendEmptyMessage(MCS_BOUND);
+                    }
+                }
+                break;
+            }
+            case MCS_BOUND: {
+                //稍后分析
+            }
+        }
+    }
 ```
 
 这里假设之前已经成功启动了 DefaultContainerService（以后简称 DCS），并且 idx 为零，所以这是 PKMS 首次处理安装请求，也就是说，下一个将要处理的是 MCS_BOUND 消息。
@@ -1063,53 +1059,48 @@ void doHandleMessage(Message msg) {
 
 ```Java
 void doHandleMessage(Message msg) {
-	switch(msg.what) {
-		case INIT_COPY: {
-			......
-		}
-		break;
-		case MCS_BOUND: {
-			if(msg.obj != null) {
-				mContainerService= (IMediaContainerService) msg.obj;
-			}
-
-			if(mContainerService == null) {
-				......//如果没法启动该 service，则不能安装程序
-				mPendingInstalls.clear();
-			} else if(mPendingInstalls.size() > 0) {
-				HandlerParamsparams = mPendingInstalls.get(0);
-				if(params != null) {
-					//调用 params 对象的 startCopy 函数，该函数由基类 HandlerParams 定义
-					if(params.startCopy()) {
-
-						......
-
-						if(mPendingInstalls.size() > 0) {
-							mPendingInstalls.remove(0);//删除队列头
-						}
-
-						if (mPendingInstalls.size() == 0) {
-							if (mBound) {
-								......//如果安装请求都处理完了，则需要和 Service 断绝联系,
-								//通过发送 MSC_UNB 消息处理断交请求
-								removeMessages(MCS_UNBIND);
-								Message ubmsg = obtainMessage(MCS_UNBIND);
-								sendMessageDelayed(ubmsg, 10000);
-							}
-						}else {
-							//如果还有未处理的请求，则继续发送 MCS_BOUND 消息。
-							//为什么不通过一个循环来处理所有请求呢
-							mHandler.sendEmptyMessage(MCS_BOUND);
-						}
-					}
-				}
-				......
-			}
-			break;
-		}
-	}
-	......
-}
+        switch (msg.what) {
+            case INIT_COPY: {
+                //...
+            }
+            case MCS_BOUND: {
+                if (msg.obj != null) {
+                    mContainerService = (IMediaContainerService) msg.obj;
+                }
+                if (mContainerService == null) {
+                    if (!mBound) {
+                        ////如果没法启动该 service，则不能安装程序
+                        mPendingInstalls.clear();
+                    }
+                } else if (mPendingInstalls.size() > 0) {
+                    HandlerParams params = mPendingInstalls.get(0);
+                    if (params != null) {
+                        ////调用 params 对象的 startCopy 函数，该函数由基类 HandlerParams 定义
+                        if (params.startCopy()) {
+                            //...
+                            if (mPendingInstalls.size() > 0) {
+                                mPendingInstalls.remove(0);//删除队列头
+                            }
+                            if (mPendingInstalls.size() == 0) {
+                                if (mBound) {
+                                    ////如果安装请求都处理完了，则需要和 Service 断绝联系,
+                                    //通过发送 MSC_UNB 消息处理断交请求
+                                    removeMessages(MCS_UNBIND);
+                                    Message ubmsg = obtainMessage(MCS_UNBIND);
+                                    sendMessageDelayed(ubmsg, 10000);
+                                }
+                            } else {
+                                //如果还有未处理的请求，则继续发送 MCS_BOUND 消息。
+                                //为什么不通过一个循环来处理所有请求呢
+                                mHandler.sendEmptyMessage(MCS_BOUND);
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
 ```
 
 MCS_BOUND 的处理还算简单，就是调用 HandlerParams 的 startCopy 函数。
@@ -1502,63 +1493,65 @@ PackageManagerService.java::doHandleMessage()
 
 ```Java
 void doHandleMessage(Message msg) {
-	switch(msg.what) {
-		case INIT_COPY: {
-			......
-		}
-		case MCS_BOUND: {
-			......
-		}
-		case POST_INSTALL:{
-            PostInstallData data=mRunningInstalls.get(msg.arg1);
-            mRunningInstalls.delete(msg.arg1);
-            boolean deleteOld=false;
+        switch (msg.what) {
+            case INIT_COPY: {
+                //...
+            }
+            case MCS_BOUND: {
+                //...
+            }
+            case POST_INSTALL: {
+                PostInstallData data = mRunningInstalls.get(msg.arg1);
+                mRunningInstalls.delete(msg.arg1);
+                boolean deleteOld = false;
 
-            if(data!=null){
-            	InstallArgs args=data.args;
-            	PackageInstalledInfo res=data.res;
+                if (data != null) {
+                    InstallArgs args = data.args;
+                    PackageInstalledInfo res = data.res;
 
-            	if(res.returnCode==PackageManager.INSTALL_SUCCEEDED){
-            		res.removedInfo.sendBroadcast(false,true);
-            		Bundle extras=new Bundle(1);
-            		extras.putInt(Intent.EXTRA_UID,res.uid);
-					final boolean update=res.removedInfo.removedPackage!=null;
-
-			        if(update){
-			        	extras.putBoolean(Intent.EXTRA_REPLACING,true);
-			        }
-
-			        //发送 PACKAGE_ADDED 广播
-			        sendPackageBroadcast(Intent.ACTION_PACKAGE_ADDED,
-			        res.pkg.applicationInfo.packageName,extras,null,null);
-
-			        if(update){
-			           /*
-			           	如果是 APK 升级，那么发送 PACKAGE_REPLACE 和 MY_PACKAGE_REPLACED 广播。
-				        二者不同之处在于 PACKAGE_REPLACE 将携带一个extra信息
-				       */
-			        }
-			
-			        Runtime.getRuntime().gc();
-
-			        if(deleteOld){
-						synchronized (mInstallLock){
-			        		//调用 FileInstallArgs 的 doPostDeleteLI 进行资源清理
-			        		res.removedInfo.args.doPostDeleteLI(true);
-			        	}
-        			}
-
-			        if(args.observer!=null){
-				        try{
-					        // 向 pm 通知安装的结果
-					        args.observer.packageInstalled(res.name,res.returnCode);
-				        }......
-
-        			}
-			break;
-		}
-	......
-}
+                    if (res.returnCode == PackageManager.INSTALL_SUCCEEDED) {
+                        final String packageName = res.pkg.applicationInfo.packageName;
+                        res.removedInfo.sendBroadcast(false, true, false);
+                        Bundle extras = new Bundle(1);
+                        extras.putInt(Intent.EXTRA_UID, res.uid);
+                        //...
+                        final boolean update = res.removedInfo.removedPackage != null;
+                        if (update) {
+                            extras.putBoolean(Intent.EXTRA_REPLACING, true);
+                        }
+                        //发送 PACKAGE_ADDED 广播
+                        sendPackageBroadcast(Intent.ACTION_PACKAGE_ADDED,
+                                packageName, extras, null, null, updateUsers);
+                        if (update) {
+                            //如果是 APK 升级，那么发送 PACKAGE_REPLACE 和 MY_PACKAGE_REPLACED 广播
+                            //二者不同之处在于 PACKAGE_REPLACE 将携带一个 extra 信息
+                            //...
+                        }
+                        //...
+                    }
+                    Runtime.getRuntime().gc();
+                    if (deleteOld) {
+                        synchronized (mInstallLock) {
+                            //调用 FileInstallArgs 的 doPostDeleteLI 进行资源清理
+                            res.removedInfo.args.doPostDeleteLI(true);
+                        }
+                    }
+                    if (args.observer != null) {
+                        try {
+                            // 向 pm 通知安装的结果
+                            Bundle extras = extrasForInstallResult(res);
+                            args.observer.onPackageInstalled(res.name, res.returnCode,
+                                    res.returnMsg, extras);
+                        } catch (RemoteException e) {
+                            Slog.i(TAG, "Observer no longer exists.");
+                        }
+                    }
+                } else {
+                    Slog.e(TAG, "Bogus post-install token " + msg.arg1);
+                }
+            } break;
+        }
+    }
 ```
 
 
