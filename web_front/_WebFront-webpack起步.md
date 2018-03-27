@@ -124,7 +124,9 @@ ERROR in Entry module not found: Error: Can't resolve './src' in '/Users/next/Wo
 
 注意，我们应该安装支持 webpack 4 的 webpack-dev-server 3 版本，否则可能出现如下错误：
 
-> Cannot find module 'webpack/bin/config-yargs'
+```
+Cannot find module 'webpack/bin/config-yargs'
+```
 
 接着在命令行下执行 webpack-dev-server：
 
