@@ -26,24 +26,24 @@ Webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module b
 > // 全局安装<br/>
 > $ npm install -g webpack
 > 
-> // 安装命令行工具
+> // 安装命令行工具<br/>
 > $ npm install -g webpack-cli
 > 
-> // 查看是否安装成功
+> // 查看是否安装成功<br/>
 > $ webpack -v
 
 局部安装（推荐）：
 
-> // 进入项目将要保存的目录
+> // 进入项目将要保存的目录<br/>
 > $ cd <项目保存目录>
 > 
-> // 创建项目文件夹
+> // 创建项目文件夹<br/>
 > $ mkdir webpack-demo
 > 
-> // 进入文件夹
+> // 进入文件夹<br/>
 > $ cd webpack-demo
 > 
-> // 快速初始化为 npm 项目，生成 package.json
+> // 快速初始化为 npm 项目，生成 package.json<br/>
 > npm init -y
 
 这时，webpack-demo 下会生成一个 package.json 文件，内容如下：
@@ -67,13 +67,13 @@ Webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module b
 
 > $ npm install -D webpack
 > 
-> // 查看 webpack 版本
+> // 查看 webpack 版本<br/>
 > $ npx webpack --version
 > 
-> // 如果没有返回版本号，继续安装 webpack-cli
+> // 如果没有返回版本号，继续安装 webpack-cli<br/>
 > $ npm install -D webpack-cli
 > 
-> // 执行 webpack
+> // 执行 webpack<br/>
 > $ npx webpack
 
 ```
@@ -95,11 +95,10 @@ ERROR in Entry module not found: Error: Can't resolve './src' in '/Users/next/Wo
 
 让我们新建一下 `src/index.js` 文件，不过暂时不写内容。
 
-> $ mkdir src
-> 
+> $ mkdir src<br/>
 > $ touch src/index.js
 > 
-> // 执行 webpack
+> // 执行 webpack<br/>
 > $ npx webpack
 
 目录下多出了 `dist/main.js` 文件。
@@ -280,17 +279,15 @@ new Vue({
 </style>
 ```
 
-> // 安装 babel-loader
+> // 安装 babel-loader<br/>
 > $ npm install -D babel-loader
 > 
-> // 安装 vue
-> $ npm install -D vue
-> 
-> $ npm install -D vue-loader
-> 
+> // 安装 vue<br/>
+> $ npm install -D vue<br/>
+> $ npm install -D vue-loader<br/>
 > $ npm install -D vue-template-compiler
 > 
-> // 安装创建 HTML 文件的插件
+> // 安装创建 HTML 文件的插件<br/>
 > $ npm install -D html-webpack-plugin
 
 常见错误：
@@ -360,10 +357,10 @@ module.exports = config;
 
 最后在控制台关闭 `webpack-dev-server`（Ctrl+C），继续执行下面命令：
 
-> // webpack 打包
+> // webpack 打包<br/>
 > $ webpack
 > 
-> // 重启 webpack-dev-server
+> // 重启 webpack-dev-server<br/>
 > $ npx webpack-dev-server --mode development --output-public-path dist
 
 ## webpack 配置文件
@@ -472,10 +469,10 @@ module.exports = config;
 }
 ```
 
-> // 生产环境打包
+> // 生产环境打包<br/>
 > $ npm run build
 > 
-> // 开发环境打包
+> // 开发环境打包<br/>
 > $ npm run dev
 
 你会看到 `./dist/main.js` 不同的变化：
