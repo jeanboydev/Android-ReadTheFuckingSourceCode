@@ -23,7 +23,7 @@ Webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module b
 
 全局安装 webpack：
 
-> // 全局安装
+> // 全局安装<br/>
 > $ npm install -g webpack
 > 
 > // 安装命令行工具
