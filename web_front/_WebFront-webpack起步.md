@@ -200,7 +200,7 @@ webpack-dev-server 未刷新页面，这个问题不注意的话很容易发生�
 webpack output is served from /
 ```
 
-是了，webpack-dev-server 构建的 main.js 其实是在 `http://localhost:8080/main.js` 的位置，而不是 `http://localhost:8080/dist/main.js`，而且，它存在于内存中，并不写入磁盘。而我们在 index.html 页面中引用的是 dist/main.js。
+webpack-dev-server 构建的 main.js 其实是在 `http://localhost:8080/main.js` 的位置，而不是 `http://localhost:8080/dist/main.js`，而且，它存在于内存中，并不写入磁盘。而我们在 index.html 页面中引用的是 dist/main.js。
 
 我们可以在运行 webpack-dev-server 时指定 output.publicPath：
 
