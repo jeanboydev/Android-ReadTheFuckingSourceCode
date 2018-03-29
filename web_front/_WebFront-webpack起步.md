@@ -282,7 +282,9 @@ new Vue({
 ```
 
 > // 安装 babel-loader<br/>
-> $ npm install -D babel-loader
+> $ npm install -D babel-loader<br/>
+> $ npm install -D babel-core<br/>
+> $ npm install -D babel-preset-env
 > 
 > // 安装 vue<br/>
 > $ npm install -D vue<br/>
@@ -319,10 +321,15 @@ const config = {
         rules: [{
             test: /\.vue$/,
             loader: 'vue-loader'
-        },{
+        }, {
             test: /\.js$/,
             exclude: /(node_modules|bower_components)/,
-            loader: 'babel-loader'
+            use: {
+                loader: 'babel-loader',
+                options: {
+                    presets: ['env']
+                }
+            }
         }]
     },
     plugins: [
@@ -373,18 +380,20 @@ module.exports = config;
 
 - Loader
 
-1. balbel-loader：将 `ES6` 转换成浏览器支持的 js
-2. style-loader：注入 `<style>` 标签将 CSS 添加到 DOM 中
-3. css-loader：解释 `@import` 和 `url()`
-4. postcss-loader：自动给 CSS 属性添加兼容不同浏览器的前缀
-5. html-loader：将 HTML 导出为字符串
-6. file-loader：转换项目中的 URL，根据配置将文件拷贝到相应路径
-7. url-loader：将文件加载为 base64 编码的 URL
-8. image-webpack-loader：图片压缩
-9. vue-loader：编译写入 .vue 文件
-10. vue-html-loader：编译 vue 的 template 部分
-11. vue-style-loader：编译 vue 的样式部分
-12. vue-hot-reload-api：webpack 对 vue 实现热替换
+1. babel-core：
+2. babel-preset-env：
+3. balbel-loader：将 `ES6` 转换成浏览器支持的 js
+4. style-loader：注入 `<style>` 标签将 CSS 添加到 DOM 中
+5. css-loader：解释 `@import` 和 `url()`
+6. postcss-loader：自动给 CSS 属性添加兼容不同浏览器的前缀
+7. html-loader：将 HTML 导出为字符串
+8. file-loader：转换项目中的 URL，根据配置将文件拷贝到相应路径
+9. url-loader：将文件加载为 base64 编码的 URL
+10. image-webpack-loader：图片压缩
+11. vue-loader：编译写入 .vue 文件
+12. vue-html-loader：编译 vue 的 template 部分
+13. vue-style-loader：编译 vue 的样式部分
+14. vue-hot-reload-api：webpack 对 vue 实现热替换
 
 
 最终配置：
@@ -407,7 +416,12 @@ const config = {
         }, {
             test: /\.js$/,
             exclude: /(node_modules|bower_components)/,
-            loader: 'babel-loader'
+            use: {
+                loader: 'babel-loader',
+                options: {
+                    presets: ['env']
+                }
+            }
         }, {
             test: /\.css$/,
             use: [
