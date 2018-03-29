@@ -1,4 +1,4 @@
-# Webpack 起步
+# Webpack 入门
 
 ## 简介
 
@@ -16,6 +16,11 @@ Webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module b
 
 - [Git 官网](https://git-scm.com/)
 - [Node.js 官网](https://nodejs.org/en/)
+
+推荐阅读：
+
+- [ECMAScript 6 入门](http://es6.ruanyifeng.com/)
+- [NPM 入门文档](https://segmentfault.com/a/1190000005799797)
 
 ## 安装 Webpack
 

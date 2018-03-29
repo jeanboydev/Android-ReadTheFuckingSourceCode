@@ -8,19 +8,23 @@ Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进
 
 ## 准备
 
-Windows 系统手动安装下面环境：
+安装下面环境：
 
 - [Git 官网](https://git-scm.com/)
-
-安装 Node 环境：
-
 - [Node.js 官网](https://nodejs.org/en/)
+
+推荐阅读：
+
+- [ECMAScript 6 入门](http://es6.ruanyifeng.com/)
+- [NPM 入门文档](https://segmentfault.com/a/1190000005799797)
 
 开始配置环境：
 
 - NPM
 
-打包工具，运行命令安装：
+NPM 是随同 NodeJS 一起安装的包管理工具。
+
+> // 使用 NPM 安装 vue
 > $ npm install vue
 
 对于中国大陆用户，建议将 NPM 源设置为[国内的镜像](https://npm.taobao.org/)，可以大幅提升安装速度。
@@ -31,28 +35,30 @@ Windows 系统手动安装下面环境：
 > // 使用 cnpm 代替 npm<br/>
 > $ cnpm install vue
 
-常用命令
+- webpack
 
-> // 初始化为 npm 项目，生成 package.json<br/>
-> $ npm init
-> 
-> // 安装组件依赖<br/>
-> $ npm install -D [webpack vue ...]
-> 
-> // 更新<br/>
-> $ npm update -g
+[Webpack 入门]()
 
 - 命令行工具 (CLI)
 
 Vue 提供一个官方命令行工具，可用于快速搭建大型单页应用。
 > // 全局安装 vue-cli<br/>
 > $ npm install --global vue-cli
-> 
+
+## 开发工具
+
+- Visual Studio Code
+- WebStorm
+
+## 创建项目
+
+确保前面的准备工作中 Node.js，webpack，vue-cli 已经成功安装，接下来开始创建 vue 项目：
+
 > // 创建一个基于 webpack 模板的新项目<br/>
-> $ vue init webpack my-project
+> $ vue init webpack <项目文件夹>
 > 
 > // 进入项目目录<br/>
-> $ cd my-project
+> $ cd <项目文件夹>
 > 
 > // 安装依赖<br/>
 > $ npm install
@@ -61,18 +67,13 @@ Vue 提供一个官方命令行工具，可用于快速搭建大型单页应用�
 > $ npm run dev
 
 
-## 开发工具
-
-- Visual Studio Code
-- WebStorm
-
 ## 项目结构
 
 ```JSON
 |-ProjectName
-    |-build//临时文件
+    |-build//构建配置
     |-dist//打包后的文件
-    |-config
+    |-config//项目配置
     |-node_modules//依赖库
     |-src
         |-assets//资源文件
@@ -81,9 +82,10 @@ Vue 提供一个官方命令行工具，可用于快速搭建大型单页应用�
         |   |-common
         |-script
         |-app.vue
-    |-package.json
-    |-package-lock.json
-    |-webpack.config.js
+        |-main.js
+    |-static
+    |-.babelrc//babel 配置
+    |-package.json//npm init 生成的文件
 ```
 
 
@@ -91,13 +93,5 @@ Vue 提供一个官方命令行工具，可用于快速搭建大型单页应用�
 
 
 
-
-## 小标题
-
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/xxx/xxx.png" alt=""/>
-
-## 参考资料
-
-- [webpack 4 入门](https://www.cnblogs.com/samwu/p/8545161.html)
 
 
