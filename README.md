@@ -78,7 +78,10 @@
 - [*Android PowerManagerService 分析]
 - [*Android Input 系统]
 
+## 前端
 
+- [Webpack 入门](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Webpack入门.md)
+- [Vue 入门](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Vue入门.md)
 
 ## 设计模式
 
@@ -125,5 +128,7 @@
 - [EventBus 源码分析 from 【codeKK】](http://a.codekk.com/detail/Android/Trinea/EventBus%20%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90)
 - [OkHttp 源码分析 from 【Piasy】](https://blog.piasy.com/2016/07/11/Understand-OkHttp/)
 - [Volley 源码分析 from 【codeKK】](http://a.codekk.com/detail/Android/grumoon/Volley%20%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90)
+
+
 
 
