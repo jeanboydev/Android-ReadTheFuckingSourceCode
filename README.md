@@ -29,7 +29,7 @@
 
 ## Android
 
-- :+1:[Android 思维导图](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-屏幕适配全攻略.md)
+- :+1:[Android 思维导图](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-思维导图.md)
 - [Android 屏幕适配全攻略](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-屏幕适配全攻略.md)
 - [一个 Demo 学会搭建 Android Studio JNI 开发环境](https://github.com/jeanboydev/Android-JNITest)
 - [一张图看明白 Android Handler 消息机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Handler消息机制.md)
