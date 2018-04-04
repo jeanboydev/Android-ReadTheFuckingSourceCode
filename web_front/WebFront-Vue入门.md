@@ -912,7 +912,7 @@ module.exports = webpackConfig
 <a href='one.html'></a>
 ```
 
-[多页面配置 Demo](https://github.com/jeanboydev/Vue-demo/tree/develop-multiple)
+- [多页面配置 Demo](https://github.com/jeanboydev/Vue-demo/tree/develop-multiple)
 
 ## 参考资料
 
