@@ -17,33 +17,10 @@
 
 # 目录
 
-## 面试知识点整理
-
-- [Java 基础知识](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/Java-基础知识.md)
-- [Android 基础知识](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/Android-基础知识.md)
-- [网络通信](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/网络通信基础知识.md)
-- [数据结构与算法](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/数据结构与算法.md)
-- [人事相关问题](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/人事相关问题.md)
-
 ## 网络通信知识
 
 - [一篇文章看明白 TCP/IP，TCP，UDP，IP，Socket 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/http/TCP_IP_UDP_Socket.md)
 - [一篇文章看明白 HTTP，HTTPS，SSL/TSL 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/http/HTTP_HTTPS_SSL_TSL.md)
-
-## 数据结构与算法
-
-- 概述
-- 线性表
-- 集合、稀疏矩阵和广义表
-- 栈和队列
-- 树
-- 图
-- 查找
-- 排序
-
-## Git
-
-- [Git 常用命令](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/git/Git常用命令.md)
 
 ## 深入理解 Java 虚拟机
 
@@ -52,6 +29,7 @@
 
 ## Android
 
+- :+1:[Android 思维导图](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-屏幕适配全攻略.md)
 - [Android 屏幕适配全攻略](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-屏幕适配全攻略.md)
 - [一个 Demo 学会搭建 Android Studio JNI 开发环境](https://github.com/jeanboydev/Android-JNITest)
 - [一张图看明白 Android Handler 消息机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Handler消息机制.md)
@@ -77,6 +55,29 @@
 - [*Android PackageManagerService 分析]
 - [*Android PowerManagerService 分析]
 - [*Android Input 系统]
+
+## Git
+
+- [Git 常用命令](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/git/Git常用命令.md)
+
+## 面试知识点整理
+
+- [Java 基础知识](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/Java-基础知识.md)
+- [Android 基础知识](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/Android-基础知识.md)
+- [网络通信](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/网络通信基础知识.md)
+- [数据结构与算法](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/数据结构与算法.md)
+- [人事相关问题](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/人事相关问题.md)
+
+## 数据结构与算法
+
+- 概述
+- 线性表
+- 集合、稀疏矩阵和广义表
+- 栈和队列
+- 树
+- 图
+- 查找
+- 排序
 
 ## 前端
 

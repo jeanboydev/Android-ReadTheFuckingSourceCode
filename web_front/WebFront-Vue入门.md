@@ -418,14 +418,113 @@ var watchExampleVM = new Vue({
 
 ## Vue 组件
 
+- 全局注册
+
+创建一个 Vue 实例：
+
+```JS
+new Vue({
+  el: '#some-element',
+  // 选项
+})
+```
+
+要注册一个全局组件，可以使用 Vue.component(tagName, options)。例如：
+
+```JS
+Vue.component('my-component', {
+  // 选项
+})
+```
+
+组件在注册之后，便可以作为自定义元素 <my-component></my-component> 在一个实例的模板中使用。注意确保在初始化根实例之前注册组件：
+
+```HTML
+<div id="example">
+  <my-component></my-component>
+</div>
+```
+
+```JS
+// 注册
+Vue.component('my-component', {
+  template: '<div>A custom component!</div>'
+})
+
+// 创建根实例
+new Vue({
+  el: '#example'
+})
+```
+
+渲染为
+
+```HTML
+<div id="example">
+  <div>A custom component!</div>
+</div>
+```
+
+- 局部注册
+
+你不必把每个组件都注册到全局。你可以通过某个 Vue 实例/组件的实例选项 components 注册仅在其作用域中可用的组件：
+
+```JS
+var Child = {
+  template: '<div>A custom component!</div>'
+}
+
+new Vue({
+  // ...
+  components: {
+    // <my-component> 将只在父组件模板中可用
+    'my-component': Child
+  }
+})
+```
+
+Prop：
+
+- 使用 Prop 传递数据
+
+组件实例的作用域是孤立的。这意味着不能 (也不应该) 在子组件的模板内直接引用父组件的数据。父组件的数据需要通过 prop 才能下发到子组件中。
+
+子组件要显式地用 props 选项声明它预期的数据：
+
+```JS
+Vue.component('child', {
+  // 声明 props
+  props: ['message'],
+  // 就像 data 一样，prop 也可以在模板中使用
+  // 同样也可以在 vm 实例中通过 this.message 来使用
+  template: '<span>{{ message }}</span>'
+})
+```
+
+然后我们可以这样向它传入一个普通字符串：
+
+```HTML
+<child message="hello!"></child>
+```
+
+Prop 是单向绑定的：当父组件的属性变化时，将传导给子组件，但是反过来不会。这是为了防止子组件无意间修改了父组件的状态，来避免应用的数据流变得难以理解。
+
+另外，每次父组件更新时，子组件的所有 prop 都会更新为最新值。这意味着你不应该在子组件内部改变 prop。如果你这么做了，Vue 会在控制台给出警告。
+
+
+- [组件使用 Demo](https://github.com/jeanboydev/Vue-demo)
+
 ## Vue 路由
 
 ## Vuex
 
 ## 项目上线
 
-> // 打包项目<br/>
-> $ npn run build
+> // 开发环境打包<br/>
+> $ npm run dev
+> 
+> // 生产环境打包<br/>
+> $ npm run build
 
 将 dist 目录下所有文件丢到服务器就可以了。
 

@@ -490,11 +490,11 @@ module.exports = config;
 }
 ```
 
-> // 生产环境打包<br/>
-> $ npm run build
-> 
 > // 开发环境打包<br/>
 > $ npm run dev
+> 
+> // 生产环境打包<br/>
+> $ npm run build
 
 你会看到 `./dist/main.js` 不同的变化：
 
