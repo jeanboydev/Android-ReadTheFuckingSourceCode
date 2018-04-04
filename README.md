@@ -17,7 +17,7 @@
 
 # 目录
 
-## 知识点整理
+## 基础知识
 
 - [Java 基础知识](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/Java-基础知识.md)
 - [Android 基础知识](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/Android-基础知识.md)
@@ -29,7 +29,7 @@
 
 - [Git 常用命令](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/git/Git常用命令.md)
 
-## 网络通信知识
+## 网络通信
 
 - [一篇文章看明白 TCP/IP，TCP，UDP，IP，Socket 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/http/TCP_IP_UDP_Socket.md)
 - [一篇文章看明白 HTTP，HTTPS，SSL/TSL 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/http/HTTP_HTTPS_SSL_TSL.md)
