@@ -67,12 +67,39 @@ Vue 提供一个官方命令行工具，可用于快速搭建大型单页应用�
 > // 安装依赖，不要从国内镜像 cnpm 安装(会导致后面缺了很多依赖库)<br/>
 > $ npm install
 > 
-> // 安装 vue 路由模块 vue-router 和网络请求模块 vue-resource<br/>
-> $ npm install vue-router vue-resource --save
+> // 安装 vue 路由模块 vue-router<br/>
+> $ npm install vue-router --save-dev
 > 
+> // 安装 vue 网络请求模块 vue-resource<br/>
+> $ npm install vue-resource --save-dev
+> 
+> // 安装 vue 状态管理模块 vuex<br/>
+> $ npm install vuex --save-dev
+> 
+> // 注入 `<style>` 标签将 CSS 添加到 DOM 中
+> $ npm install style-loader --save-dev
+> 
+> // 解释 `@import` 和 `url()`
+> $ npm install css-loader --save-dev
+> 
+> // 自动给 CSS 属性添加兼容不同浏览器的前缀
+> $ npm install postcss-loader precss sugarss --save-dev
+> 
+> // 支持 sass
+> $ npm install sass-loader node-sass --save-dev
+> 
+> // 转换项目中的 URL，根据配置将文件拷贝到相应路径
+> $ npm install file-loader --save
+> 
+> // 图片压缩
+> $ npm install image-webpack-loader --save-dev
+>  
 > // 启动项目<br/>
 > $ npm run dev
 
+批量安装
+
+> $ npm i vue-router vue-resource vuex style-loader css-loader postcss-loader sass-loader node-sass file-loader image-webpack-loader --save-dev
 
 ## 项目结构
 
