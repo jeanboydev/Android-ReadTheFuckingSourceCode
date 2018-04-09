@@ -4,11 +4,11 @@
 
 一般例如 C++ 和 Java 等语言是解释性语言，fields* 和 methods* 等的内容是以数组储存的，按一对一对应 fields 和 methods 的名称，个别变量和 methods 等储存的位置，根据类的定义来存储。在 C++ 和 Java 等语言中，事先已知道所存的变量（类）的类型，所以只需要利用数组的位移即可读取 field 和 method。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_v8/js_vs_c.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_v8/js_vs_c.jpg" alt=""/>
 
 而JavaScript 是动态类型，在 JavaScript 中对象都有自己属性和方法的表格，每次执行方法，都必须检查对象的类型。许多 JavaScript 引擎都使用哈希表（hash table）来存取属性和寻找方法等。每次存取属性或是寻找方法时，就会使用字符串作为寻找对象哈希表的键(key)。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_v8/js_hash.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_v8/js_hash.jpg" alt=""/>
 
 ## JavaScript 运行原理
 
