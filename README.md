@@ -25,10 +25,6 @@
 - [数据结构与算法](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/数据结构与算法.md)
 - [人事相关问题](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/人事相关问题.md)
 
-## Git
-
-- [Git 常用命令](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/git/Git常用命令.md)
-
 ## 网络通信
 
 - [一篇文章看明白 TCP/IP，TCP，UDP，IP，Socket 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/http/TCP_IP_UDP_Socket.md)
@@ -68,6 +64,18 @@
 - [*Android PowerManagerService 分析]
 - [*Android Input 系统]
 
+## 前端
+
+- [前端发展简史](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-发展简史.md)
+- [JavaScript 运行原理 & V8 引擎分析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-JavaScript运行原理_V8引擎分析.md)
+- [Webpack 入门](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Webpack入门.md)
+- [Vue 入门](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Vue入门.md)
+- [Vue 加入 Bootstrap 和 jQuery](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Vue&BootStrap&jQuery.md)
+
+## Git
+
+- [Git 常用命令](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/git/Git常用命令.md)
+
 ## 数据结构与算法
 
 - 概述
@@ -78,14 +86,6 @@
 - 图
 - 查找
 - 排序
-
-## 前端
-
-- [前端发展简史](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-发展简史.md)
-- [JavaScript运行原理 & V8引擎分析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-JavaScript运行原理_V8引擎分析.md)
-- [Webpack 入门](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Webpack入门.md)
-- [Vue 入门](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Vue入门.md)
-- [Vue 整合 Bootstrap 和 jQuery](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Vue&BootStrap&jQuery.md)
 
 ## 设计模式
 
