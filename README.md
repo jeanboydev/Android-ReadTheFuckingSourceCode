@@ -81,8 +81,11 @@
 
 ## 前端
 
+- [前端发展简史](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-发展简史.md)
+- [JavaScript运行原理 & V8引擎分析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-JavaScript运行原理_V8引擎分析.md)
 - [Webpack 入门](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Webpack入门.md)
 - [Vue 入门](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Vue入门.md)
+- [Vue 整合 Bootstrap 和 jQuery](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Vue&BootStrap&jQuery.md)
 
 ## 设计模式
 

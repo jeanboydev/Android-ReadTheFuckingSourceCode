@@ -26,7 +26,7 @@ JavaScript 引擎中目前流行的是 Google 的 V8 引擎。V8 引擎被 Chrom
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_v8/js_vs_c.jpg" alt=""/>
 
-而JavaScript 是动态类型，在 JavaScript 中对象都有自己属性和方法的表格，每次执行方法，都必须检查对象的类型。许多 JavaScript 引擎都使用哈希表（hash table）来存取属性和寻找方法等。每次存取属性或是寻找方法时，就会使用字符串作为寻找对象哈希表的键(key)。
+而 JavaScript 是动态类型，在 JavaScript 中对象都有自己属性和方法的表格，每次执行方法，都必须检查对象的类型。许多 JavaScript 引擎都使用哈希表（hash table）来存取属性和寻找方法等。每次存取属性或是寻找方法时，就会使用字符串作为寻找对象哈希表的键(key)。
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_v8/js_hash.jpg" alt=""/>
 
