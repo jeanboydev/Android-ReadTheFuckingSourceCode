@@ -32,6 +32,8 @@ JavaScript语言的设计者意识到，这时主线程完全可以不管IO设�
 
 具体来说，异步执行的运行机制如下。（同步执行也是如此，因为它可以被视为没有异步任务的异步执行。）
 
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_v8/js_loop.jpg" alt=""/>
+
 - 所有同步任务都在主线程上执行，形成一个执行栈（execution context stack）。
 - 主线程之外，还存在一个"任务队列"（task queue）。只要异步任务有了运行结果，就在"任务队列"之中放置一个事件。
 - 一旦"执行栈"中的所有同步任务执行完毕，系统就会读取"任务队列"，看看里面有哪些事件。那些对应的异步任务，于是结束等待状态，进入执行栈，开始执行。
