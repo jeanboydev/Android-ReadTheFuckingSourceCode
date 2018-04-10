@@ -142,23 +142,6 @@ Page({
   onUnload: function() {
     // Do something when page close.
   },
-  onPullDownRefresh: function() {
-    // Do something when pull down.
-  },
-  onReachBottom: function() {
-    // Do something when page reach bottom.
-  },
-  onShareAppMessage: function () {
-   // return custom share data when user share.
-  },
-  onPageScroll: function() {
-    // Do something when page scroll
-  },
-  onTabItemTap(item) {
-    console.log(item.index)
-    console.log(item.pagePath)
-    console.log(item.text)
-  },
   // Event handler.
   viewTap: function() {
     this.setData({
@@ -194,18 +177,6 @@ Page({
   },
   onUnload() {
     // 页面被关闭
-  },
-  onTitleClick() {
-    // 标题被点击
-  },
-  onPullDownRefresh() {
-    // 页面被下拉
-  },
-  onReachBottom() {
-    // 页面被拉到底部
-  },
-  onShareAppMessage() {
-   // 返回自定义分享信息
   },
   viewTap() {
     // 事件处理
