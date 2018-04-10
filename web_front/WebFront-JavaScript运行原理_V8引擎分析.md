@@ -321,6 +321,7 @@ V8 利用另一种称为内联缓存的技术来优化动态类型语言。内�
 
 ## 参考资料
 
+- [认识 V8 引擎](https://zhuanlan.zhihu.com/p/27628685)
 - [JavaScript 运行机制详解：再谈Event Loop](http://www.ruanyifeng.com/blog/2014/10/event-loop.html)
 - [为什么V8 JavaScript引擎这么快](http://www.xuanfengge.com/why-v8-so-fast.html)
 - [JavaScript 是如何工作的：引擎，运行时和调用堆栈的概述](http://tcatche.site/2017/08/how-javascript-work-part-1-overview/)
