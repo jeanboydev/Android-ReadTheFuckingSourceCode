@@ -2,6 +2,8 @@
 
 ## 起源
 
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/time_line.png" alt=""/>
+
 - 1990 HTML
 
 1990 年，Tim 以超文本语言 HTML 为基础在 NeXT 电脑上发明了最原始的 Web 浏览器。
@@ -106,7 +108,7 @@ Netscape 于 1998 年被 AOL 收购前创建了 Mozilla 社区，Firefox 于 200
 
 之后 Firefox 浏览器一路奋起直追，逐渐蚕食 IE 市场份额，这引发了第二次浏览器战争。在 2008 年底时，Firefox 的市场份额达到了 25% 以上，IE 则跌至 65% 以下。
 
-第二次浏览器战争中，随着以 Firefox 和 Opera 为首的W3C阵营与IE对抗程度的加剧，浏览器碎片化问题越来越严重，不同的浏览器执行不同的标准，对于开发人员来说这是一个恶梦。
+第二次浏览器战争中，随着以 Firefox 和 Opera 为首的 W3C 阵营与 IE 对抗程度的加剧，浏览器碎片化问题越来越严重，不同的浏览器执行不同的标准，对于开发人员来说这是一个恶梦。
 
 为了解决浏览器兼容性问题，Dojo、jQuery、YUI、ExtJS、MooTools 等前端 Framework 相继诞生。前端开发人员用这些 Framework 频繁发送 AJAX 请求到后台，在得到数据后，再用这些 Framework 更新 DOM 树。
 
