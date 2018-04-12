@@ -60,7 +60,7 @@ div{
 - 元素 rem 宽度：remWidth = DEW / DW * S
 - 元素 rem 高度：remHeight = DEH / DEW * remWidth
 
-终极解决方案：使用 [auto_rem.html]() 来自动计算。
+终极解决方案：使用 [auto_rem.html](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/auto_rem.html) 来自动计算。
 
 ## flex
 
