@@ -21,7 +21,7 @@
 
 ```CSS
 html{
-    font-size: 16px;//1rem = 16px
+    font-size: 16px;/* 1rem = 16px */
 }
 
 body {
@@ -30,21 +30,19 @@ body {
 }
 
 div{
-    font-size: 2rem;//32px/16px
+    font-size: 2rem;/* 32px/16px */
 }
 ```
 
 3. 根据屏幕宽度，动态设置根元素字体大小
 
 ```JS
-/* rem.js文件内容 */
+/* rem.js 文件内容 */
 (function () {
     var html = document.documentElement;
-
     function onWindowResize() {
         html.style.fontSize = html.getBoundingClientRect().width / 10 + 'px';
     }
-
     window.addEventListener('resize', onWindowResize);
     onWindowResize();
 })();
@@ -235,7 +233,7 @@ Media 所有参数汇总：
 ## 判断浏览器类型
 
 ```JS
-/* device.js文件内容 */
+/* device.js 文件内容 */
 function getBrowserName(ua) {
     if (ua.indexOf("Opera") > -1 || ua.indexOf("OPR") > -1) {
         return 'Opera';
