@@ -47,6 +47,55 @@ div{
     onWindowResize();
 })();
 ```
+淘宝开源库：[lib-flexible](https://github.com/amfe/lib-flexible)
+
+```JS
+/* lib-flexible 内容 */
+(function flexible (window, document) {
+  var docEl = document.documentElement
+  var dpr = window.devicePixelRatio || 1
+
+  // adjust body font size
+  function setBodyFontSize () {
+    if (document.body) {
+      document.body.style.fontSize = (12 * dpr) + 'px'
+    }
+    else {
+      document.addEventListener('DOMContentLoaded', setBodyFontSize)
+    }
+  }
+  setBodyFontSize();
+
+  // set 1rem = viewWidth / 10
+  function setRemUnit () {
+    var rem = docEl.clientWidth / 10
+    docEl.style.fontSize = rem + 'px'
+  }
+
+  setRemUnit()
+
+  // reset rem unit on page resize
+  window.addEventListener('resize', setRemUnit)
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) {
+      setRemUnit()
+    }
+  })
+
+  // detect 0.5px supports
+  if (dpr >= 2) {
+    var fakeBody = document.createElement('body')
+    var testElement = document.createElement('div')
+    testElement.style.border = '.5px solid transparent'
+    fakeBody.appendChild(testElement)
+    docEl.appendChild(fakeBody)
+    if (testElement.offsetHeight === 1) {
+      docEl.classList.add('hairlines')
+    }
+    docEl.removeChild(fakeBody)
+  }
+}(window, document))
+```
 
 - 屏幕宽度：DomWidth(W) = document.documentElement.getBoundingClientRect().width//例如：1920px
 - 缩放比例：Scale(S) = 10
@@ -164,7 +213,7 @@ Flex 是 Flexible Box 的缩写，意为"弹性布局"，用来为盒状模型�
 1. 设置 meta 标签
 
 ```HTML
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
 ```
 
 - width = device-width：宽度等于当前设备的宽度
@@ -283,4 +332,23 @@ console.log("iOS：" + browser.device.isIOS);
 console.log("iPhone：" + browser.device.isIPhone);
 console.log("iPad：" + browser.device.isIPad);
 ```
+
+## 概念
+
+设备物理像素：w * h
+DPI(dots per inch)：打印机每英寸可以喷的墨汁点数
+PPI(pixels per inch)：屏幕每英寸的像素数量 = √(w^2 + h^2) / 屏幕英寸
+
+密度分界基数：
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_response/dpi.png" alt=""/>
+
+DPR(Device Pixel Ratio)设备像素比：PPI / 密度分界基数(如：160)
+
+```JS
+dpr = window.devicePixelRatio;
+```
+
+CSS 像素：设备物理像素 / DPR
+DIP(Device independent Pixel)设备独立像素：CSS 像素 = 设备独立像素 = 逻辑像素
 
