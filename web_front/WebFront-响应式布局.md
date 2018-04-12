@@ -56,7 +56,7 @@ div{
 - 设计稿字体大小：DesignFontSize(DFS) = 22px
 - 设计稿元素宽度：DesignElementWidth(DEW) = 10px
 - 设计稿元素高度：DesignElementHeight(DEH) = 20px
-- 字体 rem 大小：remWidth = DFS / DW * S
+- 字体 rem 大小：remFontSize = DFS / DW * S
 - 元素 rem 宽度：remWidth = DEW / DW * S
 - 元素 rem 高度：remHeight = DEH / DEW * remWidth
 
