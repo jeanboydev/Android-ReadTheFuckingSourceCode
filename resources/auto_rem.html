@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>自动计算rem值</title>
+    <script>
+        /* rem.js文件内容 */
+        (function () {
+            var html = document.documentElement;
+
+            function onWindowResize() {
+                html.style.fontSize = html.getBoundingClientRect().width / 10 + 'px';
+            }
+
+            window.addEventListener('resize', onWindowResize);
+            onWindowResize();
+        })();
+
+        function autoRem() {
+            var desginWidth = document.getElementById("design_width").value;
+            var scale = document.getElementById("scale").value;
+            var designFontSize = document.getElementById("design_font_size").value;
+            var desginElementWidth = document.getElementById("design_element_width").value;
+            var desginElementHeight = document.getElementById("design_element_height").value;
+            var remFontSize = document.getElementById("rem_font_size");
+            var remWidth = document.getElementById("rem_width");
+            var remHeight = document.getElementById("rem_height");
+
+            var remFontSizeValue = designFontSize / desginWidth * scale;
+            var remWidthValue = desginElementWidth / desginWidth * scale;
+            var remHeightValue = desginElementHeight / desginElementWidth * remWidthValue;
+            remFontSize.innerHTML = remFontSizeValue.toFixed(3) + " rem";
+            remWidth.innerHTML = remWidthValue.toFixed(3) + " rem";
+            remHeight.innerHTML = remHeightValue.toFixed(3) + " rem";
+        }
+    </script>
+    <style>
+        body {
+            width: 10rem;
+            margin: auto;
+            font-size: 0.5rem;
+        }
+
+        input {
+            border: 1px solid #000000;
+            width: 2rem;
+        }
+
+        button {
+            width: 5rem;
+            height: 1rem;
+            background-color: gray;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <div>
+            <span>设计稿宽度：</span>
+            <input type="text" value="750" id="design_width" />
+            <span>px</span>
+        </div>
+        <div>
+            <span>缩放比例：</span>
+            <input type="text" value="10" id="scale" />
+            <span>x</span>
+        </div>
+        <div>
+            <span>设计稿字体大小：</span>
+            <input type="text" value="0" id="design_font_size" />
+            <span>px</span>
+        </div>
+        <div>
+            <span>设计稿元素宽度：</span>
+            <input type="text" value="0" id="design_element_width" />
+            <span>px</span>
+        </div>
+        <div>
+            <span>设计稿元素高度：</span>
+            <input type="text" value="0" id="design_element_height" />
+            <span>px</span>
+        </div>
+        <div>
+            <button type="button" onclick="autoRem()">计算</button>
+        </div>
+        <div>
+            <span>rem 字体大小：</span>
+            <span id="rem_font_size">0 rem</span>
+        </div>
+        <div>
+            <span>rem 宽度：</span>
+            <span id="rem_width">0 rem</span>
+        </div>
+        <div>
+            <span>rem 高度：</span>
+            <span id="rem_height">0 rem</span>
+        </div>
+    </div>
+</body>
+
+</html>
