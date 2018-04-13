@@ -341,7 +341,7 @@ PPI(pixels per inch)：屏幕每英寸的像素数量 = √(w^2 + h^2) / 屏幕�
 
 密度分界基数：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_response/dpi.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_response/dpi.jpg" alt=""/>
 
 DPR(Device Pixel Ratio)设备像素比：PPI / 密度分界基数(如：160)
 
