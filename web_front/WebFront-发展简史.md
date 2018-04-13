@@ -56,7 +56,7 @@
 
 第一次浏览器战争以 IE 浏览器完胜 Netscape 而结束，IE 开始统领浏览器市场，份额的最高峰达到 2002 年的 96%。随着第一轮大战的结束，浏览器的创新也随之减少。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/netspace" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/netspace.png" alt=""/>
 
 ## XHTML
 
@@ -92,7 +92,7 @@ Google 分别在 2004 年和 2005 年先后发布了两款重量级的 Web 产�
 
 AJAX 使得浏览器客户端可以更方便地向服务器发送数据信息，这促进了 Web 2.0 的发展。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/ajax" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/ajax.png" alt=""/>
 
 Google Trend: AJAX 从 2005 年开始得到开发人员的广泛关注。
 
@@ -114,7 +114,7 @@ Netscape 于 1998 年被 AOL 收购前创建了 Mozilla 社区，Firefox 于 200
 
 其中，jQuery 独领风骚，几乎成了所有网站的标配。Dojo、YUI、ExtJS 等提供了很多组件，这使得开发复杂的企业级 Web 应用成为可能。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/jquery" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/jquery.png" alt=""/>
 
 Google Trend: 蓝色 jQuery，红色 Dojo，绿色 YUI，紫色 ExtJS，黄色 MooTools
 
@@ -132,13 +132,13 @@ HTML5 草案发布不久，Google 在 2008 年 12 月发布了 Chrome 浏览器�
 
 在第二次浏览器大战中，各个浏览器厂商都以提升 JavaScript 运行效率和支持 HTML5 各种新特性为主要目标，促进了浏览器的良性竞争。在这一场战争中，Chrome 攻城略地，抢夺 IE 市场份额。2013 年，Chrome 超过 IE，成为市场份额最高的浏览器。2016 年，Chrome 占据了浏览器市场的半壁江山。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/browser_trend" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/browser_trend.png" alt=""/>
 
 全球浏览器市场份额（2009-2017）
 
 自 2008 年以来，浏览器中不断支持的 HTML5 新特性让开发者激动不已：WebWorker 可以让 JavaScript 运行在多线程中，WebSocket 可以实现前端与后台的双工通信，WebGL 可以创建 Web3D 网页游戏......
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/pc_html5_support" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/html5_support.png" alt=""/>
 
 桌面浏览器对 HTML5 支持程度（2009-2017）
 
@@ -182,7 +182,7 @@ Node.js 的出现吸引了很多前端开发人员开始用 JavaScript 开发服
 
 2010 年 1 月，NPM 作为 Node.js 的包管理系统首次发布。开发人员可以按照 CommonJS 的规范编写 Node.js 模块，然后将其发布到 NPM 上面供其他开发人员使用。目前 NPM 具有 40 万左右的模块，是世界上最大的包模块管理系统。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/npm" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/npm.png" alt=""/>
 
 2016 年常见包管理系统模块数量，NPM 高居榜首
 
@@ -196,7 +196,7 @@ Node.js 也催生了 node-webkit 等项目，用 JavaScript 开发跨平台的�
 
 以前只用于后台的 MV* 等架构在前端逐渐使用起来，以下列举了部分常用的 MV* 框架。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/mv_" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/mv_.png" alt=""/>
 
 
 随着这些 MV* 框架的出现，网页逐渐由 Web Site 演变成了 Web App，最终导致了复杂的单页应用（ Single Page Application）的出现。
@@ -207,7 +207,7 @@ Node.js 也催生了 node-webkit 等项目，用 JavaScript 开发跨平台的�
 
 随着 iOS 和 Android 等智能手机的广泛使用，移动浏览器也逐步加强了对 HTML5 特性的支持力度。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/mobile_html5_support" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_trend/mobile_html5_support.png" alt=""/>
 
 移动浏览器对 HTML5 支持程度（2009-2017）
 
