@@ -116,10 +116,10 @@ dependencies {
 }
 ```
 
-`api`: 对应之前的 `compile` 关键字，功能一模一样。会传递依赖，导致gradle编译的时候遍历整颗依赖树
-`implementation`: 对应之前的 `compile` ，与 api 类似，关键区别是不会有依赖传递
-`compileOnly`: 对应之前的 provided，依赖仅用于编译期不会打包进最终的 apk 中
-`runtimeOnly`: 对应之前的 `apk`，与上面的 compileOnly 相反
+- `api`: 对应之前的 `compile` 关键字，功能一模一样。会传递依赖，导致gradle编译的时候遍历整颗依赖树
+- `implementation`: 对应之前的 `compile` ，与 api 类似，关键区别是不会有依赖传递
+- `compileOnly`: 对应之前的 provided，依赖仅用于编译期不会打包进最终的 apk 中
+- `runtimeOnly`: 对应之前的 `apk`，与上面的 compileOnly 相反
 
 关于 implementation 与 api 的区别，主要在依赖是否会传递上。如：A 依赖 B，B 依赖 C，若使用api则 A 可以引用 C，而 implementation 则不能引用。
 
