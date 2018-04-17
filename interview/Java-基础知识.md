@@ -56,7 +56,14 @@
 
 序列化是一种将对象转换为字节流的过程，目的是为了将该对象存储到内存中，等后面再次构建该对象时可以获取到该对象先前的状态及数据信息。
 
-Java中，有两种方式可以实现序列化，既可以实现Serializable接口，也可以实现Parcelable接口。然而，在Android中，我们不应该使用Serializable接口。因为Serializable接口使用了反射机制，这个过程相对缓慢，而且往往会产生出很多临时对象，这样可能会触发垃圾回收器频繁地进行垃圾回收。相比而言，Parcelable接口比Serializable接口效率更高，性能方面要高出10x多倍。
+Java 中，只有一种方式可以实现序列化，只需要实现 Serializable 接口。
+
+在 Android 中，还有另外一种实现序列化的方式,实现 Parcelable，这个是 Android 独有的一种序列化方方式,相比较 Serializable，Parcelable 需要提供大量的模板代码，较为繁琐，但是效率比 Serializable 高出不少，因为 Serializable 实现的序列化利用反射，可能会进行频繁的IO操作，所以消耗比较大。而 Parcelable 则是在内存中进行序列化。
+
+所以这里推荐的是：
+
+- 内存序列化优先选择 Parcelable。
+- 存储到设备优先选择 Serializable(这里推荐使用 json 方式加密保存在本地，比较简单)。
 
 ### 什么是单例？
 
