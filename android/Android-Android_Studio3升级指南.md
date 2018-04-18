@@ -116,7 +116,7 @@ dependencies {
 }
 ```
 
-- `api`: 对应之前的 `compile` 关键字，功能一模一样。会传递依赖，导致gradle编译的时候遍历整颗依赖树
+- `api`: 对应之前的 `compile` 关键字，功能一模一样。会传递依赖，导致 gradle 编译的时候遍历整颗依赖树
 - `implementation`: 对应之前的 `compile` ，与 api 类似，关键区别是不会有依赖传递
 - `compileOnly`: 对应之前的 provided，依赖仅用于编译期不会打包进最终的 apk 中
 - `runtimeOnly`: 对应之前的 `apk`，与上面的 compileOnly 相反
