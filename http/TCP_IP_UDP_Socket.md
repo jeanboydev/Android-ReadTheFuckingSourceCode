@@ -112,7 +112,7 @@ TCP三次握手的过程如下：
 
 - 连接终止
 
-建立一个连接需要三次握手，而终止一个连接要经过四次握手，这是由TCP的半关闭（half-close）造成的。具体过程如下图所示。
+建立一个连接需要三次握手，而终止一个连接要经过四次挥手，这是由TCP的半关闭（half-close）造成的。具体过程如下图所示。
 
 ![连接终止][3]
 
@@ -187,7 +187,7 @@ TCP根据应用的提示，负责建立连接，发送数据以及断开连接�
 
 3. IP 模块处理
 
-IP 将 TCP 传过来的 TCP 首部和 TCP 数据合起来当做自己的数据，并在 TCP 首部的前端奸商自己的 IP 首部。IP 首部中包含接收端 IP 地址，发送端 IP 地址。随后 IP 包将被发送给连接这些路由器或主机网络接口的驱动程序，以实现真正的发送数据。
+IP 将 TCP 传过来的 TCP 首部和 TCP 数据合起来当做自己的数据，并在 TCP 首部的前端加上自己的 IP 首部。IP 首部中包含接收端 IP 地址，发送端 IP 地址。随后 IP 包将被发送给连接这些路由器或主机网络接口的驱动程序，以实现真正的发送数据。
 
 4. 网络接口（以太网驱动）的处理
 
@@ -222,3 +222,4 @@ IP 模块收到 IP 包首部以及后面的数据部分以后，也做类似的�
 [3]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/tcp_end.jpg
 [4]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/tcp_transaction.jpg
 [5]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/tcp_data.jpg
+
