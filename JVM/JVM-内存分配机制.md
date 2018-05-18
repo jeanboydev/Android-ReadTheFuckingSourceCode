@@ -60,7 +60,7 @@
 
 直接内存并不是 JVM 管理的内存，可以这样理解，直接内存，就是 JVM 以外的机器内存。
 
-比如：你有 4G 的内存，JVM占用了1G，则其余的 3G 就是直接内存，JDK 中有一种基于通道（Channel）和缓冲区（Buffer）的内存分配方式，将由 C 语言实现的 native 函数库分配在直接内存中，用存储在 JVM 堆中的 DirectByteBuffer 来引用。 由于直接内存收到本机器内存的限制，所以也可能出现 OutOfMemoryError 的异常。
+比如：你有 4G 的内存，JVM占用了1G，则其余的 3G 就是直接内存，JDK 中有一种基于通道（Channel）和缓冲区（Buffer）的内存分配方式，将由 C 语言实现的 native 函数库分配在直接内存中，用存储在 JVM 堆中的 DirectByteBuffer 来引用。 由于直接内存受到本机器内存的限制，所以也可能出现 OutOfMemoryError 的异常。
 
 
 ## 内存分配机制
@@ -150,3 +150,4 @@ Person person1 = new Person("张三", 18);
 ## 参考资料
 
 《深入理解 Java 虚拟机》
+
