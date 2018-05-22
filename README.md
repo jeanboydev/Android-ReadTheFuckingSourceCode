@@ -75,6 +75,7 @@
 - [Webpack 入门](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Webpack入门.md)
 - [Vue 入门](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Vue入门.md)
 - [Vue 加入 Bootstrap 和 jQuery](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-Vue&BootStrap&jQuery.md)
+- [微信小程序 vs 支付宝小程序，开发终极实践](https://github.com/jeanboydev/WebApp-Arch)
 
 ## Git
 
