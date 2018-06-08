@@ -68,13 +68,23 @@
 
 ## 工厂模式
 
+屏蔽创建的细节。
+
 - 简单工厂
 
+封装创建对象的细节。只有一个工厂，无法扩展。
+
+- 工厂方法
+
 定义了一个创建对象的接口，但由于子类决定要实例化的类是哪一个。工厂方法让类把实例化推迟到子类。
+一个工厂对应一种产品，解决简单工厂无法扩展的问题。
 
 - 抽象工厂
 
 用于创建相关或依赖对象的家族，而不需要明确具体类。
+一个工厂对应一族产品（多个不同产品），把一族相关的产品抽象出来。
+
+> 应用场景：比如，线上/本地/Radio等音乐播放；GPS/NetWork位置获取。
 
 ## 单例模式
 
@@ -84,7 +94,7 @@
 
 ```Java
 public class Singleton {  
-    private static Singleton instance = null;  
+    private static Singleton INSTANCE = null;  
     private Singleton() {}
 
     public static Singleton getInstance() {
@@ -92,10 +102,10 @@ public class Singleton {
         //第一个线程获取时为空，会创建一个实例
         //第二个线程获取时还没有创建完，也会为空，会创建第二个实例
         //这就创建了两个实例
-        if (instance == null) {
-            instance = new Singleton();  
+        if (INSTANCE == null) {
+            INSTANCE = new Singleton();  
         }
-        return instance;  
+        return INSTANCE;  
     }
 }
 ```
@@ -104,7 +114,7 @@ public class Singleton {
 
 ```Java
 public class Singleton {  
-    private static Singleton instance = null;  
+    private static Singleton INSTANCE = null;  
     private Singleton() {}
     
     //加锁
@@ -112,10 +122,10 @@ public class Singleton {
     //确保只有一个线程进入该方法
     //缺点：性能降低，只有第一次创建实例时才需要同步
     public static synchronized Singleton getInstance() {  
-         if (instance == null) {  
-             instance = new Singleton();  
+         if (INSTANCE == null) {  
+             INSTANCE = new Singleton();  
          }  
-         return instance;  
+         return INSTANCE;  
     }
 }
 ```
@@ -124,12 +134,12 @@ public class Singleton {
 
 ```Java
 public class Singleton {  
-    private static Singleton instance = new Singleton();  
+    private static Singleton INSTANCE = new Singleton();  
     private Singleton() {}
     
     public static Singleton getInstance(){
         //保证了任何线程访问之前已经创建了实例
-        return instance;
+        return INSTANCE;
     }
 }
 ```
@@ -139,21 +149,21 @@ public class Singleton {
 ```Java
 public class Singleton {
     //volatile 关键词确保当 instance 变量被赋值时，多个线程之间数据共享
-    private volatile static Singleton instance = null;  
+    private volatile static Singleton INSTANCE = null;  
     private Singleton() {}
     
     public static Singleton getInstance(){
         //检查实例，若不存在，进入同步代码块
         //只有第一次调用时实例才不存在
-        if(instance == null) {
+        if(INSTANCE == null) {
             synchronized(Singleton.class) {
                 //再检查一次，如果仍为空才创建实例
-                if(instance == null){
-                    instance = new Singleton();
+                if(INSTANCE == null){
+                    INSTANCE = new Singleton();
                 }
             }
         }
-        return instance;
+        return INSTANCE;
     }
 }
 ```
@@ -167,12 +177,20 @@ public class Singleton {
     private Singleton() {} 
     //延迟加载，减少内存开销  
     private static class SingletonHolder {  
-        private static SingletonInner instance = new SingletonInner();  
+        private final static SingletonInner INSTANCE = new SingletonInner();  
     }  
 
     public static Singleton getInstance() {  
-        return SingletonHolder.instance;  
+        return SingletonHolder.INSTANCE;  
     }
+}
+```
+
+6. 枚举
+
+```Java
+public enum Singleton {
+    INSTANCE
 }
 ```
 
