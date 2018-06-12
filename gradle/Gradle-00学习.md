@@ -20,7 +20,7 @@ Gradle 依赖于 Groovy，Groovy 同时本身是一种 DSL。所以学习 Gradle
 
 Groovy 程序运行时，首先被编译成 Java 字节码，然后通过 JVM 来执行。  Java, Groovy 和 JVM 之间的关系类似于下图： 
 
-![img](https://img-blog.csdn.net/20170516205327947?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvR2F1Z2FtZWxh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![img](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/01.png)
 
 实际上，由于 Groovy Code 在真正执行的时候，已经变成了 Java 字节码， 因此 JVM 根本不知道自己运行的是 Groovy 代码。
 
@@ -254,7 +254,7 @@ import java.math.BigDecimal
 
 # Gradle DSL
 
-Gradle 是一个编译打包工具，但实际上它也是一个编程框架。  Gradle 有自己的 API 文档，对应链接如下：  
+Gradle 是一个编译打包工具，但实际上它也是一个编程框架。Gradle 有自己的 API 文档，对应链接如下：  
 
 - [Gradle User Manual - 官方介绍文档](https://docs.gradle.org/current/userguide/userguide.html)
 - [DSL Reference - API 文档](https://docs.gradle.org/current/dsl/)
@@ -358,8 +358,6 @@ task clean(type: Delete) {
 
 这个 `build.gradle` 主要作用是配置其他子 Project 。比如，为子 Project 添加一些属性。这个 `build.gradle` 有没有都无所属。
 
-
-
 `project/settings.gradle` 则主要定义了根目录下具体有多少个 Gradle Project ，其内容类似于：
 
 ```groovy
@@ -376,7 +374,7 @@ include ':app', ':library-test'
 
 Gradle 构建系统有自己的生命周期，初始化、配置和运行三个阶段。
 
-![img](http://wiki.jikexueyuan.com/project/gradleIn-action/images/dag27.png)
+![img](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/02.png)
 
 - 初始化阶段
 
@@ -599,6 +597,8 @@ Mac 中使用 Gradle 命令会出现 `bash gradle command not found` 原因是�
 
 # Android Plugin DSL 
 
+Android Plugin DSL 就是 Google 为了开发 Android 应用定制了一个插件，具体的插件配置请查阅官方文档。
+
 - [Android Plugin DSL Reference - 官方文档](http://google.github.io/android-gradle-dsl/current)
 
 新建一个 Android 项目，可以看到 `project/app/build.gradle` 文件中的内容类似如下：
@@ -629,14 +629,293 @@ dependencies {
 }
 ```
 
-所有的配置都可以在上面官方文档中找到。
-
-![image-20180608143602132](/var/folders/t1/6fv89nkj5n18p798wmgj3cqc0000gn/T/abnerworks.Typora/image-20180608143602132.png)
+所有的配置都可以在上面官方文档中找到。![03](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/03.png)
 
 # 插件开发
 
+## 新建 Module
 
+首先新建一个项目，在项目中新建一个 Module 选择 Android Library，并修改目录结构删除不需要的文件如图：
+
+![05](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/04.png)
+
+目录结构：
+
+```json
+ProjectName
+	|-src
+		|-main
+			|-groovy
+				|-//插件具体实现逻辑
+			|-resources
+				|-META-INF
+					|-gradle-plugins
+						|-<插件 group id>.properties
+	|-build.gradle//插件构建配置
+```
+
+## 配置项目
+
+首先在 `src/main/groovy` 下创建包名 `com.jeanboy.plugin.test` ，并创建 `PluginImpl.groovy` 文件：
+
+```groovy
+com.jeanboy.plugin.test
+
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
+class TestPlugin implements Plugin<Project> {
+
+    @Override
+    void apply(Project project) {
+        project.task('testTask') << {
+            println("========================")
+            println("hello gradle plugin!")
+            println("========================")
+        }
+    }
+}
+```
+
+这时候 `PluginImpl.groovy` 文件应该是编译不通过的，我们修改下 `build.gradle` 文件，清空里面所有内容填入下面内容：
+
+```groovy
+apply plugin: 'groovy'//使用 groovy 插件构建项目
+apply plugin: 'maven'//用于发布本地 maven 仓库中
+
+dependencies {
+    compile gradleApi()//gradle sdk
+    compile localGroovy()//groovy sdk
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+def groupName = 'com.jeanboy.plugin.test'//组名
+def artifactName = 'TestPlugin'//项目名
+def versionName = '1.0.1'//版本号
+
+//上传至本地仓库
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            pom.groupId = "${groupName}"
+            pom.artifactId = "${artifactName}"
+            pom.version = "${versionName}"
+            repository(url: uri('../PluginRepository'))
+        }
+    }
+}
+```
+
+最后修改 `src/main/resources/META-INF/gradle-plugins` 下的 properties 文件：
+
+```json
+implementation-class=com.jeanboy.plugin.test.PluginImpl
+//implementation-class=<这里根据自己的插件自定义配置>
+```
+
+>  注意：该文件的文件名就是插件的名字。
+
+例如：`com.jeanboy.plugin.test.properties`
+
+最终使用插件时为：
+
+```groovy
+apply plugin: 'com.jeanboy.plugin.test'
+```
+
+## 发布到本地仓库
+
+首先找到 `uploadArchives` ，然后双击执行这个 Task：
+
+![06](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/05.png)
+
+执行结果如下表示创建插件成功：
+
+![07](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/06.png)
+
+然后在项目根目录的 `PluginRepository` 中可以找到我们创建的插件：
+
+![08](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/07.png)
+
+## 本地仓库测试
+
+接下来我们进行插件测试，首先需要到 `app` 目录下配置一下 `build.gradle` 引入我们的插件：
+
+```groovy
+//在 build.gradle 中最下面添加下面配置
+apply plugin: 'com.jeanboy.plugin.test'//使用自定义的插件
+
+//测试本地仓库中的插件
+buildscript {
+    repositories {
+        maven {
+            url uri('../PluginRepository')
+        }
+    }
+    dependencies {
+        classpath 'com.jeanboy.plugin.test:testPlugin:1.0.1'
+    }
+}
+
+```
+
+然后刷新一下 gradle，我们就可以找到刚才创建的 Task：
+
+![081](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/08.png)
+
+双击执行结果如下：
+
+![09](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/09.png)
+
+# 插件发布
+
+## 注册 bintray 账户
+
+- [bintray 官网](https://bintray.com)
+
+首先注册选择右边开源账户注册，这个是免费的；右边只是免费试用30天。
+
+![10](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/10.png)
+
+推荐使用关联 github 账号的方式注册。
+
+![11](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/11.png)
+
+创建你的 Maven 仓库，如果没有创建这个库，后面上传会出现不存在 maven 路径的错误。
+
+![12](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/12.png)
+
+## 引入 bintray release
+
+在项目根目录的 `build.gradle` 配置：
+
+```groovy
+buildscript {
+
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.2'
+        //引入上传 jcenter 的插件库
+        classpath 'com.novoda:bintray-release:0.8.1'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    //添加 utf-8 的支持，避免中文注释生成 Javadoc 文件出现编码错误
+    tasks.withType(Javadoc){
+        options{
+            encoding "UTF-8"
+            charSet 'UTF-8'
+            links "http://docs.oracle.com/javase/7/docs/api"
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+```
+
+在插件 Module 中的 `build.gradle` 添加配置：
+
+```groovy
+//使用 bintray-release 插件
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    groupId = "${groupName}"
+    artifactId = "${artifactName}"
+    publishVersion = "${versionName}"
+
+    //项目描述
+    desc = 'Task timer'
+    //项目网址，建议github开源库网址
+    website = 'https://github.com/jeanboy/Android-GradlePluginTest'
+    //bintray 的用户名
+    bintrayUser = 'jeanboydev'
+    //bintray 用户名
+    userOrg = 'jeanboydev'
+    //API Key
+    bintrayKey = "**********"
+    dryRun = false
+}
+```
+
+API Key 在个人设置中：
+
+![13](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/13.png)
+
+## 发布
+
+直接使用 Android Studio 中的 Terminal 控制台使用命令：
+
+> $ ./gradlew bintrayUpload
+
+显示 BUILD SUCCESSFUL 表示上传成功：
+
+![15](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/14.png)
+
+在刚才创建的 Maven 仓库中可以看到刚刚上传的项目。
+
+## 测试
+
+在项目根目录的 `build.gradle` 引入配置：
+
+```groovy
+buildscript {
+
+    repositories {
+        google()
+        jcenter()
+        maven {//使用远程 maven 仓库
+            //对应自己创建的仓库路径
+            url 'https://dl.bintray.com/jeanboydev/maven'
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.2'
+        //引入上传 jcenter 的插件库
+        classpath 'com.novoda:bintray-release:0.8.1'
+    }
+}
+
+//...
+```
+
+在 app 目录下添加就可以测试了。
+
+```groovy
+  apply plugin: 'com.jeanboy.plugin.timer'
+```
+
+直接使用 Android Studio 中的 Terminal 控制台使用命令：
+
+> $ ./gradlew build
+
+![131](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/15.png)
+
+##  Add to Jcenter
+
+如果没有添加到 Jcenter 可以点击这里。![16](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/16.png)
 
 # 参考资料
 
-https://blog.csdn.net/innost/article/details/48228651
+- [深入理解Android之Gradle](https://blog.csdn.net/innost/article/details/48228651)
+
+- [如何使用Android Studio开发Gradle插件](https://blog.csdn.net/sbsujjbcy/article/details/50782830)
+- [使用bintray_release插件轻松上传库到Jcenter](https://blog.csdn.net/KevinsCSDN/article/details/71655428)

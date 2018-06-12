@@ -65,6 +65,10 @@
 - [*Android PowerManagerService 分析]
 - [*Android Input 系统]
 
+## Gradle
+
+- [Gradle 简介](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/gradle/Gradle-简介.md)
+
 ## 前端
 
 - [前端发展简史](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/web_front/WebFront-发展简史.md)
