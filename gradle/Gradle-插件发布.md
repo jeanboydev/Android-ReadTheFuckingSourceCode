@@ -140,6 +140,10 @@ buildscript {
 
 如果没有添加到 Jcenter 可以点击这里。![16](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/16.png)
 
+## 项目源码
+
+https://github.com/jeanboydev/Android-GradlePluginTest
+
 # 参考资料
 
 - [深入理解Android之Gradle](https://blog.csdn.net/innost/article/details/48228651)

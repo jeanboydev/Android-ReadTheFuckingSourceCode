@@ -137,3 +137,7 @@ buildscript {
 双击执行结果如下：
 
 ![09](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/09.png)
+
+## 项目源码
+
+https://github.com/jeanboydev/Android-GradlePluginTest
