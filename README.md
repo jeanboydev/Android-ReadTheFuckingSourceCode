@@ -68,6 +68,11 @@
 ## Gradle
 
 - [Gradle 简介](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/gradle/Gradle-简介.md)
+- [Groovy Language](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/gradle/Gradle-Groovy.md)
+- [Gradle DSL](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/gradle/Gradle-Gradle_DSL.md)
+- [Android Plugin DSL](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/gradle/Gradle-Android_Plugin_DSL.md)
+- [插件开发](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/gradle/Gradle-插件开发.md)
+- [插件发布](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/gradle/Gradle-插件发布.md)
 
 ## 前端
 
