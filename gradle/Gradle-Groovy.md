@@ -8,7 +8,7 @@ Gradle 依赖于 Groovy，Groovy 同时本身是一种 DSL。所以学习 Gradle
 
 Groovy 程序运行时，首先被编译成 Java 字节码，然后通过 JVM 来执行。  Java, Groovy 和 JVM 之间的关系类似于下图： 
 
-![img](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/01.png)
+![img](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/01.png)
 
 实际上，由于 Groovy Code 在真正执行的时候，已经变成了 Java 字节码， 因此 JVM 根本不知道自己运行的是 Groovy 代码。
 

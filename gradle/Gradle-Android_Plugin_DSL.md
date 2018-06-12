@@ -32,7 +32,7 @@ dependencies {
 }
 ```
 
-所有的配置都可以在上面官方文档中找到。![03](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/03.png)
+所有的配置都可以在上面官方文档中找到。![03](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/03.png)
 
 ## 打包过程
 
@@ -40,7 +40,7 @@ dependencies {
 
 下图是谷歌官网给出的一个典型的 Apk 构建的过程，主要包括两个过程。首先是编译过程，编译的内容包括本工程的文件以及依赖的各种库文件，编译的输出包括 dex 文件和编译后的资源文件。然后是打包过程，配合 Keystore 对第一步的输出进行签名对齐，生成最终的 Apk 文件。
 
-![100](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/100.png)
+![100](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/100.png)
 
 下面这张图对上面的步骤以及每步用到的工具进行了细分，概括如下：
 
@@ -49,13 +49,13 @@ dependencies {
 3. apkbuilder 工具将 `.dex` 文件和编译后的资源文件生成未经签名对齐的 Apk 文件。这里编译后的资源文件包括两部分，一是由 aapt 编译产生的编译后的资源文件，二是依赖的三方库里的资源文件。产出为未经签名的 `.apk` 文件。
 4. 分别由 Jarsigner 和 zipalign 对 Apk 文件进行签名和对齐，生成最终的 Apk 文件。
 
-![101](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/101.png)
+![101](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/101.png)
 
 ## Gradle 目录结构
 
 Android 工程通过 Gradle 文件管理各项配置，Gradle 文件利用 DSL（Domain Specific Language）语言描述配置，并使用 Groovy 语言处理编译逻辑。
 
-![102](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/102.png)
+![102](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/102.png)
 
 在这里 Gradle 文件分布在几个不同的层级，Project 层级以及 Module 层级。
 

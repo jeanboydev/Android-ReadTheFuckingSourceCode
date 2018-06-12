@@ -60,7 +60,6 @@
 - [*Android Broadcast 启动过程]
 - [*Android ContentProvider 启动过程]
 - [*Android App 自动化测试]
-- [*Android Gradle 构建系统]
 - [*Android PackageManagerService 分析]
 - [*Android PowerManagerService 分析]
 - [*Android Input 系统]

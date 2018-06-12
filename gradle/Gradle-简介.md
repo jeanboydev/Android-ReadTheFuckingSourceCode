@@ -1,6 +1,6 @@
 # Gradle 简介
 
-![00](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/00.png)
+![00](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/00.png)
 
 ## Gradle 是什么？
 

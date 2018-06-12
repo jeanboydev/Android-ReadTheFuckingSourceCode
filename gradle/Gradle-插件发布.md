@@ -6,15 +6,15 @@
 
 首先注册选择右边开源账户注册，这个是免费的；右边只是免费试用30天。
 
-![10](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/10.png)
+![10](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/10.png)
 
 推荐使用关联 github 账号的方式注册。
 
-![11](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/11.png)
+![11](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/11.png)
 
 创建你的 Maven 仓库，如果没有创建这个库，后面上传会出现不存在 maven 路径的错误。
 
-![12](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/12.png)
+![12](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/12.png)
 
 ## 引入 bintray release
 
@@ -85,7 +85,7 @@ publish {
 
 API Key 在个人设置中：
 
-![13](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/13.png)
+![13](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/13.png)
 
 ## 发布
 
@@ -95,7 +95,7 @@ API Key 在个人设置中：
 
 显示 BUILD SUCCESSFUL 表示上传成功：
 
-![15](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/14.png)
+![15](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/14.png)
 
 在刚才创建的 Maven 仓库中可以看到刚刚上传的项目。
 
@@ -134,11 +134,11 @@ buildscript {
 
 > $ ./gradlew build
 
-![131](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/15.png)
+![131](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/15.png)
 
 ##  Add to Jcenter
 
-如果没有添加到 Jcenter 可以点击这里。![16](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/16.png)
+如果没有添加到 Jcenter 可以点击这里。![16](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/16.png)
 
 # 参考资料
 

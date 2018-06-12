@@ -4,7 +4,7 @@
 
 首先新建一个项目，在项目中新建一个 Module 选择 Android Library，并修改目录结构删除不需要的文件如图：
 
-![05](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/04.png)
+![05](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/04.png)
 
 目录结构：
 
@@ -98,15 +98,15 @@ apply plugin: 'com.jeanboy.plugin.test'
 
 首先找到 `uploadArchives` ，然后双击执行这个 Task：
 
-![06](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/05.png)
+![06](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/05.png)
 
 执行结果如下表示创建插件成功：
 
-![07](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/06.png)
+![07](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/06.png)
 
 然后在项目根目录的 `PluginRepository` 中可以找到我们创建的插件：
 
-![08](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/07.png)
+![08](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/07.png)
 
 ## 本地仓库测试
 
@@ -132,8 +132,8 @@ buildscript {
 
 然后刷新一下 gradle，我们就可以找到刚才创建的 Task：
 
-![081](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/08.png)
+![081](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/08.png)
 
 双击执行结果如下：
 
-![09](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/09.png)
+![09](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/09.png)

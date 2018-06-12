@@ -120,7 +120,7 @@ include ':app', ':library-test'
 
 Gradle 构建系统有自己的生命周期，初始化、配置和运行三个阶段。
 
-![img](/Users/next/Work/Mine/Android-ReadTheFuckingSourceCode/resources/images/gradle/02.png)
+![img](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/gradle/02.png)
 
 - 初始化阶段
 
