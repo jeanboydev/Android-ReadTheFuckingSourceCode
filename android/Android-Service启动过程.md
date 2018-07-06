@@ -6,7 +6,7 @@ Service 启动过程与 Activity 启动过程比较相似，不了解 Activity �
 
 Service 的启动分两种情况：startService，bindService。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_service/service_start.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_service/service_start.png?raw=true" alt=""/>
 
 ## startService
 
@@ -625,4 +625,8 @@ onCreate() -> onBind() -> onUnbind() -> onDestory()
 - [startService 启动过程分析](http://gityuan.com/2016/03/06/start-service/)
 - 《深入理解 Android 内核设计思想》
 
+
+## 扫一扫关注我的公众账号
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/wechat/qrcode_for_gh_26eef6f9e7c1_258.jpg?raw=true" width=256 height=256 />
 

@@ -1,4 +1,4 @@
-# Android-性能优化-内存优化
+# Android - 性能优化 内存优化
 
 ## 概述
 
@@ -327,37 +327,37 @@ Android 平台上枚举是比较争议的，在较早的 Android 版本，使用
 
 Lint 是 Android Studio 自带的工具，使用很简单找到 **Analyze** -> **Inspect Code** 然后选择想要扫面的区域即可。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_lint1.jpg" alt="memory_lint1"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_lint1.jpg?raw=true?raw=true" alt="memory_lint1"/>
 
 选择 Lint 扫描区域。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_lint2.jpg" alt="memory_lint2"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_lint2.jpg?raw=true" alt="memory_lint2"/>
 
 对可能引起性能问题的代码，Lint 都会进行提示。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_lint3.jpg" alt="memory_lint3"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_lint3.jpg?raw=true" alt="memory_lint3"/>
 
 ## 使用 Android Studio 自带的 Monitor Memory 检查
 
 一般在 Android Studio 的底部可以找到 Android Monitor。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_1.jpg" alt="Monitor Memory 1"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_1.jpg?raw=true" alt="Monitor Memory 1"/>
 
 可以看到当前 App的内存变动比较大，很有可能出现了内存泄漏。 点击 Dump Java Heap，等一段时间会自动生成 Heap Snapshot 文件。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_2.jpg" alt="Monitor Memory 2"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_2.jpg?raw=true" alt="Monitor Memory 2"/>
 
 在 Captures 中可以找到 hprof 文件。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_3.jpg" alt="Monitor Memory 3"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_3.jpg?raw=true" alt="Monitor Memory 3"/>
 
 在右侧找到 Analyzer Tasks 并打开，点击图中 Perform Analysis 按钮开始分析。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_4.jpg" alt="Monitor Memory 4"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_4.jpg?raw=true" alt="Monitor Memory 4"/>
 
 通过分析结果可以看到 TestActivity 泄漏了，从左侧 Reference Tree 中可以看到是 TestActivity 中的 context 泄露了。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_5.jpg" alt="Monitor Memory 5"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_ast_5.jpg?raw=true" alt="Monitor Memory 5"/>
 
 我们来看下代码：
 
@@ -389,37 +389,37 @@ public class TestActivity extends AppCompatActivity {
 
 在 Android Studio 中先将 hprof 文件导出为 MAT 可以识别的 hprof 文件。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat1.jpg" alt="MAT1"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat1.jpg?raw=true" alt="MAT1"/>
 
 打开刚才导出的文件。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat2.jpg" alt="MAT2"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat2.jpg?raw=true" alt="MAT2"/>
 
 经过分析后会显示如下，Leak Suspectss 是一个关于内存泄露猜想的饼图，Problem Suspect 1 是泄露猜想的描述。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat3.jpg" alt="MAT3"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat3.jpg?raw=true" alt="MAT3"/>
 
 Overview 是一个概况图，把内存的消耗以饼状图形式显示出来，鼠标在每个饼块区域划过或者点击，就会在 Inspector 栏目显示这块区域的相关信息。 MAT 从多角度提供了内存分析，其中包括 Histogram、 Dominator Tree、 Leak Suspects 和 Top consumers 等。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat4.jpg" alt="MAT4"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat4.jpg?raw=true" alt="MAT4"/>
 
 这里我们使用 Histogram 进行分析，切换到 Histogram 页面。 这个页面主要有 4 个列，Class Name、 Objects、 Shallow Heap 和 Retained Heap。 其中 Class Name 是全类名，Objects 是这个类的对象实例个数。 Shallow Heap 是对象本身占用内存大小，非数组的常规对象，本身内存占用很小，所以这个对泄露分析作用不大。 Retained Heap 指当前对象大小和当前对象能直接或间接引用的对象大小的总和，这个栏目是分析重点。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat5.jpg" alt="MAT5"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat5.jpg?raw=true" alt="MAT5"/>
 
 内存分析是分析的整个系统的内存泄露，而我们只要查找我们 App 的内存泄露情况。 这无疑增加了很多工作，不过幸亏 Histogram 支持正则表达式查找，在 Regex 中输入我们的包名进行过滤，直奔和我们 App 有关的内存泄露。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat6.jpg" alt="MAT6"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat6.jpg?raw=true" alt="MAT6"/>
 
 过滤后就显示了我们 App 相关内存信息，按 Retained Heap 大小排列下，发现 MainActivity 和 TestActivity 这两个类问题比较大。 TestActivity 的问题更突出些，所以先从 TestActivity 下手。
 
 首先看下是哪里的引用导致了 TestActivity 不能被 GC 回收。 右键使用 **Merge Shortest Paths to GC Roots** 显示距 GC Root 最短路径，当然选择过程中要排除软引用和弱引用，因为这些标记的一般都是可以被回收的。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat7.jpg" alt="MAT7"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat7.jpg?raw=true" alt="MAT7"/>
 
 进入结果页查看。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat8.jpg" alt="MAT8"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_mat8.jpg?raw=true" alt="MAT8"/>
 
 可以看到 TestActivity 不能被 GC 回收是因为 context 没有释放的原因。 我们再来看下代码：
 
@@ -446,7 +446,7 @@ public class TestActivity extends AppCompatActivity {
 
 使用方式很简单，参考项目里面的介绍即可。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_leak_test.jpg" alt="LeakCanary"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/memory_leak_test.jpg?raw=true" alt="LeakCanary"/>
 
 ## ANR
 
@@ -515,12 +515,14 @@ $ adb pull data/anr/traces.txt .
 
 ## 参考资料
 
-[Android Bitmap的内存大小是如何计算的？](https://ivonhoe.github.io/2017/03/22/Bitmap&Memory/)
+- [Android Bitmap的内存大小是如何计算的？](https://ivonhoe.github.io/2017/03/22/Bitmap&Memory/)
+- [Android性能优化之常见的内存泄漏](http://hanhailong.com/2015/12/27/Android性能优化之常见的内存泄漏/)
+- [使用新版Android Studio检测内存泄露和性能](http://www.jianshu.com/p/216b03c22bb8)
+- [Android 应用内存泄漏的定位、分析与解决策略](https://www.diycode.cc/topics/475)
+- [Android 系统稳定性 - ANR](http://rayleeya.iteye.com/blog/1955657)
 
-[Android性能优化之常见的内存泄漏](http://hanhailong.com/2015/12/27/Android性能优化之常见的内存泄漏/)
 
-[使用新版Android Studio检测内存泄露和性能](http://www.jianshu.com/p/216b03c22bb8)
+## 扫一扫关注我的公众账号
 
-[Android 应用内存泄漏的定位、分析与解决策略](https://www.diycode.cc/topics/475)
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/wechat/qrcode_for_gh_26eef6f9e7c1_258.jpg?raw=true" width=256 height=256 />
 
-[Android 系统稳定性 - ANR](http://rayleeya.iteye.com/blog/1955657)

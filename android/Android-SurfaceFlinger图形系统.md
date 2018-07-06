@@ -6,14 +6,14 @@
 - [Activity 创建过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity启动过程.md)
 - [Activity 与 Window 与 View 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity与Window与View之间的关系.md)
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-bootloader.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-bootloader.png?raw=true" alt=""/>
 
 通过前面的知识我们知道了，Android 系统从按下开机键到桌面，从桌面点击 App 图标到 Activity 显示的过程。但是 Activity 是怎么显示在屏幕上的呢？下面我们就来讨论下这一过程。
 
 ## SurfaceFlinger 启动过程
 
 SurfaceFlinger 启动过程：
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_surfaceflinger/surfaceflinger_start.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_surfaceflinger/surfaceflinger_start.png?raw=true" alt=""/>
 
 SurfaceFlinger 进程是由 init 进程创建的，运行在独立的 SurfaceFlinger 进程中。init 进程读取 init.rc 文件启动 SurfaceFlinger。
 
@@ -229,7 +229,7 @@ void SurfaceFlinger::handleMessageRefresh() {
 ## Surface 创建过程
 
 Surface 创建过程：
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_surfaceflinger/surface_creat.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_surfaceflinger/surface_creat.png?raw=true" alt=""/>
 
 Surface 创建的过程就是 Activity 显示的过程，在 ActivityThread.handleResumeActivity() 中调用了 Activity.makeVisible()，我们接着看下 Activity 是怎么显示出来的。
 
@@ -805,7 +805,7 @@ copyFrom 期间一共有三个关键对象，它们分别是：
 
 ## Surface 显示过程
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_surfaceflinger/surface_display.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_surfaceflinger/surface_display.png?raw=true" alt=""/>
 
 如图所示，在 App 进程中创建 PhoneWindow 后会创建 ViewRoot。ViewRoot 的创建会创建一个 Surface，这个 Surface 其实是空的，通过与 WindowManagerService 通信 copyFrom() 一个 NativeSurface。在与 SurfaceFlinger 通信时，会创建 SharedClient 一段共享内存，里面存放的是 SharedBufferStack 对应 SurfaceFlinger 中的 SurfaceLayer 每个 Layer 其实是一个 FrameBuffer，每个 FrameBuffer 中有两个 GraphicBuffer 记作 FrontBuffer 和 BackBuffer。
 
@@ -823,4 +823,7 @@ HWComposer 是基于硬件来产生 VSync 信号的，来通知 SurfaceFlinger �
 - [SurfaceFlinger绘图篇](http://gityuan.com/2017/02/18/surface_flinger_2/)
 - 《深入理解 Android 内核设计思想》
 
+## 扫一扫关注我的公众账号
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/wechat/qrcode_for_gh_26eef6f9e7c1_258.jpg?raw=true" width=256 height=256 />
 

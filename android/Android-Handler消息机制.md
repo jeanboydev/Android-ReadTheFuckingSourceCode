@@ -1,8 +1,9 @@
-# Android-Handler消息机制 #
+# Android - Handler 消息机制
 
-## 概述 ##
+## 概述
 Android 的消息机制主要是指 Handler 的运行机制以及 Handler 所附带的 MessageQueue 和 Looper 的工作过程。 Handler 的主要作用是将某个任务切换到 Handler 所在的线程中去执行。
-## Handler机制 ##
+
+## Handler机制
 
 Handler工作流程
 
@@ -35,11 +36,11 @@ ThreadLocal
 > 
 > ThreadLocal原理：不同线程访问同一个ThreadLoacl的get方法，ThreadLocal的get方法会从各自的线程中取出一个数组，然后再从数组中根据当前ThreadLocal的索引去查找对应的Value值。
 
-## 源码分析 ##
+## 源码分析
 通过上面分析我们知道使用 Handler 之前必须先调用 **Looper.prepare();** 进行初始化，我们先看下 Looper 的源码。
 
 
-#### 1. Looper 工作原理 ####
+#### 1. Looper 工作原理
 
 先看一下 Looper 工作流程
 
@@ -159,7 +160,7 @@ public final class Looper {
 }
 ```
 
-#### 2. MessageQueue 工作原理 ####
+#### 2. MessageQueue 工作原理
 
 在 Looper 中创建了 MessageQueue，我们接着看下 MessageQueue 是怎么工作的。
 
@@ -333,7 +334,7 @@ public final class Message implements Parcelable {
 
 }
 ```
-#### 3. Handler 工作原理 ####
+#### 3. Handler 工作原理
 
 在 Message 中我们看到了 target 是一个 Handler，我们看下 Handler 是怎么与 Looper 和 MessageQueue 一起搭配工作的。
 
@@ -474,7 +475,7 @@ public class Handler {
 }
 ```
 
-#### 4. ActivityThread 创建默认的 Handler ####
+#### 4. ActivityThread 创建默认的 Handler
 上面说过，ActivityThread 主线程默认是有一个 Handler 的，我们来看一下主线程是怎么创建默认的 Handler 的。
 
 我们看一下 ActivityThread 类中的 main 方法。
@@ -534,7 +535,7 @@ public final void runOnUiThread(Runnable action) {
 }
 ```
 
-#### 5. HandlerThread 异步消息处理机制 ####
+#### 5. HandlerThread 异步消息处理机制
 > 1. HandlerThread 继承了 Thread，是一种可以使用 Handler 的 Thread；
 > 2. 在 run 方法中通过 looper.prepare() 来开启消息循环，这样就可以在 HandlerThread 中创
 建Handler了；
@@ -678,10 +679,15 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 ```
-## 总结 ##
+## 总结
 到此 Handler 消息机制的源码已经分析完了，相信你一定明白了 Handler 消息机制。<br>
 一句话，每个线程可以创建一个 Looper ，每个 Looper 轮询着一个 MessageQueue 不断取出消息，有消息则回调给 Handler，Handler 负责向 MessageQueue 中发送消息和处理回调的消息来完成线程之间的转换。
 
-[1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_handler/01.jpg
-[2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_handler/02.png
-[3]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_handler/03.png
+## 扫一扫关注我的公众账号
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/wechat/qrcode_for_gh_26eef6f9e7c1_258.jpg?raw=true" width=256 height=256 />
+
+[1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_handler/01.jpg?raw=true
+[2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_handler/02.png?raw=true
+[3]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_handler/03.png?raw=true
+

@@ -1,4 +1,4 @@
-# Android-性能优化-UI优化
+# Android - 性能优化 UI优化
 
 ## 概述
 
@@ -35,11 +35,11 @@ V-Sync 的原理简单而直观：产生屏幕撕裂的原因是 GPU 在屏幕�
 
 大多数的 App 界面卡顿（Jank）现象都与 GPU 渲染有关，尤其是存在多层次布局嵌套，存在不必要的绘制，或者在 onDraw() 方法中执行了耗时操作，动画执行次数过多的情况下很容易出现界面卡顿。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_draw_per_16ms.png" alt="16ms"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_draw_per_16ms.png?raw=true" alt="16ms"/>
 
 如上图所示，Android 系统每隔 16ms 就会发出一个 V-Sync 信号，触发对 UI 的渲染，如果每次渲染都能成功，这样就能保证画面的流畅帧率 60fps。 如果出现 16ms 内无法渲染的情况就无法响应 V-Sync 信号，就会出现丢帧现象。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_vsync_over_draw.png" alt="vsync over draw"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_vsync_over_draw.png?raw=true" alt="vsync over draw"/>
 
 
 如上图所示：如果某个操作耗时 24ms，系统就无法正常响应当前 V-Sync 信号，只能等待下次响应 V-Sync 信号，当前 V-Sync 信号就会丢失，也就是所谓丢帧。
@@ -50,13 +50,13 @@ V-Sync 的原理简单而直观：产生屏幕撕裂的原因是 GPU 在屏幕�
 
 过度绘制就是屏幕上的某个像素在同一帧的时间内被绘制了多次。 在多层次的UI结构里面，如果不可见的 UI 也在做绘制的操作，这就会导致某些像素区域被绘制了多次。 这就浪费大量的 CPU 以及 GPU 资源。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_overdraw_1.jpg" alt="overdraw options draw"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_overdraw_1.jpg?raw=true" alt="overdraw options draw"/>
 
 ### 如何发现过度绘制？
 
 我们可以通过手机设置里面的 **开发者选项** ，打开 **显示过渡绘制区域（Show GPU Overdraw** 的选项，可以观察 UI 上的 Overdraw 情况。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_overdraw_options_view.png" alt="overdraw options draw"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_overdraw_options_view.png?raw=true" alt="overdraw options draw"/>
 
 蓝色，淡绿，淡红，深红代表了 4 种不同程度的 Overdraw 情况，我们的目标就是尽量减少红色 Overdraw，看到更多的蓝色区域。
 
@@ -73,16 +73,16 @@ Overdraw 有时候是因为你的UI布局存在大量重叠的部分，还有的
 
 首先打开 Hierarchy Viewer，依次找到：Android Studio -> Tools -> Android -> Android Device Monitor
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_android_device_monitor.jpg" alt="Android Device Monitor"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_android_device_monitor.jpg?raw=true" alt="Android Device Monitor"/>
 
 
 启动 Android Device Monitor 成功之后，在新的窗口中点击切换视图图标，选择 Hierarchy View，如下图：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_hierarchy_view.jpg" alt="hierarchy view"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_hierarchy_view.jpg?raw=true" alt="hierarchy view"/>
 
 Hierarchy View 运行界面如下：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_hierarchy_view_2.jpg" alt="hierarchy view"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_hierarchy_view_2.jpg?raw=true" alt="hierarchy view"/>
 
 - 一个 Activity 的 View 树，通过这个树可以分析出 View 嵌套的冗余层级；
 - 左下角可以输入 View 的 id 直接自动跳转到中间显示；
@@ -94,7 +94,7 @@ Hierarchy View 运行界面如下：
 
 当我们选择一个 View 后会如下图所示：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_hierarchy_view_3.jpg" alt="hierarchy view"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_hierarchy_view_3.jpg?raw=true" alt="hierarchy view"/>
 
 类似上图可以很方便的查看到当前 View 的许多信息，上图最底那三个彩色原点代表了当前 View 的性能指标，从左到右依次代表测量、布局、绘制的渲染时间，红色和黄色的点代表速度渲染较慢的 View（当然了，有些时候较慢不代表有问题，比如 ViewGroup 子节点越多、结构越复杂，性能就越差）。
 
@@ -106,13 +106,13 @@ Hierarchy View 运行界面如下：
 
 在 Android 手机上开启这个功能：打开 **开发者选项** -> **GPU 呈现模式分析（Peofile GPU Rendering tool** -> **在屏幕上显示为条形图（On screen as bars**
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_gpu_16ms.jpg" alt="gpu 16ms"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_gpu_16ms.jpg?raw=true" alt="gpu 16ms"/>
 
 在 Android 系统中是以 60fps 为满帧，绿色横线为 16ms 分界线，低于绿线即为流畅。
 
 屏幕下方的柱状图每一根代表一帧，其高度表示“渲染这一帧耗时”，随着手机屏幕界面的变化，柱状图会持续刷新每帧用时的具体情况（通过高度表示）。那么，当柱状图高于绿线，是不是就说明我卡了呢？其实这不完全正确，这里就要开始分析组成每一根柱状图不同颜色所代表的含义了。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_gpu_16ms2.jpg" alt="gpu 16ms"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_gpu_16ms2.jpg?raw=true" alt="gpu 16ms"/>
 
 - **红色**，代表了“执行时间”，它指的是 Android 渲染引擎执行盒子中这些绘制命令的时间，假如当前界面的视图越多，那么红色便会“跳”得越高。实际使用中，比如我们平时刷淘宝 App 时遇到出现多张缩略图需要加载时，那么红色会突然跳很高，但是此时你的页面滑动其实是流畅的，虽然等了零点几秒图片才加载出来，但其实这可能并不意味着你卡住了。
 
@@ -151,20 +151,20 @@ adb pull /sdcard/test_trace.trace /tmp
 
 Android Studio 内置的 Android Monitor 可以很方便的生成 trace 文件到电脑。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing.jpg" alt="android studio tracing"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing.jpg?raw=true" alt="android studio tracing"/>
 
 在 CPU 监控的那栏会有一个闹钟似的的按钮，未启动应用时是灰色；
 启动应用后，这个按钮会变亮，点击后开始追踪，相当于代码调用 startMethodTracing；
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing2.jpg" alt="android studio tracing"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing2.jpg?raw=true" alt="android studio tracing"/>
 
 当要结束追踪时再次点击这个按钮，就会生成 trace 文件了（文件可在 Caputures 中找到）。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing4.jpg" alt="android studio tracing"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing4.jpg?raw=true" alt="android studio tracing"/>
 
 生成 trace 后 Android Studio 自动加载的 traceview 图形如下：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing3.jpg" alt="android studio tracing"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing3.jpg?raw=true" alt="android studio tracing"/>
 
 从这个图可以大概了解一些方法的执行时间、次数以及调用关系，也可以搜索过滤特定的内容。
 
@@ -172,7 +172,7 @@ Android Studio 内置的 Android Monitor 可以很方便的生成 trace 文件�
 
 鼠标悬浮到黄色的矩形上，会显示对应方法的开始、结束时间，以及自己占用和调用其他方法占用的时间比例：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing5.jpg" alt="android studio tracing"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing5.jpg?raw=true" alt="android studio tracing"/>
 
 ## 3. 使用 DDMS 生成 trace 文件
 
@@ -180,15 +180,15 @@ DDMS 即 Dalvik Debug Monitor Server ，是 Android 调试监控工具，它为�
 
 打开 Android Device Monitor，找到 Device 选中需要测试的 app，点击 Start Method Profiling 后开始追踪，相当于代码调用 startMethodTracing；
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing6.jpg" alt="android studio tracing"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing6.jpg?raw=true" alt="android studio tracing"/>
 
 当要结束追踪时再次点击这个按钮，就会生成 trace 文件；
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing7.jpg" alt="android studio tracing"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing7.jpg?raw=true" alt="android studio tracing"/>
 
 停止追踪后，DDMS 会启动 TraceView 加载 trace 文件：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing8.jpg" alt="android studio tracing"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing8.jpg?raw=true" alt="android studio tracing"/>
 
 上图介绍了 TraceView 的大致内容
 
@@ -213,7 +213,7 @@ DDMS 即 Dalvik Debug Monitor Server ，是 Android 调试监控工具，它为�
 
 点击下面的任意一个方法，可以看到它的详细信息：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing9.jpg" alt="android studio tracing"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_tracing9.jpg?raw=true" alt="android studio tracing"/>
 
 - Parents：选中方法的调用处
 - Children：选中方法调用的方法
@@ -224,15 +224,15 @@ DDMS 即 Dalvik Debug Monitor Server ，是 Android 调试监控工具，它为�
 
 Systrace 和之前的工具不同的是，它记录的是整个 Android 系统的状态，并不是针对某一个 App 的。所以最好是用运行 App 比较少的设备来做检测，这样就不会受到其他 App 的干扰了。 
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_systrace.jpg" alt="android studio systrace"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_systrace.jpg?raw=true" alt="android studio systrace"/>
 
 点击开始按钮会弹出窗口选择所需要的参数，这里主要研究屏幕的交互数据，主要收集 CPU，graphics 和 view 数据。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_systrace2.jpg" alt="android studio systrace"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_systrace2.jpg?raw=true" alt="android studio systrace"/>
 
 trace 数据记录在一个 html 文件里，可以用浏览器打开。 点击OK之后，Systrace 会马上开始采集设备上的数据（最好马上开始操作）。 因为采集的数据非常之多，所以最好一次只针对一个问题。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_systrace3.jpg" alt="android studio systrace"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_systrace3.jpg?raw=true" alt="android studio systrace"/>
 
 鼠标可以控制滑动，WASD 可以用来 zoom in/out（W，S）和左右滑动（A，D）。在刚跑的 trace 数据最上面，能看到 CPU 的详细数据， CPU 数据的下面是几个可折叠的区域，分别表示不同的活跃进程。每一个色条表示系统的一个行为，色条的长度表示该行为的耗时（放大可以看到更多细节）。
 
@@ -256,25 +256,25 @@ trace 数据记录在一个 html 文件里，可以用浏览器打开。 点击O
 
 Alerts 一栏标记了以下性能有问题的点，你可以点击该点查看详细信息,右边侧边栏还有一个 Alerts 框，点击可以查看每个类型的 Alerts 的数量。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_systrace5.jpg" alt="android studio systrace"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_systrace5.jpg?raw=true" alt="android studio systrace"/>
 
 在每个包下都有 Frame 一栏，该栏中都有一个一个的 F 代表每一个 Frame，用颜色来代表性能的好坏，依次为绿-黄-红(性能越来越差),点击某一个 F,会显示该 Frame 绘制过程中的一些 Alerts 信息，如果你想查看Frame的耗时，可以点击某个 F 标志，然后按 m 键:。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_systrace4.jpg" alt="android studio systrace"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_performance/ui_systrace4.jpg?raw=true" alt="android studio systrace"/>
 
 
 ## 参考资料
 
-[脑洞大开：为啥帧率达到 60 fps 就流畅？](http://www.jianshu.com/p/71cba1711de0)
 
-[Android性能优化之渲染篇](http://hukai.me/android-performance-render/)
-
-[Android性能专项测试-TraceView工具(Device Monitor)](https://www.kancloud.cn/digest/itfootballprefermanc/100911)
-
-[Android性能专项测试-Systrace工具](https://www.kancloud.cn/digest/itfootballprefermanc/100913)
-
-[Analyzing UI Performance with Systrace](https://developer.android.com/studio/profile/systrace.html)
+- [脑洞大开：为啥帧率达到 60 fps 就流畅？](http://www.jianshu.com/p/71cba1711de0)
+- [Android性能优化之渲染篇](http://hukai.me/android-performance-render/)
+- [Android性能专项测试-TraceView工具(Device Monitor)](https://www.kancloud.cn/digest/itfootballprefermanc/100911)
+- [Android性能专项测试-Systrace工具](https://www.kancloud.cn/digest/itfootballprefermanc/100913)
+- [Analyzing UI Performance with Systrace](https://developer.android.com/studio/profile/systrace.html)
 
 
+## 扫一扫关注我的公众账号
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/wechat/qrcode_for_gh_26eef6f9e7c1_258.jpg?raw=true" width=256 height=256 />
 
 

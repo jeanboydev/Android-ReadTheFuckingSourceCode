@@ -1,4 +1,4 @@
-# HTTP，HTTPS，SSL/TSL #
+# HTTP，HTTPS，SSL/TSL
 ## 概述
 
 ## 什么是 HTTP ？
@@ -177,15 +177,20 @@ HTTP2.0 消息头的压缩算法采用 HPACK，而非 SPDY 采用的 DEFLATE。
 
 《图解HTTP》、《图解TCP/IP》、百度百科
 
-[1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_version.jpg
-[2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_tcp.jpg
-[3]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_connect.jpg
-[4]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_connect_simple.jpg
-[5]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_connect_keep.jpg
-[6]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_https.jpg
-[7]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_none.jpg
-[8]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_key.jpg
-[9]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_pub_pre_key.jpg
-[10]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_pub_hacker.jpg
-[11]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_spdy.jpg
-[12]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/https_ca.jpg
+[1]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_version.jpg?raw=true
+[2]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_tcp.jpg?raw=true
+[3]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_connect.jpg?raw=true
+[4]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_connect_simple.jpg?raw=true
+[5]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_connect_keep.jpg?raw=true
+[6]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_https.jpg?raw=true
+[7]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_none.jpg?raw=true
+[8]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_key.jpg?raw=true
+[9]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_pub_pre_key.jpg?raw=true
+[10]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/pass_pub_hacker.jpg?raw=true
+[11]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/http_spdy.jpg?raw=true
+[12]:https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/http/https_ca.jpg?raw=true
+
+## 扫一扫关注我的公众账号
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/wechat/qrcode_for_gh_26eef6f9e7c1_258.jpg?raw=true" width=256 height=256 />
+

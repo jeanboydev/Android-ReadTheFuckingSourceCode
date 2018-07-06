@@ -13,7 +13,7 @@
 
 ## onCreate() - Window 创建过程
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity/app_start.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity/app_start.png?raw=true" alt=""/>
 
 在 Activity 创建过程中执行 scheduleLaunchActivity() 之后便调用到了 handleLaunchActivity() 方法。
 
@@ -152,7 +152,7 @@ private void installDecor() {
 
 Activity 与 PhoneWindow 与 DecorView 关系图：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity_window_view/android_phonewindow_decorview.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity_window_view/android_phonewindow_decorview.png?raw=true" alt=""/>
 
 ActivityThread.handleResumeActivity()：
 ```Java
@@ -341,7 +341,7 @@ public int addWindow(Session session, IWindow client, int seq, WindowManager.Lay
 
 Activity 中 Window 创建过程：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity_window_view/android_activity_window_create.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity_window_view/android_activity_window_create.png?raw=true" alt=""/>
 
 ## 总结
 
@@ -359,4 +359,7 @@ Window 是 Android 中窗口的宏观定义，主要是管理 View 的创建，�
 - [Android视图框架Activity,Window,View,ViewRootImpl理解](https://silencedut.github.io/2016/08/10/Android视图框架Activity,Window,View,ViewRootImpl理解)
 - 《深入理解 Android 内核设计思想》
 
+## 扫一扫关注我的公众账号
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/wechat/qrcode_for_gh_26eef6f9e7c1_258.jpg?raw=true" width=256 height=256 />
 

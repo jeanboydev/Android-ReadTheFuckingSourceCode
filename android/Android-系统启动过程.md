@@ -43,7 +43,7 @@ Android 系统虽然也是基于 Linux 系统的，但是由于 Android 属于�
 - /misc：包含一些杂项内容，如系统设置和系统功能启用禁用设置
 - /sdcard：用户自己的存储区，可以存放照片，音乐，视频等文件
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/boot_image.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/boot_image.png?raw=true" alt=""/>
 
 那么 Bootloader 是如何被加载的呢？跟 PC 启动过程类似，当开机通电时首先会加载 Bootloader，Bootloader 会读取 ROM 找到操作系统并将 Linux 内核加载到 RAM 中。
 
@@ -51,7 +51,7 @@ Android 系统虽然也是基于 Linux 系统的，但是由于 Android 属于�
 
 ## init 进程
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-booting.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-booting.png?raw=true" alt=""/>
 
 init 是 Linux 系统中用户空间的第一个进程(pid=1)，Kernel 启动后会调用 /system/core/init/Init.cpp 的 main() 方法。
 
@@ -95,7 +95,7 @@ MediaServer 进程主要是启动 AudioFlinger 音频服务，CameraService 相�
 ## Zygote 进程
 
 fork 创建进程过程：
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-process.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-process.png?raw=true" alt=""/>
 
 Zygote 进程孵化了所有的 Android 应用进程，是 Android Framework 的基础，该进程的启动也标志着 Framework 框架初始化启动的开始。 
 
@@ -203,7 +203,7 @@ ActivityManagerService.systemReady()
 
 ## 完整启动过程
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-bootloader.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-bootloader.png?raw=true" alt=""/>
 
 ## 参考资料
 
@@ -211,4 +211,8 @@ ActivityManagerService.systemReady()
 - [按下电源键之后，电脑又默默干了很多事](http://daily.zhihu.com/story/8803295)
 - [Android系统启动-概述](http://gityuan.com/2016/02/01/android-booting/)
 
+
+## 扫一扫关注我的公众账号
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/wechat/qrcode_for_gh_26eef6f9e7c1_258.jpg?raw=true" width=256 height=256 />
 

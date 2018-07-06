@@ -215,11 +215,44 @@
 
 - 本地搜索功能
 
+  > $ npm install hexo-generator-search --save
+  >
   > $ npm install hexo-generator-searchdb --save
+
+  在博客目录的 `_config.yml` 中添加如下代码：
+
+  ```js
+  # 本地搜索
+  search:
+    path: search.xml
+    field: post
+    format: html
+    limit: 10000
+  ```
+
+  编译你的博客：
+
+  > $ hexo g
 
 - 生成搜索引擎网站地图
 
   > $ npm install hexo-generator-sitemap --save
+  >
+  > $ npm install hexo-generator-baidu-sitemap --save
+
+  在博客目录的 `_config.yml` 中添加如下代码：
+
+  ```js
+  # 自动生成 sitemap
+  sitemap:
+  	path: sitemap.xml
+  baidusitemap:
+  	path: baidusitemap.xml
+  ```
+
+  编译你的博客：
+
+  > $ hexo g
 
 - 可视化编辑博客
 

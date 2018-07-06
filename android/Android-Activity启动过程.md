@@ -18,7 +18,7 @@
 
 如不了解 Android 是如何从开机到 Launcher 启动的过程，请先阅读[Android - 系统启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-系统启动过程.md)。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-bootloader.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-bootloader.png?raw=true" alt=""/>
 
 我们知道 Android 系统启动后已经启动了 Zygote，ServiceManager，SystemServer 等系统进程；ServiceManager 进程中完成了 Binder 初始化；SystemServer 进程中 ActivityManagerService，WindowManagerService，PackageManagerService 等系统服务在 ServiceManager 中已经注册；最后启动了 Launcher 桌面应用。
 
@@ -30,7 +30,7 @@
 
 ## 点击 Launcher 中应用图标
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity/app_start.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity/app_start.png?raw=true" alt=""/>
 
 点击 Launcher 中应用图标将会执行以下方法
 
@@ -264,7 +264,7 @@ ActivityThread.performResumeActivity()
 
 Activity 的整体启动流程如图所示：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity/activity_start.jpg" alt="Activity 启动过程"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_activity/activity_start.jpg?raw=true" alt="Activity 启动过程"/>
 
 - ActivityThread 是什么，它是一个线程吗，如何被启动的？
 
@@ -309,4 +309,9 @@ Activity.onResume() 完成了 Activity 中 Window 与 WindowManager 的关联，
 - [Android应用程序的Activity启动过程简要介绍和学习计划](http://blog.csdn.net/luoshengyang/article/details/6685853/)
 - [Android 应用点击图标到Activity界面显示的过程分析](https://silencedut.github.io/2016/08/02/Android%20应用点击图标到Activity界面显示的过程分析/)
 - 《深入理解 Android 内核设计思想》
+
+
+## 扫一扫关注我的公众账号
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/wechat/qrcode_for_gh_26eef6f9e7c1_258.jpg?raw=true" width=256 height=256 />
 

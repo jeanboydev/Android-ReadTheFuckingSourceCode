@@ -6,7 +6,7 @@
 
 了解 Java GC 机制，必须先清楚在 JVM 中内存区域的划分。 在 Java 运行时的数据区里，由 JVM 管理的内存区域分为下图几个模块：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/jvm_memory_area.png" alt="JVM 内存划分"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/jvm_memory_area.png?raw=true" alt="JVM 内存划分"/>
 
 ### 程序计数器（Program Counter Register）
 
@@ -111,7 +111,7 @@ public class Test {
 
 1. 首先 JVM 会将 Test.class, Person.class 加载到方法区，找到有 main() 方法的类开始执行。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/jvm_memory_area_simple1.png" alt="JVM 内存划分 实例1"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/jvm_memory_area_simple1.png?raw=true" alt="JVM 内存划分 实例1"/>
 
 如上图所示，JVM 找到 main() 方法入口，创建 main() 方法的栈帧放入虚拟机栈，开始执行 main() 方法。
 
@@ -125,7 +125,7 @@ Person person1 = new Person("张三", 18);
 
 2. 创建完 Person 两个实例，main() 方法中的 person1，person2 会指向堆区中的 0x001，0x002（这里的内存地址仅作为示范）。紧接着会调用 Person 的构造函数进行赋值，如下图：
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/jvm_memory_area_simple2.png" alt="JVM 内存划分 实例2"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/jvm_memory_area_simple2.png?raw=true" alt="JVM 内存划分 实例2"/>
 
 如上图所示，新创建的的 Person 实例中的 name, age 开始都是默认值。 调用构造函数之后进行赋值，name 是 String 引用类型，会在常量池中创建并将地址赋值给 name，age 是基本数据类型将直接保存数值。
 
@@ -145,9 +145,14 @@ Person person1 = new Person("张三", 18);
 
 3. Person 实例初始化完后，执行到 toString() 方法，同 main() 方法一样 JVM 会创建一个 toString() 的栈帧放入虚拟机栈中，执行完之后返回一个值。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/jvm_memory_area_simple3.png" alt="JVM 内存划分 实例3"/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/jvm/jvm_memory_area_simple3.png?raw=true" alt="JVM 内存划分 实例3"/>
 
 ## 参考资料
 
 《深入理解 Java 虚拟机》
+
+## 扫一扫关注我的公众账号
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/wechat/qrcode_for_gh_26eef6f9e7c1_258.jpg?raw=true" width=256 height=256 />
+
 
