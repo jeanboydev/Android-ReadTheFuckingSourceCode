@@ -4,7 +4,7 @@
 
 PackageManagerService（简称 PKMS），是 Android 系统中核心服务之一，管理着所有跟 package 相关的工作，常见的比如安装、卸载应用。
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-bootloader.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-bootloader.png?raw=true" alt=""/>
 
 PackageManagerService 是在 SystemServer 进程中启动的。如不了解 Android 是如何从开机到 Launcher 启动的过程，请先阅读[Android - 系统启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-系统启动过程.md)。
 
@@ -35,24 +35,24 @@ private void startBootstrapServices() {
 
     //【2】
     mPackageManager = mSystemContext.getPackageManager();
-    ...
+    //...
 }
 
 private void startOtherServices() {
-    ...
+    //...
     //启动 MountService，后续 PackageManager 会需要使用
     mSystemServiceManager.startService(MOUNT_SERVICE_CLASS);
     //【3】做 dex 优化。dex 是 Android 上针对 Java 字节码的一种优化技术，可提高运行效率
     mPackageManagerService.performBootDexOpt();
-    ...  
+    /...  
 
     // phase 500
     mSystemServiceManager.startBootPhase(SystemService.PHASE_SYSTEM_SERVICES_READY);
-    ...
+    //...
 
     //【4】
     mPackageManagerService.systemReady();
-    ...
+    //...
 }
 ```
 
@@ -75,7 +75,7 @@ public static PackageManagerService main(Context context, Installer installer,
     return m;
 }
 ```
-该方法的主要功能创建 PKMS 对象，并将其注册到 `ServiceManager` 中，内部是一个 HashMap 的集合，存储了很多相关的 `binder` 服务，缓存起来，我们在使用的时候， 会通过 `getService(key)` 的方式去 `map`中获取，`ServiceManger` 工作流程详见：[Android - Binder 机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-系统启动过程.md)。
+该方法的主要功能创建 PKMS 对象，并将其注册到 `ServiceManager` 中，内部是一个 HashMap 的集合，存储了很多相关的 `binder` 服务，缓存起来，我们在使用的时候， 会通过 `getService(key)` 的方式去 `map`中获取，ServiceManger 工作流程详见：[Android - Binder 机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-系统启动过程.md)。
 
 关于 PKMS 对象的构造方法很长，分为以下几个阶段，每个阶段会输出相应的 EventLog。
 
@@ -83,9 +83,9 @@ public static PackageManagerService main(Context context, Installer installer,
 public PackageManagerService(Context context, Installer installer, 
 	boolean factoryTest, boolean onlyCore) {
 
-    //PackageManagerService启动开始
+    //PackageManagerService 启动开始
     EventLog.writeEvent(EventLogTags.BOOT_PROGRESS_PMS_START, SystemClock.uptimeMillis());
-    //SDK版本检查
+    //SDK 版本检查
     if (mSdkVersion <= 0) {
         Slog.w(TAG, "**** ro.build.version.sdk not set!");
     }
@@ -96,8 +96,8 @@ public PackageManagerService(Context context, Installer installer,
     Slog.i(TAG, "engModeEnable: " + engModeEnable + " ,mode:" + mode);
     mContext = context;
     mFactoryTest = factoryTest;//开机模式
-    mOnlyCore = onlyCore;//是否对包做dex优化
-    //如果编译版本为eng，则不需要dex优化
+    mOnlyCore = onlyCore;//是否对包做 dex 优化
+    //如果编译版本为 eng，则不需要 dex 优化
     mNoDexOpt = "eng".equals(SystemProperties.get("ro.build.type"));
     //创建显示尺寸信息
     mMetrics = new DisplayMetrics();
@@ -194,16 +194,13 @@ SharedUserSetting addSharedUserLPw(String name, int uid, int pkgFlags) {
         注意这里的参数：name 为字符串”android.uid.system”，uid 为 1000，pkgFlags 为
         ApplicationInfo.FLAG_SYSETM (以后简写为FLAG_SYSTEM)
       */
-
     //mSharedUsers 是一个 HashMap，key 为字符串，值为 SharedUserSetting 对象
     SharedUserSetting s = mSharedUsers.get(name);
     if (s != null) {
         if (s.userId == uid) {
             return s;
         }
-
         //...
-
         return null;
     }
 
@@ -230,7 +227,7 @@ SharedUserSetting addSharedUserLPw(String name, int uid, int pkgFlags) {
        coreApp="true"
        android:sharedUserId="android.uid.system"
        android:process="system">
-......
+...
 ```
 
 在 xml 中，声明了一个名为 `android:sharedUserId` 的属性，其值为 `android.uid.system`。 sharedUserId 看起来和 UID 有关，确实如此，它有两个作用：
@@ -276,15 +273,12 @@ private boolean addUserIdLPw(int uid, Object obj, Objectname) {
         while (index >= N) {
             mUserIds.add(null);
             N++;
-
         }
-
-        //......
+        //...
         //判断该索引位置的内容是否为空，为空才保存
         mUserIds.set(index, obj);//mUserIds 保存应用 Package 的 UID
     } else {
-
-        //......
+        //...
         mOtherUserIds.put(uid, obj);//系统 Package 的 UID 由 mOtherUserIds 保存
     }
     return true;
@@ -299,15 +293,13 @@ private boolean addUserIdLPw(int uid, Object obj, Objectname) {
 void readPermissions() {
     // 指向 /system/etc/permission 目录，该目录中存储了和设备相关的一些权限信息
     FilelibraryDir = new File(Environment.getRootDirectory(), "etc/permissions");
-
-    //......
+    //...
     for (File f : libraryDir.listFiles()) {
         //先处理该目录下的非platform.xml文件
         if (f.getPath().endsWith("etc/permissions/platform.xml")) {
             continue;
         }
-
-        //......
+        //...
         // 调用 readPermissionFromXml 解析此 XML 文件
         readPermissionsFromXml(f);
     }
@@ -331,71 +323,71 @@ private void readPermissionsFromXml(File permFile) {
     try {
         permReader = new FileReader(permFile);
     }
-    //......
+    //...
     try {
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(permReader);
         XmlUtils.beginDocument(parser, "permissions");
         while (true) {
-            //......
+            //...
             String name = parser.getName();
-            //解析group标签，前面介绍的XML文件中没有单独使用该标签的地方
+            //解析 group 标签，前面介绍的 XML 文件中没有单独使用该标签的地方
             if ("group".equals(name)) {
                 String gidStr = parser.getAttributeValue(null, "gid");
                 if (gidStr != null) {
                     int gid = Integer.parseInt(gidStr);
-                    //转换XML中的gid字符串为整型，并保存到mGlobalGids中
+                    //转换 XML 中的 gi d字符串为整型，并保存到 mGlobalGids 中
                     mGlobalGids = appendInt(mGlobalGids, gid);
                 }
-                //......
-            } else if ("permission".equals(name)) {//解析permission标签
+                //...
+            } else if ("permission".equals(name)) {//解析 permission 标签
                 String perm = parser.getAttributeValue(null, "name");
-                //......
+                //...
                 perm = perm.intern();
-                //调用readPermission处理
+                //调用 readPermission 处理
                 readPermission(parser, perm);
             } else if ("assign-permission".equals(name)) {//下面解析的是assign-permission标签
                 String perm = parser.getAttributeValue(null, "name");
-                //......
+                //...
                 String uidStr = parser.getAttributeValue(null, "uid");
-                //......
-                //如果是assign-permission，则取出uid字符串，然后获得Linux平台上
-                //的整型uid值
+                //...
+                //如果是 assign-permission，则取出 uid 字符串，然后获得 Linux 平台上
+                //的整型 uid 值
                 int uid = Process.getUidForName(uidStr);
-                //......
+                //...
                 perm = perm.intern();
-                //和assign相关的信息保存在mSystemPermissions中
+                //和 assign 相关的信息保存在 mSystemPermissions 中
                 HashSet<String> perms = mSystemPermissions.get(uid);
                 if (perms == null) {
                     perms = newHashSet < String > ();
                     mSystemPermissions.put(uid, perms);
                 }
                 perms.add(perm);
-                //......
-            } else if ("library".equals(name)) {//解析library标签
+                //...
+            } else if ("library".equals(name)) {//解析 library 标签
                 String lname = parser.getAttributeValue(null, "name");
                 String lfile = parser.getAttributeValue(null, "file");
                 if (lname == null) {
-                    //......
+                    //...
                 } else if (lfile == null) {
-                    //......
+                    //...
                 } else {
-                    //将XML中的name和library属性值存储到mSharedLibraries中
+                    //将 XML 中的 name 和 library 属性值存储到 mSharedLibraries 中
                     mSharedLibraries.put(lname, lfile);
                 }
-                //......
-            } else if ("feature".equals(name)) {//解析feature标签
+                //...
+            } else if ("feature".equals(name)) {//解析 feature 标签
                 String fname = parser.getAttributeValue(null, "name");
-                //......
+                //...
                 {
-                    //在XML中定义的feature由FeatureInfo表达
+                    //在 XML 中定义的 feature 由 FeatureInfo 表达
                     FeatureInfo fi = newFeatureInfo();
                     fi.name = fname;
-                    //存储feature名和对应的FeatureInfo到mAvailableFeatures中
+                    //存储 feature 名和对应的 FeatureInfo 到 mAvailableFeatures 中
                     mAvailableFeatures.put(fname, fi);
-                }//......
-            } //......
-        } //......
+                }//...
+            } //...
+        } //...
     }
 }
 ```
@@ -411,7 +403,7 @@ Settings() {
     FiledataDir = Environment.getDataDirectory();
     FilesystemDir = new File(dataDir, "system");//指向/data/system目录
     systemDir.mkdirs();//创建该目录
-    //......
+    //...
     /*
         一共有 5 个文件，packages.xml 和 packages-backup.xml 为一组，用于描述系统中
         所安装的 Package 的信息，其中 backup 是临时文件。PKMS 先把数据写到 backup 中，
@@ -448,7 +440,7 @@ PKMS 构造函数在第一阶段的工作，主要是扫描并解析 XML 文件�
 PKMS 构造函数第二阶段的工作就是扫描系统中的 APK 了。由于需要逐个扫描文件，因此手机上装的程序越多，PKMS 的工作量越大，系统启动速度也就越慢。
 
 ```java
-//......
+//...
 mRestoredSettings = mSettings.readLPw();//接第一段的结尾
 longstartTime = SystemClock.uptimeMillis();//记录扫描开始的时间
 //定义扫描参数
@@ -486,16 +478,16 @@ if (bootClassPath != null) {
                 didDexOpt = true;
             }
         }
-        //......
+        //...
     }
 }
-//......
+//...
 /*
 还记得 mSharedLibrarires 的作用吗？它保存的是 platform.xml 中声明的系统库的信息。
 这里也要判断系统库是否需要做 dex 优化。处理方式同上
 */
 if (mSharedLibraries.size() > 0) {
-    //......
+    //...
 }
 //将 framework-res.apk 添加到 libFiles 中。framework-res.apk 定义了系统常用的
 //资源，还有几个重要的 Activity，如长按 Power 键后弹出的选择框
@@ -503,7 +495,7 @@ libFiles.add(mFrameworkDir.getPath() + "/framework-res.apk");
 //列举 /system/frameworks 目录中的文件
 String[] frameworkFiles = mFrameworkDir.list();
 if (frameworkFiles != null) {
-    //......
+    //...
     // 判断该目录下的 apk 或 jar 文件是否需要做 dex 优化。处理方式同上
 }
 /*
@@ -524,7 +516,7 @@ if (didDexOpt) {
             String fn = files[i];
             if (fn.startsWith("data@app@") || fn.startsWith("data@app-private@")) {
                 (newFile(mDalvikCacheDir, fn)).delete();
-                //......
+                //...
             }
         }
     }
@@ -561,7 +553,7 @@ mVendorInstallObserver.startWatching();
 //扫描 /vendor/app 下的 package
 scanDirLI(mVendorAppDir, PackageParser.PARSE_IS_SYSTEM | PackageParser.PARSE_IS_SYSTEM_DIR, scanMode, 0);
 
-//和 installed 交互。以后单独分析 installed
+//和 installd 交互。以后单独分析 installd
 mInstaller.moveFiles();
 ```
 
@@ -576,7 +568,7 @@ PKMS 调用 scanDirLI 函数进行扫描，下面来分析此函数。
 ```java
 private void scanDirLI(File dir, int flags, int scanMode, long currentTime) {
     String[] files = dir.list();//列举该目录下的文件
-    //......
+    //...
     int i;
     for (i = 0; i < files.length; i++) {
         File file = new File(dir, files[i]);
@@ -623,10 +615,10 @@ private PackageParser.Package scanPackageLI(FilescanFile, int parseFlags,
         */
     finalPackageParser.Package pkg = pp.parsePackage(scanFile,
                                                      scanPath, mMetrics, parseFlags);
-    //......
+    //...
     PackageSetting ps = null;
     PackageSetting updatedPkg;
-    //......
+    //...
 
     /*
             这里略去一大段代码，主要是关于 Package 升级方面的工作。
@@ -644,7 +636,7 @@ private PackageParser.Package scanPackageLI(FilescanFile, int parseFlags,
     String codePath = null;
     String resPath = null;
     if ((parseFlags & PackageParser.PARSE_FORWARD_LOCK) != 0) {
-        //......//这里不考虑 PARSE_FORWARD_LOCK的情况。
+        //...//这里不考虑 PARSE_FORWARD_LOCK的情况。
     } else {
         resPath = pkg.mScanPath;
     }
@@ -670,7 +662,7 @@ public Package parsePackage(File sourceFile, String destCodePath,
                                 DisplayMetrics metrics, int flags) {
     mParseError = PackageManager.INSTALL_SUCCEEDED;
     mArchiveSourcePath = sourceFile.getPath();
-    //......//检查是否为 APK 文件
+    //...//检查是否为 APK 文件
     XmlResourceParser parser = null;
     AssetManager assmgr = null;
     Resources res = null;
@@ -689,16 +681,16 @@ public Package parsePackage(File sourceFile, String destCodePath,
             parser = assmgr.openXmlResourceParser(cookie,
                                                   ANDROID_MANIFEST_FILENAME);
             assetError = false;
-        } //......//出错处理
+        } //...//出错处理
         String[] errorText = new String[1];
         Package pkg = null;
         Exception errorException = null;
         try {
             //调用另外一个 parsePackage 函数
             pkg = parsePackage(res, parser, flags, errorText);
-        }//......
+        }//...
 
-        //......//错误处理
+        //...//错误处理
         parser.close();
         assmgr.close();
         //保存文件路径，都指向 APK 文件所在的路径
@@ -721,27 +713,27 @@ private Package parsePackage(Resources res, XmlResourceParser parser, int flags,
     mParseServiceArgs = null;
     mParseProviderArgs = null;
     //得到 Package 的名字，其实就是得到 AndroidManifest.xml 中 package 属性的值，
-    //每个A PK 都必须定义该属性
+    //每个 APK 都必须定义该属性
     String pkgName = parsePackageName(parser, attrs, flags, outError);
-    //......
+    //...
     int type;
-    //......
+    //...
     //以 pkgName 名字为参数，创建一个 Package 对象。后面的工作就是解析 XML 并填充
     //该 Package 信息
     final Package pkg = new Package(pkgName);
     boolean foundApp = false;
-    //......//下面开始解析该文件中的标签，由于这段代码功能简单，所以这里仅列举相关函数
+    //...//下面开始解析该文件中的标签，由于这段代码功能简单，所以这里仅列举相关函数
     while (如果解析未完成) {
-        //......
+        //...
         StringtagName = parser.getName(); //得到标签名
         if (tagName.equals("application")) {
-            //......//解析 application 标签
+            //...//解析 application 标签
             parseApplication(pkg, res, parser, attrs, flags, outError);
         } else if (tagName.equals("permission-group")) {
-            //......//解析 permission-group 标签
+            //...//解析 permission-group 标签
             parsePermissionGroup(pkg, res, parser, attrs, outError);
         } else if (tagName.equals("permission")) {
-            //......//解析 permission 标签
+            //...//解析 permission 标签
             parsePermission(pkg, res, parser, attrs, outError);
         } else if (tagName.equals("uses-permission")) {
             //从 XML 文件中获取 uses-permission 标签的属性
@@ -760,10 +752,10 @@ private Package parsePackage(Resources res, XmlResourceParser parser, int flags,
                 等）。游戏类的应用可能对此有特殊要求。
             */
             ConfigurationInfocPref = new ConfigurationInfo();
-            //......//解析该标签所支持的各种属性
+            //...//解析该标签所支持的各种属性
             pkg.configPreferences.add(cPref);//保存到 Package 的 configPreferences 数组
         }
-        //......//对其他标签解析和处理
+        //...//对其他标签解析和处理
     }
 }
 ```
@@ -784,7 +776,7 @@ PackageParser 及其内部重要成员的信息。
 private PackageParser.PackagescanPackageLI(
     PackageParser.Package pkg, int parseFlags, int scanMode, long currentTime) {
     FilescanFile = new File(pkg.mScanPath);
-    //......
+    //...
     mScanningPath = scanFile;
     //设置 package 对象中 applicationInfo 的 flags 标签，用于标示该 Package 为系统
     //Package
@@ -796,7 +788,7 @@ private PackageParser.PackagescanPackageLI(
     if (pkg.packageName.equals("android")) {
         synchronized (mPackages) {
             if (mAndroidApplication != null) {
-                //......
+                //...
 
                 mPlatformPackage = pkg;
                 pkg.mVersionCode = mSdkVersion;
@@ -847,7 +839,7 @@ framework-res.apk 的 AndroidManifest.xml：
 此处保存这些信息，主要是为了提高运行过程中的效率。Goolge工 程师可能觉得 ChooserActivity 使用的地方比较多，所以这里单独保存了此 Activity 的信息。
 
 ```java
-//......//mPackages 用于保存系统内的所有 Package，以 packageName 为 key
+//...//mPackages 用于保存系统内的所有 Package，以 packageName 为 key
 if (mPackages.containsKey(pkg.packageName)
         || mSharedLibraries.containsKey(pkg.packageName)) {
     return null;
@@ -858,7 +850,7 @@ FiledestResourceFile = new File(pkg.applicationInfo.publicSourceDir);
 SharedUserSettingsuid = null;//代表该 Package 的 SharedUserSetting 对象
 PackageSetting pkgSetting = null;//代表该 Package 的 PackageSetting 对象
 synchronized (mPackages) {
-    //......//此段代码大约有300行左右，主要做了以下几方面工作
+    //...//此段代码大约有300行左右，主要做了以下几方面工作
     /*
       1. 如果该 Package 声明了”uses-libraries” 话，那么系统要判断该 library 是否在 mSharedLibraries 中
       2. 如果 package 声明了 SharedUser，则需要处理 SharedUserSettings 相关内容，由 Settings 的 getSharedUserLPw 函数处理
@@ -883,10 +875,10 @@ if (mPlatformPackage == pkg) {
    */
     dataPath = getDataPathForPackage(pkg.packageName, 0);
     if (dataPath.exists()) {
-        //......//如果该目录已经存在，则要处理 uid 的问题
+        //...//如果该目录已经存在，则要处理 uid 的问题
     } else {
-        //......//向 installed 发送 install 命令，实际上就是在 /data/data 下
-        //建立 packageName 目录。后续将分析 installed 相关知识
+        //...//向 installd 发送 install 命令，实际上就是在 /data/data 下
+        //建立 packageName 目录。后续将分析 installd 相关知识
         int ret = mInstaller.install(pkgName, pkg.applicationInfo.uid,
                 pkg.applicationInfo.uid);
         //为系统所有 user 安装此程序
@@ -894,11 +886,11 @@ if (mPlatformPackage == pkg) {
                 pkg.applicationInfo.uid);
         if (dataPath.exists()) {
             pkg.applicationInfo.dataDir = dataPath.getPath();
-        } //......
+        } //...
 
         if (pkg.applicationInfo.nativeLibraryDir == null &&
                 pkg.applicationInfo.dataDir != null) {
-            //......//为该 Package 确定 native library 所在目录
+            //...//为该 Package 确定 native library 所在目录
             //一般是 /data/data/packagename/lib
         }
     }
@@ -922,7 +914,7 @@ if (mPlatformPackage == pkg) {
                         isSymLink = S_ISLNK(Libcore.os.lstat(
                                 nativeLibraryDir.getPath()).st_mode);
 
-                    } //......//判断是否为链接，如果是，需要删除该链接
+                    } //...//判断是否为链接，如果是，需要删除该链接
                     if (isSymLink) {
                         mInstaller.unlinkNativeLibraryDirectory(dataPathString);
                     }
@@ -934,11 +926,11 @@ if (mPlatformPackage == pkg) {
                     mInstaller.linkNativeLibraryDirectory(dataPathString,
                             pkg.applicationInfo.nativeLibraryDir);
                 }
-            } //......
+            } //...
         }
         pkg.mScanPath = path;
         if ((scanMode & SCAN_NO_DEX) == 0) {
-            //......//对该 APK 做 dex 优化
+            //...//对该 APK 做 dex 优化
             performDexOptLI(pkg, forceDex, (scanMode & SCAN_DEFER_DEX);
         }
         //如果该 APK 已经存在，要先杀掉运行该 APK 的进程
@@ -946,7 +938,7 @@ if (mPlatformPackage == pkg) {
             killApplication(pkg.applicationInfo.packageName,
                     pkg.applicationInfo.uid);
         }
-        //......
+        //...
         /*
          在此之前，四大组件信息都属于 Package 的私有财产，现在需要把它们登记注册到 PKMS 内部的
          财产管理对象中。这样，PKMS 就可对外提供统一的组件信息，而不必拘泥于具体的 Package
@@ -967,9 +959,7 @@ if (mPlatformPackage == pkg) {
                         p.info.processName, pkg.applicationInfo.uid);
                 //mProvidersByComponent 提供基于 ComponentName 的 Provider 信息查询
                 mProvidersByComponent.put(new ComponentName(
-
-                        //......
-
+                        //...
             }
             //处理该 Package 中的 Service 信息
             N = pkg.services.size();
@@ -984,7 +974,7 @@ if (mPlatformPackage == pkg) {
             for (i = 0; i < N; i++) {
                 PackageParser.Activity a = pkg.receivers.get(i);
                 mReceivers.addActivity(a, "receiver");
-                //......
+                //...
             }
             //处理该 Package 中的 Activity 信息
             N = pkg.activities.size();
@@ -995,18 +985,18 @@ if (mPlatformPackage == pkg) {
             }
             //处理该 Package 中的 PermissionGroups 信息
             N = pkg.permissionGroups.size();
-            //......//permissionGroups 处理
+            //...//permissionGroups 处理
             N = pkg.permissions.size();
-            //......//permissions 处理
+            //...//permissions 处理
             N = pkg.instrumentation.size();
-            //......//instrumentation 处理
+            //...//instrumentation 处理
             if (pkg.protectedBroadcasts != null) {
                 N = pkg.protectedBroadcasts.size();
                 for (i = 0; i < N; i++) {
                     mProtectedBroadcasts.add(pkg.protectedBroadcasts.get(i));
                 }
             }
-            //......//Package 的私有财产终于完成了公有化改造
+            //...//Package 的私有财产终于完成了公有化改造
             return pkg;
         }
     }
@@ -1024,11 +1014,11 @@ if (!mOnlyCore) {//mOnlyCore 用于控制是否扫描非系统 Package
     Iterator<PackageSetting> psit = mSettings.mPackages.values().iterator();
 
     while (psit.hasNext()) {
-        //......//删除系统package中那些不存在的APK
+        //...//删除系统package中那些不存在的APK
     }
 
     mAppInstallDir = new File(dataDir, "app");
-    //......//删除安装不成功的文件及临时文件
+    //...//删除安装不成功的文件及临时文件
     if (!mOnlyCore) {
         //在普通模式下，还需要扫描 /data/app 以及 /data/app_private 目录
         mAppInstallObserver = new AppDirObserver(
@@ -1070,7 +1060,7 @@ PKMS 构造函数第二阶段的工作任务非常繁重，要创建比较多的
     mSettings.writeLPr();
     Runtime.getRuntime().gc();
     mRequiredVerifierPackage= getRequiredVerifierLPr();
-    //......//PKMS 构造函数返回
+    //...//PKMS 构造函数返回
 }
 ```
 
@@ -1095,7 +1085,6 @@ public PackageManager getPackageManager() {
         //创建 ApplicationPackageManager 对象
         return (mPackageManager = new ApplicationPackageManager(this, pm));
     }
-
     return null;
 }
 ```
@@ -1334,7 +1323,7 @@ int main(const int argc __unused, char *argv[]) {
     struct sockaddr addr;
     socklen_t alen;
     int lsocket, s;
-    ...
+    //...
 
     //初始化全局信息【1】
     if (initialize_globals() < 0) {
@@ -1376,8 +1365,7 @@ int main(const int argc __unused, char *argv[]) {
                 break;
             }
             buf[count] = 0;
-            ...
-            
+            //...
             //执行指令【3】
             if (execute(s, buf)) break;
         }
@@ -1388,7 +1376,7 @@ int main(const int argc __unused, char *argv[]) {
 ```
 
 
-installd.cpp->initialize_globals
+installd.cpp -> initialize_globals
 
 ```C++
 int initialize_globals() {
@@ -1431,8 +1419,7 @@ int initialize_globals() {
     android_system_dirs.count = 4;
 
     android_system_dirs.dirs = (dir_rec_t*) calloc(android_system_dirs.count, sizeof(dir_rec_t));
-    ...
-
+    //...
     dir_rec_t android_root_dir;
     // 目录/system
     if (get_path_from_env(&android_root_dir, "ANDROID_ROOT") < 0) {
@@ -1459,7 +1446,7 @@ int initialize_globals() {
 }
 ```
 
-installd.cpp->initialize_directories
+installd.cpp -> initialize_directories
 
 ```C++
 int initialize_directories() {
@@ -1481,23 +1468,20 @@ int initialize_directories() {
     char *legacy_data_dir = build_string2(android_data_dir.path, PRIMARY_USER_PREFIX);
     // 目录/data/user/0
     char *primary_data_dir = build_string3(android_data_dir.path, SECONDARY_USER_PREFIX, "0");
-    ...
-
+    //...
     //将/data/user/0链接到/data/data
     if (access(primary_data_dir, R_OK) < 0) {
         if (symlink(legacy_data_dir, primary_data_dir)) {
             goto fail;
         }
     }
-
-    ... //处理data/media 相关
-    
+    //... //处理data/media 相关
     return res;
 }
 ```
 
 
-installd.cpp->execute
+installd.cpp -> execute
 
 ```C++
 static int execute(int s, char cmd[BUFFER_MAX]) {
@@ -1564,7 +1548,7 @@ SystemServer.java
 private void startBootstrapServices() {
     //启动 installer 服务
     Installer installer = mSystemServiceManager.startService(Installer.class);
-    ...
+    //...
 }
 ```
 
@@ -1608,7 +1592,6 @@ public int execute(String cmd) {
 }
 
 public synchronized String transact(String cmd) {
-
     if (!connect()) {
         return "-1";
     }
@@ -1706,39 +1689,33 @@ private boolean readFully(byte[] buffer, int len) {
 
 ### adb install 分析
 
-adb install 有多个参数，这里仅考虑最简单的，如 adb installframeworktest.apk。adb 是一个命令，install 是它的参数。此处直接跳到处理 install 参数的代码：
+adb install 有多个参数，这里仅考虑最简单的，如： `adb install frameworktest.apk`。adb 是一个命令，install 是它的参数。此处直接跳到处理 install 参数的代码：
 
 commandline.c
 
 ```C
 int adb_commandline(int argc, char **argv){
-
-   	...... 
-
+   	//... 
 	if(!strcmp(argv[0], "install")) {
-	
-       	......
+       	//...
 		//调用 install_app 函数处理
        	return install_app(ttype, serial, argc, argv);
-	
 	}
-
-	......
+	//...
 }
 
 int install_app(transport_type transport, char*serial, int argc, char** argv){
-
 	//要安装的APK现在还在Host机器上，要先把APK复制到手机中。
    	//这里需要设置复制目标的目录，如果安装在内部存储中，则目标目录为/data/local/tmp；
    	//如果安装在SD卡上，则目标目录为/sdcard/tmp。
-    staticconst char *const DATA_DEST = "/data/local/tmp/%s";
-    staticconst char *const SD_DEST = "/sdcard/tmp/%s";
-    constchar* where = DATA_DEST;
-    charapk_dest[PATH_MAX];
-    charverification_dest[PATH_MAX];
-    char*apk_file;
-    char*verification_file = NULL;
-    intfile_arg = -1;
+    static const char *const DATA_DEST = "/data/local/tmp/%s";
+    static const char *const SD_DEST = "/sdcard/tmp/%s";
+    const char* where = DATA_DEST;
+    char apk_dest[PATH_MAX];
+    char verification_dest[PATH_MAX];
+    char *apk_file;
+    char *verification_file = NULL;
+    int file_arg = -1;
     int err
     int i;
 
@@ -1746,39 +1723,28 @@ int install_app(transport_type transport, char*serial, int argc, char** argv){
         if(*argv[i] != '-') {
            file_arg = i
            break;
-        }else if (!strcmp(argv[i], "-i")) {
+        } else if (!strcmp(argv[i], "-i")) {
             i++;
-        }else if (!strcmp(argv[i], "-s")) {
+        } else if (!strcmp(argv[i], "-s")) {
            where = SD_DEST; //-s参数指明该APK安装到SD卡
         }
     }
-
-    ......
-
-    apk_file= argv[file_arg];
-
-    ......
-
+    //...
+    apk_file = argv[file_arg];
+    //...
     //获取目标文件的全路径，如果安装在内部存储中，则目标全路径为/data/local/tmp/安装包名，
     //调用do_sync_push将此APK传送到手机的目标路径
-    err =do_sync_push(apk_file, apk_dest, 1 /* verify APK */);
-    
-	...... 
-
+    err = do_sync_push(apk_file, apk_dest, 1 /* verify APK */);
+	//... 
     //执行 pm 命令【1】
 
     pm_command(transport,serial, argc, argv);
-
-	......
-
+	//...
   	cleanup_apk:
 
     //在手机中执行shell rm 命令，删除刚才传送过去的目标 Apk 文件
-
   	delete_file(transport, serial, apk_dest);
-
     return err;
-
 }
 ```
 
@@ -1787,12 +1753,9 @@ commandline.c
 ```C
 static int pm_command(transport_type transport,char* serial,
 	int argc, char** argv){
-
-    charbuf[4096];
+    char buf[4096];
     snprintf(buf,sizeof(buf), "shell:pm");
-
-  	......
-
+  	//...
   	//发送"shell:pm install 参数"给手机端的 adbd
    	send_shellcommand(transport, serial, buf);
     return 0;
@@ -1801,7 +1764,7 @@ static int pm_command(transport_type transport,char* serial,
 
 手机端的 adbd 在收到客户端发来的 shell:pm 命令时会启动一个 shell，然后在其中执行 pm。
 
-pm实际上是一个脚本，其内容如下：
+pm 实际上是一个脚本，其内容如下：
 
 ```C
 # Script to start "pm" on the device,which has a very rudimentary
@@ -1813,7 +1776,7 @@ export CLASSPATH=$base/frameworks/pm.jar
 exec app_process $base/bincom.android.commands.pm.Pm "$@"
 ```
 
-在编译 system.imag e时，Android.mk 中会将该脚本复制到 system/bin 目录下。从 pm 脚本的内容来看，它就是通过 app_process 执行 pm.jar 包的 main 函数。
+在编译 system.image 时，Android.mk 中会将该脚本复制到 system/bin 目录下。从 pm 脚本的内容来看，它就是通过 app_process 执行 pm.jar 包的 main 函数。
 
 pm.java
 
@@ -1825,36 +1788,25 @@ public static void main(String[] args) {
 //直接分析 run 函数
 public void run(String[] args) {
 	boolean validCommand = false;
-
-	......
-
+	//...
 	//获取PKMS的binder客户端
-
 	mPm = IPackageManager.Stub
 			.asInterface(ServiceManager.getService("package"));
-
-	......
-
+	//...
 	mArgs = args;
 	String op = args[0];
 	mNextArg = 1;
-
-	......//处理其他命令，这里仅考虑 install 的处理
-
+	//...//处理其他命令，这里仅考虑 install 的处理
 	if("install".equals(op)) {
    		runInstall();
    		return;
-
 	}
-
-   ......
+   //...
 }
 
 private void runInstall() {
-
 	intinstallFlags = 0;
 	String installerPackageName = null;
-
 	String opt;
 	while ((opt=nextOption()) != null) {
    		if (opt.equals("-l")) {
@@ -1863,9 +1815,9 @@ private void runInstall() {
 			installFlags |= PackageManager.INSTALL_REPLACE_EXISTING;
 		} else if (opt.equals("-i")) {
 			installerPackageName = nextOptionData();
-			...... //参数解析
+			//... //参数解析
 		} 
-		......
+		//...
 	}
 
 	final Uri apkURI;
@@ -1876,9 +1828,7 @@ private void runInstall() {
 	if(apkFilePath != null) {
 		apkURI = Uri.fromFile(new File(apkFilePath));
 	}
-
-	......
-
+	//...
 	//获取 Verification Package 的文件位置
 	final String verificationFilePath = nextArg();
 
@@ -1887,10 +1837,8 @@ private void runInstall() {
 	}else {
    		verificationURI = null;
 	}
-
 	//创建 PackageInstallObserver，用于接收 PKMS 的安装结果
 	PackageInstallObserver obs = new PackageInstallObserver();
-
 	try{
 	  	//调用 PKMS 的 installPackageWithVerification 完成安装
 	   	mPm.installPackageWithVerification(apkURI, obs,
@@ -1901,17 +1849,14 @@ private void runInstall() {
   			try{
           		obs.wait();//等待安装结果
      		}
-		......
+		//...
  		}
-
 	 	if(obs.result == PackageManager.INSTALL_SUCCEEDED) {
 	    	System.out.println("Success");//安装成功，打印 Success
 	 	}
-		
-		......//安装失败，打印失败原因
+		//...//安装失败，打印失败原因
 	} 
-	
-	......
+	//...
 }
 ```
 
@@ -1934,7 +1879,7 @@ public void installPackageWithVerification(UripackageURI,
 	final int filteredFlags;
 
 	if(uid == Process.SHELL_UID || uid == 0) {
-		......//如果通过 shell pm 的方式安装，则增加 INSTALL_FROM_ADB 标志
+		//...//如果通过 shell pm 的方式安装，则增加 INSTALL_FROM_ADB 标志
 		filteredFlags = flags | PackageManager.INSTALL_FROM_ADB;
 	}else {
 		filteredFlags = flags & ~PackageManager.INSTALL_FROM_ADB;
@@ -1962,42 +1907,42 @@ PackageManagerService.java::handleMesssage
 public void handleMessage(Message msg) {
 	try {
 		doHandleMessage(msg);//调用 doHandleMessage 函数
-	} ......
+	} //...
 }
 
 void doHandleMessage(Message msg) {
-        switch (msg.what) {
-            case INIT_COPY: {
-                //这里记录的是 params 的基类类型 HandlerParams，实际类型为 InstallParams
-                HandlerParams params = (HandlerParams) msg.obj;
-                //idx为当前等待处理的安装请求的个数
-                int idx = mPendingInstalls.size();
+    switch (msg.what) {
+        case INIT_COPY: {
+            //这里记录的是 params 的基类类型 HandlerParams，实际类型为 InstallParams
+            HandlerParams params = (HandlerParams) msg.obj;
+            //idx为当前等待处理的安装请求的个数
+            int idx = mPendingInstalls.size();
 
-                if (!mBound) {
-                    //APK 的安装居然需要使用另外一个 APK 提供的服务，该服务就是
-                    //DefaultContainerService，由 DefaultCotainerService.apk 提供，
-                    //下面的 connectToService 函数将调用 bindService 来启动该服务
-                    if (!connectToService()) {
-                        params.serviceError();
-                        return;
-                    } else {
-                        ////如果已经连上，则以 idx 为索引，将 params 保存到 mPendingInstalls 中
-                        mPendingInstalls.add(idx, params);
-                    }
+            if (!mBound) {
+                //APK 的安装居然需要使用另外一个 APK 提供的服务，该服务就是
+                //DefaultContainerService，由 DefaultCotainerService.apk 提供，
+                //下面的 connectToService 函数将调用 bindService 来启动该服务
+                if (!connectToService()) {
+                    params.serviceError();
+                    return;
                 } else {
+                    ////如果已经连上，则以 idx 为索引，将 params 保存到 mPendingInstalls 中
                     mPendingInstalls.add(idx, params);
-                    if (idx == 0) {
-                        //如果安装请求队列之前的状态为空，则表明要启动安装
-                        mHandler.sendEmptyMessage(MCS_BOUND);
-                    }
                 }
-                break;
+            } else {
+                mPendingInstalls.add(idx, params);
+                if (idx == 0) {
+                    //如果安装请求队列之前的状态为空，则表明要启动安装
+                    mHandler.sendEmptyMessage(MCS_BOUND);
+                }
             }
-            case MCS_BOUND: {
-                //稍后分析
-            }
+            break;
+        }
+        case MCS_BOUND: {
+            //稍后分析
         }
     }
+}
 ```
 
 这里假设之前已经成功启动了 DefaultContainerService（以后简称 DCS），并且 idx 为零，所以这是 PKMS 首次处理安装请求，也就是说，下一个将要处理的是 MCS_BOUND 消息。
@@ -2006,48 +1951,48 @@ void doHandleMessage(Message msg) {
 
 ```Java
 void doHandleMessage(Message msg) {
-        switch (msg.what) {
-            case INIT_COPY: {
-                //...
+    switch (msg.what) {
+        case INIT_COPY: {
+            //...
+        }
+        case MCS_BOUND: {
+            if (msg.obj != null) {
+                mContainerService = (IMediaContainerService) msg.obj;
             }
-            case MCS_BOUND: {
-                if (msg.obj != null) {
-                    mContainerService = (IMediaContainerService) msg.obj;
+            if (mContainerService == null) {
+                if (!mBound) {
+                    //如果没法启动该 service，则不能安装程序
+                    mPendingInstalls.clear();
                 }
-                if (mContainerService == null) {
-                    if (!mBound) {
-                        ////如果没法启动该 service，则不能安装程序
-                        mPendingInstalls.clear();
-                    }
-                } else if (mPendingInstalls.size() > 0) {
-                    HandlerParams params = mPendingInstalls.get(0);
-                    if (params != null) {
-                        ////调用 params 对象的 startCopy 函数，该函数由基类 HandlerParams 定义
-                        if (params.startCopy()) {
-                            //...
-                            if (mPendingInstalls.size() > 0) {
-                                mPendingInstalls.remove(0);//删除队列头
+            } else if (mPendingInstalls.size() > 0) {
+                HandlerParams params = mPendingInstalls.get(0);
+                if (params != null) {
+                    //调用 params 对象的 startCopy 函数，该函数由基类 HandlerParams 定义
+                    if (params.startCopy()) {
+                        //...
+                        if (mPendingInstalls.size() > 0) {
+                            mPendingInstalls.remove(0);//删除队列头
+                        }
+                        if (mPendingInstalls.size() == 0) {
+                            if (mBound) {
+                                //如果安装请求都处理完了，则需要和 Service 断绝联系,
+                                //通过发送 MSC_UNB 消息处理断交请求
+                                removeMessages(MCS_UNBIND);
+                                Message ubmsg = obtainMessage(MCS_UNBIND);
+                                sendMessageDelayed(ubmsg, 10000);
                             }
-                            if (mPendingInstalls.size() == 0) {
-                                if (mBound) {
-                                    ////如果安装请求都处理完了，则需要和 Service 断绝联系,
-                                    //通过发送 MSC_UNB 消息处理断交请求
-                                    removeMessages(MCS_UNBIND);
-                                    Message ubmsg = obtainMessage(MCS_UNBIND);
-                                    sendMessageDelayed(ubmsg, 10000);
-                                }
-                            } else {
-                                //如果还有未处理的请求，则继续发送 MCS_BOUND 消息。
-                                //为什么不通过一个循环来处理所有请求呢
-                                mHandler.sendEmptyMessage(MCS_BOUND);
-                            }
+                        } else {
+                            //如果还有未处理的请求，则继续发送 MCS_BOUND 消息。
+                            //为什么不通过一个循环来处理所有请求呢
+                            mHandler.sendEmptyMessage(MCS_BOUND);
                         }
                     }
                 }
-                break;
             }
+            break;
         }
     }
+}
 ```
 
 MCS_BOUND 的处理还算简单，就是调用 HandlerParams 的 startCopy 函数。
@@ -2067,7 +2012,7 @@ final boolean startCopy() {
 			handleStartCopy();//调用派生类的 handleStartCopy 函数
 			res= true;
 		}
-	} ......
+	} ...
 
 	handleReturnCode();//调用派生类的 handleReturnCode，返回处理结果
 	return res;
@@ -2083,7 +2028,7 @@ PackageManagerService::InstallParams.handleStartCopy()
 ```Java
 public void handleStartCopy() throwsRemoteException {
 
-	int ret= PackageManager.INSTALL_SUCCEEDED;
+	int ret = PackageManager.INSTALL_SUCCEEDED;
 	final boolean fwdLocked = (flags &PackageManager.INSTALL_FORWARD_LOCK) != 0;
 
 	//根据 adb install 的参数，判断安装位置
@@ -2094,11 +2039,11 @@ public void handleStartCopy() throwsRemoteException {
 
 	if(onInt && onSd) {
 		//APK 不能同时安装在内部存储和 SD 卡上
-		ret =PackageManager.INSTALL_FAILED_INVALID_INSTALL_LOCATION;
+		ret = PackageManager.INSTALL_FAILED_INVALID_INSTALL_LOCATION;
 
 	} else if (fwdLocked && onSd) {
 		//fwdLocked 的应用不能安装在 SD 卡上
-		ret =PackageManager.INSTALL_FAILED_INVALID_INSTALL_LOCATION;
+		ret = PackageManager.INSTALL_FAILED_INVALID_INSTALL_LOCATION;
 	} else {
 		final long lowThreshold;
 
@@ -2115,7 +2060,6 @@ public void handleStartCopy() throwsRemoteException {
 		}
 
 		try {
-
 			//授权 DefContainerService URI 读权限
 			mContext.grantUriPermission(DEFAULT_CONTAINER_PACKAGE,
 						packageURI,Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -2123,16 +2067,15 @@ public void handleStartCopy() throwsRemoteException {
 			//调用 DCS 的 getMinimalPackageInfo 函数，得到一个 PackageLite 对象，详见下面分析
 			pkgLite = mContainerService.getMinimalPackageInfo(packageURI, flags,lowThreshold);
 
-		}finally ......//撤销 URI 授权
+		}finally //...//撤销 URI 授权
 
 		//PacakgeLite 的 recommendedInstallLocation 成员变量保存该 APK 推荐的安装路径
-		int loc =pkgLite.recommendedInstallLocation;
+		int loc = pkgLite.recommendedInstallLocation;
 
-		if (loc== PackageHelper.RECOMMEND_FAILED_INVALID_LOCATION) {
-			ret= PackageManager.INSTALL_FAILED_INVALID_INSTALL_LOCATION;
-		} else if......{
+		if (loc == PackageHelper.RECOMMEND_FAILED_INVALID_LOCATION) {
+			ret = PackageManager.INSTALL_FAILED_INVALID_INSTALL_LOCATION;
+		} else if...{
 		} else {
-
 			//根据 DCS 返回的安装路径，还需要调用 installLocationPolicy 进行检查
 			loc = installLocationPolicy(pkgLite, flags);
 	
@@ -2141,7 +2084,7 @@ public void handleStartCopy() throwsRemoteException {
 					flags |= PackageManager.INSTALL_EXTERNAL;
 					flags &=~PackageManager.INSTALL_INTERNAL;
 	
-				} ......//处理安装位置为内部存储的情况
+				} //...//处理安装位置为内部存储的情况
 			}
 		}
 	}
@@ -2149,18 +2092,18 @@ public void handleStartCopy() throwsRemoteException {
 	//创建一个安装参数对象，对于安装位置为内部存储的情况，args 的真实类型为 FileInstallArgs
 	final InstallArgs args = createInstallArgs(this);
 
-	mArgs =args;
+	mArgs = args;
 
-	if (ret== PackageManager.INSTALL_SUCCEEDED) {
+	if (ret == PackageManager.INSTALL_SUCCEEDED) {
 		final int requiredUid = mRequiredVerifierPackage == null ? -1 : getPackageUid(mRequiredVerifierPackage);
 		if(requiredUid != -1 && isVerificationEnabled()) {
-			......//verification 的处理，这部分代码后续再介绍
-		}else {
+			//...//verification 的处理，这部分代码后续再介绍
+		} else {
 			//调用 args 的 copyApk 函数
 			ret = args.copyApk(mContainerService, true);
 		}
 	}
-	mRet =ret;//确定返回值
+	mRet = ret;//确定返回值
 }
 ```
 
@@ -2178,16 +2121,11 @@ DefaultContainerService.java::getMinimalPackageInfo()
 
 ```Java
 public PackageInfoLite getMinimalPackageInfo(finalUri fileUri, int flags, longthreshold) {
-
 	//注意该函数的参数：fileUri 指向该 APK 的文件路径（此时还在 /data/local/tmp 下）
 	PackageInfoLite ret = new PackageInfoLite();
-
-	......
-
+	//...
 	String scheme = fileUri.getScheme();
-
-	......
-
+	//...
 	String archiveFilePath = fileUri.getPath();
 	DisplayMetrics metrics = new DisplayMetrics();
 	metrics.setToDefaults();
@@ -2196,9 +2134,8 @@ public PackageInfoLite getMinimalPackageInfo(finalUri fileUri, int flags, longth
  	PackageParser.PackageLite pkg =
 			PackageParser.parsePackageLite(archiveFilePath,0);
 
-	if (pkg== null) {//解析失败
-
-		......//设置错误值
+	if (pkg == null) {//解析失败
+		//...//设置错误值
 		return ret;
 	}
 
@@ -2208,12 +2145,10 @@ public PackageInfoLite getMinimalPackageInfo(finalUri fileUri, int flags, longth
 
 	//调用 recommendAppInstallLocation，取得一个合理的安装位置
 	ret.recommendedInstallLocation =
-	
+
 	recommendAppInstallLocation(pkg.installLocation,archiveFilePath,
 	           flags, threshold);
-
 	return ret;
-
 }
 ```
 
@@ -2224,12 +2159,10 @@ DefaultContainerService.java::recommendAppInstallLocation()
 ```Java
 private int recommendAppInstallLocation(intinstallLocation, 
 				StringarchiveFilePath, int flags,long threshold) {
-
 	int prefer;
 	boolean checkBoth = false;
 
 	check_inner: {
-
 		if((flags & PackageManager.INSTALL_FORWARD_LOCK) != 0) {
 			prefer = PREFER_INTERNAL;
 			break check_inner; //根据 FOWRAD_LOCK 的情况，只能安装在内部存储
@@ -2237,9 +2170,7 @@ private int recommendAppInstallLocation(intinstallLocation,
 			prefer = PREFER_INTERNAL;
 			break check_inner;
 		}
-
-		......//检查各种情况
-
+		//...//检查各种情况
 		} else if(installLocation == PackageInfo.INSTALL_LOCATION_AUTO) {
 			prefer= PREFER_INTERNAL;//一般设定的位置为 AUTO，默认是内部空间
 			checkBoth = true; //设置checkBoth为true
@@ -2263,7 +2194,6 @@ private int recommendAppInstallLocation(intinstallLocation,
 		}
 
 		prefer =PREFER_INTERNAL;
-
 	}
 
 	//判断外部存储空间是否为模拟的，这部分内容我们以后再介绍
@@ -2274,26 +2204,24 @@ private int recommendAppInstallLocation(intinstallLocation,
 	if(checkBoth || prefer == PREFER_INTERNAL) {
 		try {//检查内部存储空间是否足够大
 			fitsOnInternal = isUnderInternalThreshold(apkFile, threshold);
-		} ......
+		} //...
 	}
 
 	boolean fitsOnSd = false;
 	if(!emulated && (checkBoth || prefer == PREFER_EXTERNAL)) {
 		try{ //检查外部存储空间是否足够大
 			fitsOnSd = isUnderExternalThreshold(apkFile);
-		} ......
+		} //...
 	}
 
 	if (prefer== PREFER_INTERNAL) {
 		if(fitsOnInternal) {//返回推荐安装路径为内部空间
 			return PackageHelper.RECOMMEND_INSTALL_INTERNAL;
 		}
-		
 	} else if (!emulated && prefer == PREFER_EXTERNAL) {
 		if(fitsOnSd) {//返回推荐安装路径为外部空间
 			returnPackageHelper.RECOMMEND_INSTALL_EXTERNAL;
 		}
-	
 	}
 
 	if(checkBoth) {
@@ -2304,9 +2232,8 @@ private int recommendAppInstallLocation(intinstallLocation,
 		}
 	}
 
-	...... //到此，前几个条件都不满足，此处将根据情况返回一个明确的错误值
+	//... //到此，前几个条件都不满足，此处将根据情况返回一个明确的错误值
 	return PackageHelper.RECOMMEND_FAILED_INSUFFICIENT_STORAGE;
-	
 	}
 }
 ```
@@ -2325,39 +2252,36 @@ PackageManagerService.java::InstallArgs.copyApk()
 
 ```Java
 int copyApk(IMediaContainerService imcs, booleantemp) throws RemoteException {
-
-        if (temp) {
-            /*
+    if (temp) {
+        /*
             本例中temp参数为true，createCopyFile将在/data/app下创建一个临时文件。
             临时文件名为vmdl-随机数.tmp。为什么会用这样的文件名呢？
             因为PKMS通过Linux的inotify机制监控了/data/app,目录，如果新复制生成的文件名后缀
             为apk，将触发PKMS扫描。为了防止发生这种情况，这里复制生成的文件才有了
             如此奇怪的名字
             */
-            createCopyFile();
-        }
-
-        FilecodeFile = new File(codeFileName);
-
-        ......
-
-        ParcelFileDescriptor out = null;
-        try {
-            out = ParcelFileDescriptor.open(codeFile, ParcelFileDescriptor.MODE_READ_WRITE);
-        }......
-
-        int ret = PackageManager.INSTALL_FAILED_INSUFFICIENT_STORAGE;
-        try {
-            mContext.grantUriPermission(DEFAULT_CONTAINER_PACKAGE,
-                    packageURI, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            //调用 DCS 的 copyResource，该函数将执行复制操作，最终结果是 /data/local/tmp
-            //下的APK文件被复制到 /data/app 下，文件名也被换成 vmdl-随机数.tmp
-            ret = imcs.copyResource(packageURI, out);
-        } finally {
-            ......//关闭 out，撤销 URI 授权
-        }
-        return ret;
+        createCopyFile();
     }
+
+    FilecodeFile = new File(codeFileName);
+    //...
+    ParcelFileDescriptor out = null;
+    try {
+        out = ParcelFileDescriptor.open(codeFile, ParcelFileDescriptor.MODE_READ_WRITE);
+    }//...
+
+    int ret = PackageManager.INSTALL_FAILED_INSUFFICIENT_STORAGE;
+    try {
+        mContext.grantUriPermission(DEFAULT_CONTAINER_PACKAGE,
+                                    packageURI, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        //调用 DCS 的 copyResource，该函数将执行复制操作，最终结果是 /data/local/tmp
+        //下的APK文件被复制到 /data/app 下，文件名也被换成 vmdl-随机数.tmp
+        ret = imcs.copyResource(packageURI, out);
+    } finally {
+        //...//关闭 out，撤销 URI 授权
+    }
+    return ret;
+}
 ```
 
 ### handleReturnCode 分析
@@ -2412,7 +2336,7 @@ private void processPendingInstall(finalInstallArgs args, final intcurrentStatus
             //保存到 mRunningInstalls 结构中，以 token 为 key
             mRunningInstalls.put(token, data);
             if (res.returnCode == PackageManager.INSTALL_SUCCEEDED && doRestore){
-              ......//备份恢复的情况暂时不考虑
+             //...//备份恢复的情况暂时不考虑
             }
 
             if (!doRestore) {
@@ -2440,65 +2364,65 @@ PackageManagerService.java::doHandleMessage()
 
 ```Java
 void doHandleMessage(Message msg) {
-        switch (msg.what) {
-            case INIT_COPY: {
-                //...
-            }
-            case MCS_BOUND: {
-                //...
-            }
-            case POST_INSTALL: {
-                PostInstallData data = mRunningInstalls.get(msg.arg1);
-                mRunningInstalls.delete(msg.arg1);
-                boolean deleteOld = false;
-
-                if (data != null) {
-                    InstallArgs args = data.args;
-                    PackageInstalledInfo res = data.res;
-
-                    if (res.returnCode == PackageManager.INSTALL_SUCCEEDED) {
-                        final String packageName = res.pkg.applicationInfo.packageName;
-                        res.removedInfo.sendBroadcast(false, true, false);
-                        Bundle extras = new Bundle(1);
-                        extras.putInt(Intent.EXTRA_UID, res.uid);
-                        //...
-                        final boolean update = res.removedInfo.removedPackage != null;
-                        if (update) {
-                            extras.putBoolean(Intent.EXTRA_REPLACING, true);
-                        }
-                        //发送 PACKAGE_ADDED 广播
-                        sendPackageBroadcast(Intent.ACTION_PACKAGE_ADDED,
-                                packageName, extras, null, null, updateUsers);
-                        if (update) {
-                            //如果是 APK 升级，那么发送 PACKAGE_REPLACE 和 MY_PACKAGE_REPLACED 广播
-                            //二者不同之处在于 PACKAGE_REPLACE 将携带一个 extra 信息
-                            //...
-                        }
-                        //...
-                    }
-                    Runtime.getRuntime().gc();
-                    if (deleteOld) {
-                        synchronized (mInstallLock) {
-                            //调用 FileInstallArgs 的 doPostDeleteLI 进行资源清理
-                            res.removedInfo.args.doPostDeleteLI(true);
-                        }
-                    }
-                    if (args.observer != null) {
-                        try {
-                            // 向 pm 通知安装的结果
-                            Bundle extras = extrasForInstallResult(res);
-                            args.observer.onPackageInstalled(res.name, res.returnCode,
-                                    res.returnMsg, extras);
-                        } catch (RemoteException e) {
-                            Slog.i(TAG, "Observer no longer exists.");
-                        }
-                    }
-                } else {
-                    Slog.e(TAG, "Bogus post-install token " + msg.arg1);
-                }
-            } break;
+    switch (msg.what) {
+        case INIT_COPY: {
+            //...
         }
+        case MCS_BOUND: {
+            //...
+        }
+        case POST_INSTALL: {
+            PostInstallData data = mRunningInstalls.get(msg.arg1);
+            mRunningInstalls.delete(msg.arg1);
+            boolean deleteOld = false;
+
+            if (data != null) {
+                InstallArgs args = data.args;
+                PackageInstalledInfo res = data.res;
+
+                if (res.returnCode == PackageManager.INSTALL_SUCCEEDED) {
+                    final String packageName = res.pkg.applicationInfo.packageName;
+                    res.removedInfo.sendBroadcast(false, true, false);
+                    Bundle extras = new Bundle(1);
+                    extras.putInt(Intent.EXTRA_UID, res.uid);
+                    //...
+                    final boolean update = res.removedInfo.removedPackage != null;
+                    if (update) {
+                        extras.putBoolean(Intent.EXTRA_REPLACING, true);
+                    }
+                    //发送 PACKAGE_ADDED 广播
+                    sendPackageBroadcast(Intent.ACTION_PACKAGE_ADDED,
+                                         packageName, extras, null, null, updateUsers);
+                    if (update) {
+                        //如果是 APK 升级，那么发送 PACKAGE_REPLACE 和 MY_PACKAGE_REPLACED 广播
+                        //二者不同之处在于 PACKAGE_REPLACE 将携带一个 extra 信息
+                        //...
+                    }
+                    //...
+                }
+                Runtime.getRuntime().gc();
+                if (deleteOld) {
+                    synchronized (mInstallLock) {
+                        //调用 FileInstallArgs 的 doPostDeleteLI 进行资源清理
+                        res.removedInfo.args.doPostDeleteLI(true);
+                    }
+                }
+                if (args.observer != null) {
+                    try {
+                        // 向 pm 通知安装的结果
+                        Bundle extras = extrasForInstallResult(res);
+                        args.observer.onPackageInstalled(res.name, res.returnCode,
+                                                         res.returnMsg, extras);
+                    } catch (RemoteException e) {
+                        Slog.i(TAG, "Observer no longer exists.");
+                    }
+                }
+            } else {
+                Slog.e(TAG, "Bogus post-install token " + msg.arg1);
+            }
+        } break;
     }
+}
 ```
 
 ### Apk 安装流程总结
