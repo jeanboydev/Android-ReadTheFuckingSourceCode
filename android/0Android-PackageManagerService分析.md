@@ -6,7 +6,7 @@ PackageManagerService（简称 PKMS），是 Android 系统中核心服务之一
 
 <img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_boot_loader/android-bootloader.png?raw=true" alt=""/>
 
-PackageManagerService 是在 SystemServer 进程中启动的。如不了解 Android 是如何从开机到 Launcher 启动的过程，请先阅读[Android - 系统启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-系统启动过程.md)。
+PackageManagerService 是在 SystemServer 进程中启动的。如不了解 Android 是如何从开机到 Launcher 启动的过程，请先阅读：[Android - 系统启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-系统启动过程.md)。
 
 
 ## PackageManagerService 启动
@@ -245,7 +245,7 @@ SharedUserSetting addSharedUserLPw(String name, int uid, int pkgFlags) {
 
 了解了上面三个关键点，再来看 Android 是如何设计相应数据结构的，如图所示。
 
-[类图](http://wiki.jikexueyuan.com/project/deep-android-v2/images/chapter4/image002.png)
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_pkms/01.png?raw=true" alt=""/>
 
 由上图可知：
 
@@ -313,7 +313,7 @@ void readPermissions() {
 
 在 `etc/permissions` 目录下保存了一下配置文件：
 
-[图](http://wiki.jikexueyuan.com/project/deep-android-v2/images/chapter4/image003.png)
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_pkms/02.png?raw=true" alt=""/>
 
 函数 readPermissionsFromXml 使用 PULL 方式解析这些 XML 文件：
 
@@ -764,7 +764,7 @@ private Package parsePackage(Resources res, XmlResourceParser parser, int flags,
 
 PackageParser 及其内部重要成员的信息。
 
-[图](http://wiki.jikexueyuan.com/project/deep-android-v2/images/chapter4/image006.png)
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_pkms/03.png?raw=true" alt=""/>
 
 - PackageParser 定了相当多的内部类，这些内部类的作用就是保存对应的信息。解析 AndroidManifest.xml 文件得到的信息由 Package 保存。从该类的成员变量可看出，和 Android 四大组件相关的信息分别由 activites、receivers、providers、services 保存。由于一个 APK 可声明多个组件，因此 activites 和 receiver s等均声明为 ArrayList。
 - 以 PackageParser.Activity 为例，它从 Component<ActivityIntentInfo> 派生。Component 是一个模板类，元素类型是 ActivityIntentInfo，此类的顶层基类是 IntentFilter。PackageParser.Activity 内部有一个 ActivityInfo 类型的成员变量，该变量保存的就是四大组件中 Activity 的信息。细心的读者可能会有疑问，为什么不直接使用 ActivityInfo，而是通过 IntentFilter 构造出一个使用模板的复杂类型 PackageParser.Activity 呢？原来，Package 除了保存信息外，还需要支持 Intent 匹配查询。例如，设置 Intent 的 Action 为某个特定值，然后查找匹配该 Intent 的 Activity。由于 ActivityIntentInfo 是从 IntentFilter 派生的，因此它它能判断自己是否满足该 Intent 的要求，如果满足，则返回对应的 ActivityInfo。
@@ -819,7 +819,7 @@ private PackageParser.PackagescanPackageLI(
 
 framework-res.apk 的 AndroidManifest.xml：
 
-[图](http://wiki.jikexueyuan.com/project/deep-android-v2/images/chapter4/image007.png)
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_pkms/04.png?raw=true" alt=""/>
 
 实际上，framework-res.apk 还包含了以下几个常用的 Activity。
 
@@ -1005,7 +1005,7 @@ if (mPlatformPackage == pkg) {
 
 scanPackageLI() 总结
 
-[图](http://wiki.jikexueyuan.com/project/deep-android-v2/images/chapter4/image008.png)
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_pkms/05.png?raw=true" alt=""/>
 
 扫描非系统 Package，非系统 Package 就是指那些不存储在系统目录下的 APK 文件，这部分代码如下：
 
@@ -2427,7 +2427,7 @@ void doHandleMessage(Message msg) {
 
 ### Apk 安装流程总结
 
-[图](https://img-blog.csdn.net/20150803111058786?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_pkms/06.png?raw=true" alt=""/>
 
 
 ## 参考资料
