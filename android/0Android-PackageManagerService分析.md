@@ -1299,6 +1299,10 @@ public void systemReady() {
 }
 ```
 
+PackageManagerService 启动完整流程图：
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_pkms/07.png?raw=true" alt=""/>
+
 ## installd
 
 PackageManagerServie 服务负责应用的安装、卸载等相关工作，而真正干活的还是 installd。 其中 PKMS 执行权限为 system，而进程 installd 的执行权限为 root。
