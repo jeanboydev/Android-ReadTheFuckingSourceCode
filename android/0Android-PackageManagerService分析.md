@@ -75,7 +75,7 @@ public static PackageManagerService main(Context context, Installer installer,
     return m;
 }
 ```
-该方法的主要功能创建 PKMS 对象，并将其注册到 `ServiceManager` 中，内部是一个 HashMap 的集合，存储了很多相关的 `binder` 服务，缓存起来，我们在使用的时候， 会通过 `getService(key)` 的方式去 `map`中获取，ServiceManger 工作流程详见：[Android - Binder 机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-系统启动过程.md)。
+该方法的主要功能创建 PKMS 对象，并将其注册到 `ServiceManager` 中，内部是一个 HashMap 的集合，存储了很多相关的 `binder` 服务，缓存起来，我们在使用的时候， 会通过 `getService(key)` 的方式去 `map`中获取，ServiceManger 工作流程详见：[Android - Binder 机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Binder%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E8%AE%AF.md)。
 
 关于 PKMS 对象的构造方法很长，分为以下几个阶段，每个阶段会输出相应的 EventLog。
 
