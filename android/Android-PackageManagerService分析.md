@@ -2431,7 +2431,7 @@ void doHandleMessage(Message msg) {
 
 ### Apk 安装流程总结
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_pkms/06.png?raw=true" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/android_pkms/08.png?raw=true" alt=""/>
 
 
 ## 参考资料

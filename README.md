@@ -50,6 +50,7 @@
 - :+1: [一篇文章看明白 Activity 与 Window 与 View 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity与Window与View之间的关系.md)
 - :+1: [一篇文章看明白 Android 图形系统 Surface 与 SurfaceFlinger 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-SurfaceFlinger图形系统.md)
 - :+1: [一篇文章看明白 Android Service 启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Service启动过程.md)
+- :+1: [一篇文章看明白 Android PackageManagerService 工作流程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-PackageManagerService分析.md)
 - [Windows 环境下载 Android 源码](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Windows环境下载源码.md)
 - [Android 反编译指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-反编译指南.md)
 - [Android 多渠道打包最佳实践](https://github.com/jeanboydev/Android-Flavors)
@@ -60,7 +61,6 @@
 - [*Android Broadcast 启动过程]
 - [*Android ContentProvider 启动过程]
 - [*Android App 自动化测试]
-- [*Android PackageManagerService 分析]
 - [*Android PowerManagerService 分析]
 - [*Android Input 系统]
 
