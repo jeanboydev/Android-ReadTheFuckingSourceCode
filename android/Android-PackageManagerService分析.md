@@ -2439,4 +2439,8 @@ void doHandleMessage(Message msg) {
 - [深入理解 PackagerManagerService](http://blog.csdn.net/innost/article/details/47253179)
 - [PackageManager 启动篇](http://gityuan.com/2016/11/06/packagemanager/)
 
+## 扫一扫关注我的公众账号
+
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/wechat/qrcode_for_gh_26eef6f9e7c1_258.jpg?raw=true" width=256 height=256 />
+
 

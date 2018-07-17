@@ -185,7 +185,11 @@
   ---
   ```
 
-- 
+- 发布 hexo 到 github page：
+
+  > //等于一次性执行了，清空、刷新、部署三个命令
+  >
+  > $ hexo clean && hexo g && hexo d
 
 ## 插件
 
