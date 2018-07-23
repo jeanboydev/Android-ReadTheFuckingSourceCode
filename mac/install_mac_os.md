@@ -167,7 +167,7 @@
 
 - WIN + Mac 时间不同步问题
 
-  让 Window s把硬件时间当作 UTC 运行，在 CMD 中执行命令：
+  让 Window s把硬件时间当作 UTC 运行，使用管理员权限执行命令：
 
   > $ Reg add HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v RealTimeIsUniversal /t REG_DWORD /d 1
 
@@ -179,7 +179,7 @@
 
   打开 `HWSensors-xxx.dmg` 可以看到：
 
-  ```json
+  ```js
   |-HWMonitor.app
   |-ACPISensors.kext
   |-CPUSensors.kext
@@ -190,11 +190,11 @@
 
   然后打开 `FakeSMC.kext` -> `右键显示包内容` ：
 
-  ```json
+  ```js
   |-Contents
   	|-MacOS
-  	|-Plugins	//没有新建文件夹命名为 Plugins，将 HWSensors 中的 kext 放入
-          |-ACPISensors.kext
+  	|-Plugins//没有新建文件夹命名为 Plugins，将 HWSensors 中的 kext 放入
+  		|-ACPISensors.kext
           |-CPUSensors.kext
           |-GPUSensors.kext
           |-LPCSensors.kext
