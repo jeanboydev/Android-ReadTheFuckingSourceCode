@@ -47,18 +47,21 @@
   选择自定义：
 
   - [x] 仅安装 UEFI 开机版本
-
   - [x] 安装 Clover 到 EFI 系统区
-
   - [x] 开机主题
-
   - [x] drivers64UEFI
 
-    - [x] EmuVariableUefi-64.efi
-
-    - [x] OsxAptioFix3Drv-64.efi
-
-    - [x] PartitionDxe-64.efi
+    - [x] 默认打钩必备
+    - [x] ApfsDriverLoader-64
+    - [x] AptioInputFix-64
+    - [x] AptioMemoryFix-64
+    - [x] EmuVariableUefi-64
+    - [x] Fat-64
+    - [x] NTFS（如果有可以选上）
+    - [x] HashServiceFix-64
+    - [x] NvmExpressDex-64
+    - [x] OsxAptioFix3Drv-64
+    - [x] PartitionDxe-64
     - [x] UsbkbDxe-64
     - [x] UsbMouseDxe-64
 
@@ -70,7 +73,7 @@
   >
   > Clover 中 drivers64UEFI 说明参考附录2。
 
-- 配置 config.plist
+- 配置 `config.plist`
 
   下载最新版的 Clover Configurator：[去下载](https://mackie100projects.altervista.org/download-clover-configurator/)
 
@@ -80,10 +83,19 @@
 
 ## 主板设置
 
-- 无论是哪个系列的芯片组，进入BIOS要把 `VT-d`、`VT-x` 虚拟化关掉。
-- USB 选项中的 `EHCI`、`XHCI Hand-off` 打开，不然在引导安装过程中无法识别 U 盘导致无法继续安装。
-- `Super IO` 选项也要关闭，各个主板的命名可能不一样（技嘉中叫 IOAPIC 24-119）这个选项和苹果的电源管理可能会发生冲突，导致 AppleLPC.kext 无法加载，无法启用原生电源管理
-- 关闭 `CSM`，纯 UEFI 引导
+- `Save & Exit` -> **Load Optimized Defaults**
+- `M.I.T.` -> `Advanced Memory Settings Extreme Memory Profile(X.M.P.)` : **Profile1**
+- `BIOS` -> `Fast Boot` : **Disabled**
+- `Secure Boot Enable`: **Disabled**
+- `Windows 8/10 Features`: **Windows 8/10**
+- `BIOS` -> `CSM Support`: **Disabled**
+- `BIOS` -> `LAN PXE Boot Option ROM` : **Disabled**
+- `BIOS` -> `Storage Boot Option Control` : **UEFI**
+- `Peripherals` -> `Super IO Configuration` -> `Serial Port` : **Disabled**
+- `Peripherals` -> `USB Configuration` -> `XHCI Hand-off` : **Enabled**
+- `Chipset` -> `Vt-d` : **Disabled**（Enabled也可以，这个无所谓的，win下跑虚拟机需要，所以我打开了的）
+- `Chipset` -> `ERP` ：**Enabled**（这个会影响MAC关机后鼠键的背光，不打开关机后按键盘和鼠标背光会亮）
+- 需要集显加速的还需要把集显设置成 Enabled
 - 电源管理相关的设置会对后期的 Mac 系统优化有所影响，所以我们前期可以先为后期优化做好铺垫。打开 `Intel(R) Speed Shift Technlolgy`、`CPU EIST` 这两个选项对后期的打开 Skylake（Kabylake... 更新的CPU架构）HWP 有所帮助，可以实现对 CPU 的睿频和自动降频节能
 
 ## 单盘双系统
@@ -151,25 +163,57 @@
 
 - 声卡
 
-  声卡驱动推荐使用 [AppleALC](https://github.com/vit9696/AppleALC/releases)，这个驱动可以让你的电脑加载原生的 AppleHDA。
+  声卡驱动推荐使用 [AppleALC](https://github.com/vit9696/AppleALC/releases)，这个驱动可以让你的电脑加载原生的 `AppleHDA`。
 
-- USB 驱动
-
-- 电源管理
-
-- WIN + MAC 时间不同步问题
+- WIN + Mac 时间不同步问题
 
   让 Window s把硬件时间当作 UTC 运行，在 CMD 中执行命令：
 
   > $ Reg add HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v RealTimeIsUniversal /t REG_DWORD /d 1
 
+- HWSensors/HWMonitor 显示硬件信息
+
+  先安装 **FakeSMC.kext**：[下载 FakeSMC.kext](https://bitbucket.org/RehabMan/os-x-fakesmc-kozlek/downloads/)
+
+  下载最新版软件：[下载 HWSensors](https://github.com/kozlek/HWSensors)
+
+  打开 `HWSensors-xxx.dmg` 可以看到：
+
+  ```json
+  |-HWMonitor.app
+  |-ACPISensors.kext
+  |-CPUSensors.kext
+  |-GPUSensors.kext
+  |-LPCSensors.kext
+  |-FakeSMC.kext
+  ```
+
+  然后打开 `FakeSMC.kext` -> `右键显示包内容` ：
+
+  ```json
+  |-Contents
+  	|-MacOS
+  	|-Plugins	//没有新建文件夹命名为 Plugins，将 HWSensors 中的 kext 放入
+          |-ACPISensors.kext
+          |-CPUSensors.kext
+          |-GPUSensors.kext
+          |-LPCSensors.kext
+  	|-Info.plist
+  ```
+
+  然后重新安装 `FakeSMC.kext`，将  `HWMonitor.app` 复制到应用程序中，重启电脑。
+
+- Intel 查看 CPU 频率
+
+  [IntelPowerGadget](https://software.intel.com/en-us/articles/intel-power-gadget-20)
+
 - 开启 HIDPI
 
-  激活 HIDPI
+  首先激活 HIDPI
 
   > $ sudo defaults write /Library/Preferences/com.apple.windowserver.plist DisplayResolutionEnabled -bool true
 
-  获取显示器的 `DisplayVendorID` 和 `DisplayProductID`：
+  然后获取显示器的 `DisplayVendorID` 和 `DisplayProductID`：
 
   > $ ioreg -l | grep "DisplayVendorID"
   >
@@ -215,37 +259,6 @@
   </plist>
   ```
 
-  如果显示器使用 HDMI 链接需要验证下 ProductID：
-
-  > $ ioreg -l -w0 -d0 -r -c AppleDisplay | grep ID | grep -v IO
-
-  用以下配置覆盖之前的配置：
-
-  ```xml
-  <?xml version="1.0" encoding="UTF-8"?>
-  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-  <plist version="1.0">
-  <dict>
-    <key>DisplayProductName</key>
-    <string>Dell U2515H (HiDPI + RGB)</string>
-    <key>IODisplayEDID</key>
-      <data>AP///////wAQrG/QTEE0MCkZAQSlNx94JkRVqVVNnSYPUFSlSwCzANEAcU+p
-  QIGAd4ABAQEBVl4AoKCgKVAwIDUAKTchAAAaAAAA/wBYWFhYWFhYWFhYWFgK
-  AAAA/ABERUxMIFUyNTE1SAogAAAA/QA4Vh5xHgEKICAgICAgAKM=</data>
-    <key>DisplayVendorID</key>
-    <integer>4268</integer>
-    <key>DisplayProductID</key>
-    <integer>53360</integer>
-    <key>scale-resolutions</key>
-      <array>
-      <data>AAAPAAAACHAAAAAB</data>
-      <data>AAAMgAAABwgAAAAB</data>
-      <data>AAALQAAABlQAAAAB</data>
-    </array>
-  </dict>
-  </plist>
-  ```
-
   将刚创建的文件夹以及文件复制到系统目录：
 
   > /System/Library/Displays/Contents/Resources/Overrides/
@@ -260,6 +273,10 @@
   - https://www.insanelymac.com/forum/topic/310345-qhd-monitor-1920x1080-hidpi/
 
   [更简便的方式](https://github.com/syscl/Enable-HiDPI-OSX)
+
+- 隐藏 Clover 多余启动项
+
+  打开 `config.plist` ，左侧选择 `Gui` -> `Hide Volume`，点击加号添加 "Preboot"，"Recovery"，"Legend"。
 
 ## kext 扩展库
 
@@ -334,11 +351,29 @@
 
 ## 附录2 - drivers64UEFI 文件功能说明
 
-- AptioInputFixVit9696
+- **AppleImageCodec-64**：默认
+
+- **AppleKeyAggregator-64**：默认
+
+- **AppleUITheme-64**：默认
+
+- **DataHubDxe-64**：默认
+
+- **FirmwareVolume-64**：默认
+
+- **FSInject-64**：默认
+
+- **SMCHelper-64**：默认
+
+- **VboxHfs-64**：默认
+
+- **ApfsDriverLoader-64**
+
+- **AptioInputFix-64**
 
   编写的针对FileVault2启动界面的键盘和鼠标输入设备的支持
 
-- AptioMemoryFix
+- **AptioMemoryFix-64**
 
   Vit9696自OsxAptioFix2驱动优化而来的新驱动，支持更多新特性，例如：
 
@@ -361,9 +396,15 @@
   macOS使用NVRAM存储一些系统变量，大部分的UEFI主板在配合合适的Aptio驱动后支持原生硬件NVRAM，但是少部分主板不支持NVRAM或者NVRAM的支持有问题，此时建议加入该驱动，该驱动通过开机时加载位于EFI分区内的nvram.plist内容到nvram中，以模拟NVRAM支持
   需要注意的是，是用此驱动，需要勾选“安装RC scripts到目标磁区”选项才有效
 
-- Fat-64
+- **Fat-64**
 
   可选择的64位FAT文件系统的支持
+
+- **NTFS**
+
+- **HashServiceFix-64**
+
+- **NvmExpressDex-64**
 
 - OsxAptioFixDrv-64
 
@@ -380,7 +421,7 @@
   Vit9696等作者在OsxAptioFix2Drv-64的基础之上进行了优化，修复了大多数新设备的NVRAM支持，该驱动在部分机型依然需要手动设置slide值
   （请勿与其余内存修复驱动同时使用）
 
-- OsxFatBinaryDrv-64
+- **OsxFatBinaryDrv-64**
 
   可选择的64位FAT文件系统的支持
 
@@ -397,7 +438,7 @@
 
   FileVault2启动界面的键盘输入设备的支持
 
-- UsbMouseDxe-64
+- **UsbMouseDxe-64**
 
   FileVault2启动界面的鼠标输入设备的支持
 
