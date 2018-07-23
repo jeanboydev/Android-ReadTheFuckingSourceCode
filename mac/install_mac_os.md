@@ -195,9 +195,9 @@
   	|-MacOS
   	|-Plugins//没有新建文件夹命名为 Plugins，将 HWSensors 中的 kext 放入
   		|-ACPISensors.kext
-          |-CPUSensors.kext
-          |-GPUSensors.kext
-          |-LPCSensors.kext
+  		|-CPUSensors.kext
+  		|-GPUSensors.kext
+  		|-LPCSensors.kext
   	|-Info.plist
   ```
 
