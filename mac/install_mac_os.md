@@ -133,10 +133,15 @@
 - Windows 系统下挂在 EFI 分区
 
   > $ list disk
+  >
   > $ select disk 0	//选择EFI引导分区所在的磁盘
+  >
   > $ list partition
+  >
   > $ select partition 1	//选择EFI引导分区
+  >
   > $ assign letter=p	//为所选分区分配盘符，请分配空闲盘符
+  >
   > $ remove letter=p	//修改完成后，移除盘符（如果不移除，重启计算机以后，会自动移除）
 
   这时候 你就可以在 电脑盘里找到 p 盘了，然后下载  [Total Commander](https://www.ghisler.com/download.htm) 就可以正常访问了。
