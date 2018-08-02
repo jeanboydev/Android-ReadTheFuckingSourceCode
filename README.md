@@ -44,6 +44,10 @@
 - [一张图看明白 Android Activity 生命周期](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity生命周期.md)
 - [一篇文章看明白 Android Activity 启动模式 & IntentFilter匹配规则](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity启动模式&IntentFilter匹配规则.md)
 - [一篇文章学会使用 Android IPC 多进程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-IPC多进程.md)
+- [Windows 环境下载 Android 源码](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Windows环境下载源码.md)
+- [Android 反编译指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-反编译指南.md)
+- [Android 多渠道打包最佳实践](https://github.com/jeanboydev/Android-Flavors)
+- [Android Studio 3.x 升级指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Android_Studio3升级指南.md)
 - :+1: [一篇文章了解相见恨晚的 Android Binder 进程间通讯](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Binder进程间通讯.md)
 - :+1: [一篇文章看明白 Android 系统启动时都干了什么](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-系统启动过程.md)
 - :+1: [一篇文章看明白 Android 从点击应用图标到界面显示的过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity启动过程.md)
@@ -51,13 +55,9 @@
 - :+1: [一篇文章看明白 Android 图形系统 Surface 与 SurfaceFlinger 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-SurfaceFlinger图形系统.md)
 - :+1: [一篇文章看明白 Android Service 启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Service启动过程.md)
 - :+1: [一篇文章看明白 Android PackageManagerService 工作流程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-PackageManagerService分析.md)
-- [Windows 环境下载 Android 源码](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Windows环境下载源码.md)
-- [Android 反编译指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-反编译指南.md)
-- [Android 多渠道打包最佳实践](https://github.com/jeanboydev/Android-Flavors)
 - :+1: [Android 项目架构探索](https://github.com/jeanboydev/Android-Architecture)
 - :+1: [Android 性能优化 - UI优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-UI优化.md)
 - :+1: [Android 性能优化 - 内存优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-性能优化-内存优化.md)
-- [Android Studio 3.x 升级指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Android_Studio3升级指南.md)
 - [*Android Broadcast 启动过程]
 - [*Android ContentProvider 启动过程]
 - [*Android App 自动化测试]
