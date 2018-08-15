@@ -74,7 +74,7 @@ WebKit 是一种开放源代码呈现引擎，起初用于 Linux 平台，随后
 
 图：WebKit 主流程
 
-<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_html/image008.png" alt=""/>
+<img src="https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/resources/images/web_front_html/firefoxflow.jpg" alt=""/>
 
 图：Mozilla 的 Gecko 呈现引擎主流程 (3.6)
 从图 3 和图 4 可以看出，虽然 WebKit 和 Gecko 使用的术语略有不同，但整体流程是基本相同的。
