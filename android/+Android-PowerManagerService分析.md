@@ -13,10 +13,11 @@ private void startBootstrapServices() {
         //...
         mPowerManagerService = mSystemServiceManager.startService(PowerManagerService.class);
         //...
-        mPackageManagerService.systemReady();
-        //...
         //系统启动的各个阶段会调用 startBootPhase() 方法
         mSystemServiceManager.startBootPhase(xxx);
+        //...
+        mPackageManagerService.systemReady(mActivityManagerService.getAppOpsService());
+        //...
 }
 ```
 
@@ -276,6 +277,146 @@ public void onStart() {
 
 onStart() 完成的工作就是将 POWER_SERVICE 作为 Binder 的服务端，注册到 SystemService 中去；将PowerManagerInternal 注册到本地服务中，将自己加到 watchdog 的监控队列中去；将之前在构造函数中创建的 mHandler 对象加入到 watchdog 的中，用于监视 mHandler 的 looper 是否空闲。
 
+
+
+## startBootPhase() 分析
+
+onStart() 方法调用完毕后会回到 SytemServer 中，然后根据 SystemService 的生命周期，会开始执行 onBootPhase()，这个方法的功能是为所有的已启动的服务指定启动阶段，从而可以在指定的启动阶段来做指定的工作。
+
+```Java
+//frameworks/base/services/core/java/com/android/server/SystemServiceManager.java
+
+public void startBootPhase(final int phase) {
+        if (phase <= mCurrentPhase) {
+            throw new IllegalArgumentException("Next phase must be larger than previous");
+        }
+        mCurrentPhase = phase;
+        try {
+            final int serviceLen = mServices.size();
+            //遍历已经服务列表
+            for (int i = 0; i < serviceLen; i++) {
+                final SystemService service = mServices.get(i);
+                try {
+                    //调用服务的 onBootPhase() 方法
+                    service.onBootPhase(mCurrentPhase);
+                } catch (Exception ex) {}
+            }
+        } finally {}
+    }
+```
+
+在 SystemServiceManager 的 startBootPhase() 中，调用 SystemService 的 onBootPhase(int) 方法，此时每个 SystemService 都会执行其对应的 onBootPhase() 方法。通过在 SystemServiceManager 中传入不同的形参，回调所有 SystemService的onBootPhase()，根据形参的不同，在方法实现中完成不同的工作，在 SystemService 中定义了五个阶段：
+
+- SystemService.PHASE_WAIT_FOR_DEFAULT_DISPLAY：这是一个依赖 项，只有DisplayManagerService中进行了对应处理；
+- SystemService.PHASE_LOCK_SETTINGS_READY：经过这个引导阶段后，服务才可以接收到wakelock相关设置数据；
+- SystemService.PHASE_SYSTEM_SERVICES_READY：经过这个引导阶段 后，服务才可以安全地使用核心系统服务
+- SystemService.PHASE_ACTIVITY_MANAGER_READY：经过这个引导阶 段后，服务可以发送广播
+- SystemService.PHASE_THIRD_PARTY_APPS_CAN_START：经过这个引 导阶段后，服务可以启动第三方应用，第三方应用也可以通过Binder来调 用服务。
+- SystemService.PHASE_BOOT_COMPLETED：经过这个引导阶段后，说明服务启动完成，这时用户就可以和设备进行交互。
+
+因此，只要在其他模块中调用了 SystemServiceManager.startBootPhase()，都会触发各自的 onBootPhase()。PowerManagerService 的 onBootPhase() 方法只对引导阶段的 2 个阶段做了处理，具体代码如下：
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+@Override
+public void onBootPhase(int phase) {
+    synchronized (mLock) {
+        if (phase == PHASE_THIRD_PARTY_APPS_CAN_START) {
+            //统计启动的 Apk 个数
+            incrementBootCount();
+        } else if (phase == PHASE_BOOT_COMPLETED) {
+            final long now = SystemClock.uptimeMillis();
+            //设置 mBootCompleted 状态
+            mBootCompleted = true;
+            mDirty |= DIRTY_BOOT_COMPLETED;
+            //更新用户活动时间
+            userActivityNoUpdateLocked(
+                    now, PowerManager.USER_ACTIVITY_EVENT_OTHER, 0, Process.SYSTEM_UID);
+            //更新电源状态信息
+            updatePowerStateLocked();
+
+            if (!ArrayUtils.isEmpty(mBootCompletedRunnables)) {
+                Slog.d(TAG, "Posting " + mBootCompletedRunnables.length + " delayed runnables");
+                for (Runnable r : mBootCompletedRunnables) {
+                    BackgroundThread.getHandler().post(r);
+                }
+            }
+            mBootCompletedRunnables = null;
+        }
+    }
+}
+```
+
+在这个方法中，mDirty 是一个二进制的标记位，用来表示电源状态哪一部分发生了改变，通过对其进行置位（| 操作）、清零（～ 操作），得到二进制数各个位的值(0 或 1)，进行不同的处理。我们接着来看下 userActivityNoUpdateLocked() 方法：
+
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+private boolean userActivityNoUpdateLocked(long eventTime, int event, int flags, int uid) {
+    //如果发生时间是上一次休眠或唤醒前，或当前没有开机完成到 systemReady，不采取操作直接返回
+    if (eventTime < mLastSleepTime || eventTime < mLastWakeTime
+            || !mBootCompleted || !mSystemReady) {
+        return false;
+    }
+
+    Trace.traceBegin(Trace.TRACE_TAG_POWER, "userActivity");
+    try {
+        //更新 mLastInteractivePowerHintTime 时间
+        if (eventTime > mLastInteractivePowerHintTime) {
+            powerHintInternal(PowerHint.INTERACTION, 0);
+            mLastInteractivePowerHintTime = eventTime;
+        }
+
+        //通过 mNotifier 通知 BatteryStats UserActivity 事件
+        mNotifier.onUserActivity(event, uid);
+
+        if (mUserInactiveOverrideFromWindowManager) {
+            mUserInactiveOverrideFromWindowManager = false;
+            mOverriddenTimeout = -1;
+        }
+
+        //如果系统处于休眠状态，不进行处理
+        if (mWakefulness == WAKEFULNESS_ASLEEP
+                || mWakefulness == WAKEFULNESS_DOZING
+                || (flags & PowerManager.USER_ACTIVITY_FLAG_INDIRECT) != 0) {
+            return false;
+        }
+
+        //根据 flag 是否在已变暗的情况下，是否重启活动超时更新 mLastUserActivityTimeNoChangeLights
+        //或 mLastUserActivityTime，并且设置 mDirty -> DIRTY_USER_ACTIVITY
+        if ((flags & PowerManager.USER_ACTIVITY_FLAG_NO_CHANGE_LIGHTS) != 0) {
+            if (eventTime > mLastUserActivityTimeNoChangeLights
+                    && eventTime > mLastUserActivityTime) {
+                mLastUserActivityTimeNoChangeLights = eventTime;
+                mDirty |= DIRTY_USER_ACTIVITY;
+                if (event == PowerManager.USER_ACTIVITY_EVENT_BUTTON) {
+                    mDirty |= DIRTY_QUIESCENT;
+                }
+
+                return true;
+            }
+        } else {
+            if (eventTime > mLastUserActivityTime) {
+                mLastUserActivityTime = eventTime;
+                mDirty |= DIRTY_USER_ACTIVITY;
+                if (event == PowerManager.USER_ACTIVITY_EVENT_BUTTON) {
+                    mDirty |= DIRTY_QUIESCENT;
+                }
+                return true;
+            }
+        }
+    } finally {
+        Trace.traceEnd(Trace.TRACE_TAG_POWER);
+    }
+    return false;
+}
+```
+
+此外，这个方法中调用到了 updatePowerStateLocked() 方法，这是整个 PowerManagerService 中最重要的方法，这块会在下文中进行详细分析。此时，SystemServer.startBootstrapServices() 执行完毕，生命周期方法也执行完毕。接下来会执行到 systemReady()。
+
+
 ## systemReady()
 
 SystemServer 创建完 PowerManagerService 后，继续调用 systemReady() 方法，再做一些初始化的工作。
@@ -284,77 +425,263 @@ SystemServer 创建完 PowerManagerService 后，继续调用 systemReady() 方�
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
 
 public void systemReady(IAppOpsService appOps) {
-        synchronized (mLock) {
-            mSystemReady = true;
-            mAppOps = appOps;
-            //5.0 后的新方法，localService 可以直接取
-            mDreamManager = getLocalService(DreamManagerInternal.class);
-            mDisplayManagerInternal = getLocalService(DisplayManagerInternal.class);
-            mPolicy = getLocalService(WindowManagerPolicy.class);
-            mBatteryManagerInternal = getLocalService(BatteryManagerInternal.class);
-            //获取最小、最大、默认的屏幕点亮超时时间
-            PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
-            mScreenBrightnessSettingMinimum = pm.getMinimumScreenBrightnessSetting();
-            mScreenBrightnessSettingMaximum = pm.getMaximumScreenBrightnessSetting();
-            mScreenBrightnessSettingDefault = pm.getDefaultScreenBrightnessSetting();
-            mScreenBrightnessForVrSettingDefault = pm.getDefaultScreenBrightnessForVrSetting();
-            //传感器相关，传感器检查到外部事件可以通过发送消息到 mHandler 的消息队列中处理
-            SensorManager sensorManager = new SystemSensorManager(mContext, mHandler.getLooper());
-            
-            // The notifier runs on the system server's main looper so as not to interfere
-            // with the animations and other critical functions of the power manager.
-            mBatteryStats = BatteryStatsService.getService();
-            
-            //注意上面的注释，notifier 运行在 system_server 的主线程中，
-            //并且参数中传入了一个 SuspendBlocker 对象，应该是在发送通知的时候点亮屏幕
-            mNotifier = new Notifier(Looper.getMainLooper(), mContext, mBatteryStats,
-                    mAppOps, createSuspendBlockerLocked("PowerManagerService.Broadcasts"),
-                    mPolicy);
-            //无线充电相关，参数中传入了 sensorManager，并且传入了一个 SuspendBlocker 对象，
-            //也是为了有外部事件时点亮屏幕
-            mWirelessChargerDetector = new WirelessChargerDetector(sensorManager,
-                    createSuspendBlockerLocked("PowerManagerService.WirelessChargerDetector"),
-                    mHandler);
-            //监听电源相关的设置改变
-            mSettingsObserver = new SettingsObserver(mHandler);
-
-            mLightsManager = getLocalService(LightsManager.class);
-            mAttentionLight = mLightsManager.getLight(LightsManager.LIGHT_ID_ATTENTION);
-
-            // Initialize display power management.
-            mDisplayManagerInternal.initPowerManagement(
-                    mDisplayPowerCallbacks, mHandler, sensorManager);
-
-            // Go.
-            //读取资源文档中的电源相关设置
-            readConfigurationLocked();
-            //更新设置中电源相关的设置
-            updateSettingsLocked();
-            mDirty |= DIRTY_BATTERY_STATE;
-            //更新电源状态，这里统一处理的所有的状态更新，该方法会频繁的调用
-            updatePowerStateLocked();
-        }
-
-        final ContentResolver resolver = mContext.getContentResolver();
-        mConstants.start(resolver);
-        mBatterySaverPolicy.start(resolver);
-
-        //监听系统中对电源的设置，如开关省电模式、默认休眠超时时间、屏幕亮度、充电是否亮屏等等
-        resolver.registerContentObserver(Settings.Secure.getUriFor(
-                Settings.Secure.SCREENSAVER_ENABLED),
-                false, mSettingsObserver, UserHandle.USER_ALL);
-        //...
+    synchronized (mLock) {
+        mSystemReady = true;
+        mAppOps = appOps;
+        //和 DreamManagerService 交互
+        mDreamManager = getLocalService(DreamManagerInternal.class);
+        //和 DisplayManagerService 交互
+        mDisplayManagerInternal = getLocalService(DisplayManagerInternal.class);
+        //和 WindowManagerService 交互
+        mPolicy = getLocalService(WindowManagerPolicy.class);
+        //和 BatteryService 交互
+        mBatteryManagerInternal = getLocalService(BatteryManagerInternal.class);
+        //获取最小、最大、默认的屏幕点亮超时时间
+        PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        mScreenBrightnessSettingMinimum = pm.getMinimumScreenBrightnessSetting();
+        mScreenBrightnessSettingMaximum = pm.getMaximumScreenBrightnessSetting();
+        mScreenBrightnessSettingDefault = pm.getDefaultScreenBrightnessSetting();
+        mScreenBrightnessForVrSettingDefault = pm.getDefaultScreenBrightnessForVrSetting();
+        //传感器相关，传感器检查到外部事件可以通过发送消息到 mHandler 的消息队列中处理
+        SensorManager sensorManager = new SystemSensorManager(mContext, mHandler.getLooper());
         
-        // 注册一些广播，用来监听如电量变化、用户切换
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
-        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
-        mContext.registerReceiver(new BatteryReceiver(), filter, null, mHandler);
-        //...
+        // The notifier runs on the system server's main looper so as not to interfere
+        // with the animations and other critical functions of the power manager.
+        //获取 BatteryStatsService
+        mBatteryStats = BatteryStatsService.getService();
+        
+        //注意上面的注释，notifier 运行在 system_server 的主线程中，
+        //并且参数中传入了一个 SuspendBlocker 对象，应该是在发送通知的时候点亮屏幕
+        mNotifier = new Notifier(Looper.getMainLooper(), mContext, mBatteryStats,
+                mAppOps, createSuspendBlockerLocked("PowerManagerService.Broadcasts"),
+                mPolicy);
+        //无线充电相关，参数中传入了 sensorManager，并且传入了一个 SuspendBlocker 对象，
+        //也是为了有外部事件时点亮屏幕
+        mWirelessChargerDetector = new WirelessChargerDetector(sensorManager,
+                createSuspendBlockerLocked("PowerManagerService.WirelessChargerDetector"),
+                mHandler);
+        //监听电源相关的设置改变
+        mSettingsObserver = new SettingsObserver(mHandler);
+
+        mLightsManager = getLocalService(LightsManager.class);
+        mAttentionLight = mLightsManager.getLight(LightsManager.LIGHT_ID_ATTENTION);
+
+        // Initialize display power management.
+        //和显示有关，如：亮灭屏、背光调节
+        mDisplayManagerInternal.initPowerManagement(
+                mDisplayPowerCallbacks, mHandler, sensorManager);
+
+        // Go.
+        //读取资源文档中的电源相关设置，详见下面分析
+        readConfigurationLocked();
+        //更新设置中电源相关的设置，详见下面分析
+        updateSettingsLocked();
+        mDirty |= DIRTY_BATTERY_STATE;
+        //更新电源状态，这里统一处理的所有的状态更新，该方法会频繁的调用，详见下面分析
+        updatePowerStateLocked();
     }
+
+    final ContentResolver resolver = mContext.getContentResolver();
+    mConstants.start(resolver);
+    mBatterySaverPolicy.start(resolver);
+
+    //监听系统中对电源的设置，如开关省电模式、默认休眠超时时间、屏幕亮度、充电是否亮屏等等
+    resolver.registerContentObserver(Settings.Secure.getUriFor(
+            Settings.Secure.SCREENSAVER_ENABLED),
+            false, mSettingsObserver, UserHandle.USER_ALL);
+    //...
+    
+    // 注册一些广播，用来监听如电量变化、用户切换
+    //注册 BatteryService 中 ACTION_BATTERY_CHANGED广播
+    IntentFilter filter = new IntentFilter();
+    filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+    filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+    mContext.registerReceiver(new BatteryReceiver(), filter, null, mHandler);
+    IntentFilter filter = new IntentFilter();
+    //Dream 相关
+    filter = new IntentFilter();
+    filter.addAction(Intent.ACTION_DREAMING_STARTED);
+    filter.addAction(Intent.ACTION_DREAMING_STOPPED);
+    mContext.registerReceiver(new DreamReceiver(), filter, null, mHandler);
+    //用户切换
+    filter = new IntentFilter();
+    filter.addAction(Intent.ACTION_USER_SWITCHED);
+    mContext.registerReceiver(new UserSwitchedReceiver(), filter, null, mHandler);
+    //Dock 相关
+    filter = new IntentFilter();
+    filter.addAction(Intent.ACTION_DOCK_EVENT);
+    mContext.registerReceiver(new DockReceiver(), filter, null, mHandler);
+}
 ```
 
-- updatePowerStateLocked()
+- readConfigurationLocked()
+
+调用 readConfigurationLocked() 方法读取配置文件中的默认值：
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+private void readConfigurationLocked() {
+    final Resources resources = mContext.getResources();
+
+    mDecoupleHalAutoSuspendModeFromDisplayConfig = resources.getBoolean(
+            com.android.internal.R.bool.config_powerDecoupleAutoSuspendModeFromDisplay);
+    mDecoupleHalInteractiveModeFromDisplayConfig = resources.getBoolean(
+            com.android.internal.R.bool.config_powerDecoupleInteractiveModeFromDisplay);
+    //插拔 USB 是否亮屏
+    mWakeUpWhenPluggedOrUnpluggedConfig = resources.getBoolean(
+            com.android.internal.R.bool.config_unplugTurnsOnScreen);
+    //设备处于剧院模式时，插拔 USB 是否亮屏
+    mWakeUpWhenPluggedOrUnpluggedInTheaterModeConfig = resources.getBoolean(
+            com.android.internal.R.bool.config_allowTheaterModeWakeFromUnplug);
+    //是否允许设备由于接近传感器而关闭屏幕时 CPU 挂起，进入 suspend 状态
+    mSuspendWhenScreenOffDueToProximityConfig = resources.getBoolean(
+            com.android.internal.R.bool.config_suspendWhenScreenOffDueToProximity);
+    //是否支持屏保
+    mDreamsSupportedConfig = resources.getBoolean(
+            com.android.internal.R.bool.config_dreamsSupported);
+    //是否屏保默认打开--false
+    mDreamsEnabledByDefaultConfig = resources.getBoolean(
+            com.android.internal.R.bool.config_dreamsEnabledByDefault);
+    //睡眠是否打开屏保
+    mDreamsActivatedOnSleepByDefaultConfig = resources.getBoolean(
+            com.android.internal.R.bool.config_dreamsActivatedOnSleepByDefault);
+    //Dock时屏保是否激活
+    mDreamsActivatedOnDockByDefaultConfig = resources.getBoolean(
+            com.android.internal.R.bool.config_dreamsActivatedOnDockByDefault);
+    //放电时是否允许进入屏保
+    mDreamsEnabledOnBatteryConfig = resources.getBoolean(
+            com.android.internal.R.bool.config_dreamsEnabledOnBattery);
+    //充电时允许屏保的最低电量，使用 -1 禁用此功能
+    mDreamsBatteryLevelMinimumWhenPoweredConfig = resources.getInteger(
+            com.android.internal.R.integer.config_dreamsBatteryLevelMinimumWhenPowered);
+    //放电时允许屏保的最低电量，使用 -1 禁用此功能，默认 15
+    mDreamsBatteryLevelMinimumWhenNotPoweredConfig = resources.getInteger(
+            com.android.internal.R.integer.config_dreamsBatteryLevelMinimumWhenNotPowered);
+    //电亮下降到该百分点，当用户活动超时后不进入屏保，默认5
+    mDreamsBatteryLevelDrainCutoffConfig = resources.getInteger(
+            com.android.internal.R.integer.config_dreamsBatteryLevelDrainCutoff);
+    //如果为 true，则直到关闭屏幕并执行屏幕关闭动画之后，才开始 Doze，默认 false
+    mDozeAfterScreenOffConfig = resources.getBoolean(
+            com.android.internal.R.bool.config_dozeAfterScreenOff);
+    //用户活动超时的最小时间，默认10000ms,必须大于0
+    mMinimumScreenOffTimeoutConfig = resources.getInteger(
+            com.android.internal.R.integer.config_minimumScreenOffTimeout);
+    //用户活动超时进入且关闭屏幕前屏幕变暗的最大时间，默认 7000ms，必须大于 0
+    mMaximumScreenDimDurationConfig = resources.getInteger(
+            com.android.internal.R.integer.config_maximumScreenDimDuration);
+    //屏幕变暗的时长比例，如果用于超时时间过短，则在 7000ms 的基础上按还比例减少，默认 20%
+    mMaximumScreenDimRatioConfig = resources.getFraction(
+            com.android.internal.R.fraction.config_maximumScreenDimRatio, 1, 1);
+    //是否支持双击唤醒屏幕
+    mSupportsDoubleTapWakeConfig = resources.getBoolean(
+            com.android.internal.R.bool.config_supportDoubleTapWake);
+}
+```
+
+- updateSettingsLocked()
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+private void updateSettingsLocked() {
+    final ContentResolver resolver = mContext.getContentResolver();
+    //屏保是否支持
+    mDreamsEnabledSetting = (Settings.Secure.getIntForUser(resolver,
+            Settings.Secure.SCREENSAVER_ENABLED,
+            mDreamsEnabledByDefaultConfig ? 1 : 0,
+            UserHandle.USER_CURRENT) != 0);
+    //休眠时是否启用屏保
+    mDreamsActivateOnSleepSetting = (Settings.Secure.getIntForUser(resolver,
+            Settings.Secure.SCREENSAVER_ACTIVATE_ON_SLEEP,
+            mDreamsActivatedOnSleepByDefaultConfig ? 1 : 0,
+            UserHandle.USER_CURRENT) != 0);
+    //插入基座时屏保是否激活
+    mDreamsActivateOnDockSetting = (Settings.Secure.getIntForUser(resolver,
+            Settings.Secure.SCREENSAVER_ACTIVATE_ON_DOCK,
+            mDreamsActivatedOnDockByDefaultConfig ? 1 : 0,
+            UserHandle.USER_CURRENT) != 0);
+    //设备在一段时间不活动后进入休眠或者屏保状态的时间，15 * 1000ms
+    mScreenOffTimeoutSetting = Settings.System.getIntForUser(resolver,
+            Settings.System.SCREEN_OFF_TIMEOUT, DEFAULT_SCREEN_OFF_TIMEOUT,
+            UserHandle.USER_CURRENT);
+    //设备在一段时间不活动后完全进入休眠状态之前的超时时间，
+    //该值必须大于 SCREEN_OFF_TIMEOUT，否则设置了屏保后来不及显示屏保就 sleep
+    mSleepTimeoutSetting = Settings.Secure.getIntForUser(resolver,
+            Settings.Secure.SLEEP_TIMEOUT, DEFAULT_SLEEP_TIMEOUT,
+            UserHandle.USER_CURRENT);
+    /充电时屏幕一直开启
+    mStayOnWhilePluggedInSetting = Settings.Global.getInt(resolver,
+            Settings.Global.STAY_ON_WHILE_PLUGGED_IN, BatteryManager.BATTERY_PLUGGED_AC);
+    //是否支持剧院模式
+    mTheaterModeEnabled = Settings.Global.getInt(mContext.getContentResolver(),
+            Settings.Global.THEATER_MODE_ON, 0) == 1;
+    //屏幕保持常亮
+    mAlwaysOnEnabled = mAmbientDisplayConfiguration.alwaysOnEnabled(UserHandle.USER_CURRENT);
+
+    //双击唤醒屏幕设置
+    if (mSupportsDoubleTapWakeConfig) {
+        boolean doubleTapWakeEnabled = Settings.Secure.getIntForUser(resolver,
+                Settings.Secure.DOUBLE_TAP_TO_WAKE, DEFAULT_DOUBLE_TAP_TO_WAKE,
+                        UserHandle.USER_CURRENT) != 0;
+        if (doubleTapWakeEnabled != mDoubleTapWakeEnabled) {
+            mDoubleTapWakeEnabled = doubleTapWakeEnabled;
+            nativeSetFeature(POWER_FEATURE_DOUBLE_TAP_TO_WAKE, mDoubleTapWakeEnabled ? 1 : 0);
+        }
+    }
+
+    final int oldScreenBrightnessSetting = getCurrentBrightnessSettingLocked();
+
+    mScreenBrightnessForVrSetting = Settings.System.getIntForUser(resolver,
+            Settings.System.SCREEN_BRIGHTNESS_FOR_VR, mScreenBrightnessForVrSettingDefault,
+            UserHandle.USER_CURRENT);
+
+    mScreenBrightnessSetting = Settings.System.getIntForUser(resolver,
+            Settings.System.SCREEN_BRIGHTNESS, mScreenBrightnessSettingDefault,
+            UserHandle.USER_CURRENT);
+
+    //屏幕亮度
+    if (oldScreenBrightnessSetting != getCurrentBrightnessSettingLocked()) {
+        mTemporaryScreenBrightnessSettingOverride = -1;
+    }
+
+    final float oldScreenAutoBrightnessAdjustmentSetting =
+            mScreenAutoBrightnessAdjustmentSetting;
+    mScreenAutoBrightnessAdjustmentSetting = Settings.System.getFloatForUser(resolver,
+            Settings.System.SCREEN_AUTO_BRIGHTNESS_ADJ, 0.0f,
+            UserHandle.USER_CURRENT);
+    if (oldScreenAutoBrightnessAdjustmentSetting != mScreenAutoBrightnessAdjustmentSetting) {
+        mTemporaryScreenAutoBrightnessAdjustmentSettingOverride = Float.NaN;
+    }
+
+    //亮度调节模式，自动 1，正常 0
+    mScreenBrightnessModeSetting = Settings.System.getIntForUser(resolver,
+            Settings.System.SCREEN_BRIGHTNESS_MODE,
+            Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL, UserHandle.USER_CURRENT);
+
+    //低电量模式是否可用，1 表示 true
+    final boolean lowPowerModeEnabled = Settings.Global.getInt(resolver,
+            Settings.Global.LOW_POWER_MODE, 0) != 0;
+    final boolean autoLowPowerModeConfigured = Settings.Global.getInt(resolver,
+            Settings.Global.LOW_POWER_MODE_TRIGGER_LEVEL, 0) != 0;
+    if (lowPowerModeEnabled != mLowPowerModeSetting
+            || autoLowPowerModeConfigured != mAutoLowPowerModeConfigured) {
+        mLowPowerModeSetting = lowPowerModeEnabled;
+        mAutoLowPowerModeConfigured = autoLowPowerModeConfigured;
+        //更新低电量模式
+        updateLowPowerModeLocked();
+    }
+
+    //标志位置位
+    mDirty |= DIRTY_SETTINGS;
+}
+```
+
+至此 systemReady() 方法中已经分析完毕，PowerManagerService 的启动过程已经完成，还差一个 updatePowerStateLocked() 方法没有分析，它是 PowerManagerService 的核心方法，我们接着往下看。
+
+
+## updatePowerStateLocked()
+
+在 systemReady() 方法的最后，调用了 updatePowerStateLocked() 方法，它是整个 PowerManagerService 中的核心方法，也是整个 PowerManagerService 中最重要的一个方法，它用来更新整个电源状态的改变，并进行重新计算。PowerManagerService 中使用一个 int 值 mDirty 作为标志位判断电源状态是否发生变化。当电源状态发生改变时，如亮灭屏、电池状态改变、暗屏等等都会调用该方法，在该方法中调用了其他同级方法进行更新，下面逐个进行分析：
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -363,16 +690,14 @@ private void updatePowerStateLocked() {
         if (!mSystemReady || mDirty == 0) {
             return;
         }
-        if (!Thread.holdsLock(mLock)) {
-            Slog.wtf(TAG, "Power manager lock was not held when calling updatePowerStateLocked");
-        }
 
-        Trace.traceBegin(Trace.TRACE_TAG_POWER, "updatePowerState");
         try {
             // Phase 0: Basic state updates.
+            //更新电池信息
             updateIsPoweredLocked(mDirty);
-            //设置 DIRTY_STAY_ON 的标志位
+            //更新屏幕保持唤醒标识值 mStayOn
             updateStayOnLocked(mDirty);
+            //亮度增强相关
             updateScreenBrightnessBoostLocked(mDirty);
 
             // Phase 1: Update wakefulness.
@@ -385,25 +710,32 @@ private void updatePowerStateLocked() {
                 dirtyPhase2 |= dirtyPhase1;
                 mDirty = 0;
 
+                //更新统计 wakelock 的标记值 mWakeLockSummary
                 updateWakeLockSummaryLocked(dirtyPhase1);
+                //更新统计 userActivity 的标记值 mUserActivitySummary 和休眠到达时间
                 updateUserActivitySummaryLocked(now, dirtyPhase1);
+                //用来更新屏幕唤醒状态，状态改变返回 true
                 if (!updateWakefulnessLocked(dirtyPhase1)) {
                     break;
                 }
             }
 
             // Phase 2: Update display power state.
+            //和 Display 交互，请求 Display 状态
             boolean displayBecameReady = updateDisplayPowerStateLocked(dirtyPhase2);
 
             // Phase 3: Update dream state (depends on display ready signal).
+            //更新屏保
             updateDreamLocked(dirtyPhase2, displayBecameReady);
 
             // Phase 4: Send notifications, if needed.
+            //如果 wakefulness 改变，做最后的收尾工作
             finishWakefulnessChangeIfNeededLocked();
 
             // Phase 5: Update suspend blocker.
             // Because we might release the last suspend blocker here, we need to make sure
             // we finished everything else first!
+            //更新 Suspend 锁
             updateSuspendBlockerLocked();
         } finally {
             Trace.traceEnd(Trace.TRACE_TAG_POWER);
@@ -411,299 +743,355 @@ private void updatePowerStateLocked() {
     }
 ```
 
-第 0 阶段：基本状态更新：
+如果没有进行特定场景的分析，这块可能很难理解，在后续的分析中会对特定场景进行分析，这样更能理解方法的使用，如果这里还不太理解，不用太担心。
+
+- updateIsPoweredLocked()
+
+这个方法主要功能有两个：
+
+1. USB 插入亮屏；
+2. 更新低电量模式；
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
 
 private void updateIsPoweredLocked(int dirty) {
-        if ((dirty & DIRTY_BATTERY_STATE) != 0) {
-            final boolean wasPowered = mIsPowered;
-            final int oldPlugType = mPlugType;
-            final boolean oldLevelLow = mBatteryLevelLow;
-            //获取充电标志位，充电器类型、电量百分比、低电量标志位
-            mIsPowered = mBatteryManagerInternal.isPowered(BatteryManager.BATTERY_PLUGGED_ANY);
-            mPlugType = mBatteryManagerInternal.getPlugType();
-            mBatteryLevel = mBatteryManagerInternal.getBatteryLevel();
-            mBatteryLevelLow = mBatteryManagerInternal.getBatteryLevelLow();
+    if ((dirty & DIRTY_BATTERY_STATE) != 0) {
+        final boolean wasPowered = mIsPowered;//是否充电
+        final int oldPlugType = mPlugType;//充电类型
+        final boolean oldLevelLow = mBatteryLevelLow;//是否处于低电量
+        //获取充电标志位，充电器类型、电量百分比、低电量标志位
+        mIsPowered = mBatteryManagerInternal.isPowered(BatteryManager.BATTERY_PLUGGED_ANY);
+        mPlugType = mBatteryManagerInternal.getPlugType();
+        mBatteryLevel = mBatteryManagerInternal.getBatteryLevel();
+        mBatteryLevelLow = mBatteryManagerInternal.getBatteryLevelLow();
 
-            if (DEBUG_SPEW) {
-                Slog.d(TAG, "updateIsPoweredLocked: wasPowered=" + wasPowered
-                        + ", mIsPowered=" + mIsPowered
-                        + ", oldPlugType=" + oldPlugType
-                        + ", mPlugType=" + mPlugType
-                        + ", mBatteryLevel=" + mBatteryLevel);
+        //充电器插拔事件或者充电器类型改变，则设置 DIRTY_IS_POWERED 标志位
+        if (wasPowered != mIsPowered || oldPlugType != mPlugType) {
+            mDirty |= DIRTY_IS_POWERED;
+
+            // Update wireless dock detection state.
+            //判断是否进行无线充电
+            final boolean dockedOnWirelessCharger = mWirelessChargerDetector.update(
+                    mIsPowered, mPlugType, mBatteryLevel);
+
+            // Treat plugging and unplugging the devices as a user activity.
+            // Users find it disconcerting when they plug or unplug the device
+            // and it shuts off right away.
+            // Some devices also wake the device when plugged or unplugged because
+            // they don't have a charging LED.
+            //上面注释的意思是说插拔充电器可以看做是用户行为，当插拔充电器时如果设备没有给出提示则用户比较迷惑
+            //特别是在设备没有充电指示灯时，所以一般插拔充电器时会唤醒设备
+            final long now = SystemClock.uptimeMillis();
+            if (shouldWakeUpWhenPluggedOrUnpluggedLocked(wasPowered, oldPlugType,
+                    dockedOnWirelessCharger)) {
+                //屏幕唤醒
+                wakeUpNoUpdateLocked(now, "android.server.power:POWER", Process.SYSTEM_UID,
+                        mContext.getOpPackageName(), Process.SYSTEM_UID);
             }
-            //充电器插拔事件或者充电器类型改变，则设置 DIRTY_IS_POWERED 标志位
-            if (wasPowered != mIsPowered || oldPlugType != mPlugType) {
-                mDirty |= DIRTY_IS_POWERED;
+            //如果设置了插拔充电器时需要唤醒设备，则在这里唤醒设备
+            userActivityNoUpdateLocked(
+                    now, PowerManager.USER_ACTIVITY_EVENT_OTHER, 0, Process.SYSTEM_UID);
 
-                // Update wireless dock detection state.
-                //判断是否进行无线充电
-                final boolean dockedOnWirelessCharger = mWirelessChargerDetector.update(
-                        mIsPowered, mPlugType, mBatteryLevel);
-
-                // Treat plugging and unplugging the devices as a user activity.
-                // Users find it disconcerting when they plug or unplug the device
-                // and it shuts off right away.
-                // Some devices also wake the device when plugged or unplugged because
-                // they don't have a charging LED.
-                //上面注释的意思是说插拔充电器可以看做是用户行为，当插拔充电器时如果设备没有给出提示则用户比较迷惑
-                //特别是在设备没有充电指示灯时，所以一般插拔充电器时会唤醒设备
-                final long now = SystemClock.uptimeMillis();
-                if (shouldWakeUpWhenPluggedOrUnpluggedLocked(wasPowered, oldPlugType,
-                        dockedOnWirelessCharger)) {
-                    wakeUpNoUpdateLocked(now, "android.server.power:POWER", Process.SYSTEM_UID,
-                            mContext.getOpPackageName(), Process.SYSTEM_UID);
-                }
-                //如果设置了插拔充电器时需要唤醒设备，则在这里唤醒设备
-                userActivityNoUpdateLocked(
-                        now, PowerManager.USER_ACTIVITY_EVENT_OTHER, 0, Process.SYSTEM_UID);
-
-                // Tell the notifier whether wireless charging has started so that
-                // it can provide feedback to the user.
-                //当无线充电器开始充电时给出提示音，在 mNotifier 中进行处理，播放一个 ogg 音频文件
-                if (dockedOnWirelessCharger) {
-                    mNotifier.onWirelessChargingStarted();
-                }
-            }
-            //如果电源发生插拔时或者低电量标志位发生变化
-            if (wasPowered != mIsPowered || oldLevelLow != mBatteryLevelLow) {
-                if (oldLevelLow != mBatteryLevelLow && !mBatteryLevelLow) {
-                    //当设备从低电量转换为非低电量，则设置自动打盹为 false
-                    if (DEBUG_SPEW) {
-                        Slog.d(TAG, "updateIsPoweredLocked: resetting low power snooze");
-                    }
-                    mAutoLowPowerModeSnoozing = false;
-                }
-                //发送广播 ACTION_POWER_SAVE_MODE_CHANGED，该广播在系统中多出进行处理，
-                //在 SystemUI 中进行处理，如果低电量则给出提示
-                updateLowPowerModeLocked();
+            // Tell the notifier whether wireless charging has started so that
+            // it can provide feedback to the user.
+            //当无线充电器开始充电时给出提示音，在 mNotifier 中进行处理，播放一个 ogg 音频文件
+            if (dockedOnWirelessCharger) {
+                mNotifier.onWirelessChargingStarted();
             }
         }
-    }
-    
- private void updateScreenBrightnessBoostLocked(int dirty) {
-        if ((dirty & DIRTY_SCREEN_BRIGHTNESS_BOOST) != 0) {
-            if (mScreenBrightnessBoostInProgress) {
-                final long now = SystemClock.uptimeMillis();
-                //删除屏幕亮度提升超时广播
-                mHandler.removeMessages(MSG_SCREEN_BRIGHTNESS_BOOST_TIMEOUT);
-                if (mLastScreenBrightnessBoostTime > mLastSleepTime) {
-                    final long boostTimeout = mLastScreenBrightnessBoostTime +
-                            SCREEN_BRIGHTNESS_BOOST_TIMEOUT;
-                    //如果超时还没有发生，则重新发送广播
-                    if (boostTimeout > now) {
-                        Message msg = mHandler.obtainMessage(MSG_SCREEN_BRIGHTNESS_BOOST_TIMEOUT);
-                        msg.setAsynchronous(true);
-                        mHandler.sendMessageAtTime(msg, boostTimeout);
-                        return;
-                    }
-                }
-                //进行到这里有两个条件
-                //mLastScreenBrightnessBoostTime <= mLastSleepTime 说明还在睡眠中
-                //boostTimeout <= now 说明亮度提升超时发生
-                mScreenBrightnessBoostInProgress = false;
-                mNotifier.onScreenBrightnessBoostChanged();
-                userActivityNoUpdateLocked(now,
-                        PowerManager.USER_ACTIVITY_EVENT_OTHER, 0, Process.SYSTEM_UID);
+        //如果电源发生插拔时或者低电量标志位发生变化
+        if (wasPowered != mIsPowered || oldLevelLow != mBatteryLevelLow) {
+            if (oldLevelLow != mBatteryLevelLow && !mBatteryLevelLow) {
+                //当设备从低电量转换为非低电量，则设置自动打盹为 false
+                mAutoLowPowerModeSnoozing = false;
             }
+            //发送广播 ACTION_POWER_SAVE_MODE_CHANGED，该广播在系统中多出进行处理，
+            //在 SystemUI 中进行处理，如果低电量则给出提示
+            updateLowPowerModeLocked();
         }
     }
+}
 ```
 
-第 1 阶段：基本状态更新：
+因此可以看到，这个方法跟电池有关，只要电池状态发生变化，就能够调用执行到这个方法进行操作。
+
+- updateStayOnLocked()
+
+这个方法主要用于判断系统是否在 Settings 中设置了充电时保持屏幕亮屏后，根据是否充电来决定是否亮屏。
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+private void updateStayOnLocked(int dirty) {
+    if ((dirty & (DIRTY_BATTERY_STATE | DIRTY_SETTINGS)) != 0) {
+        final boolean wasStayOn = mStayOn;
+        //充电时亮屏 && DevicePolicyManager 中未设置最大关闭时间
+        if (mStayOnWhilePluggedInSetting != 0
+                && !isMaximumScreenOffTimeoutFromDeviceAdminEnforcedLocked()) {
+            //保持亮屏取决于是否充电
+            mStayOn = mBatteryManagerInternal.isPowered(mStayOnWhilePluggedInSetting);
+        } else {
+            mStayOn = false;
+        }
+
+        if (mStayOn != wasStayOn) {
+            //如果 mStayOn 值改变 mDirty 置位
+            mDirty |= DIRTY_STAY_ON;
+        }
+    }
+}
+```
+
+- updateScreenBrightnessBoostLocked()
+
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+private void updateScreenBrightnessBoostLocked(int dirty) {
+    if ((dirty & DIRTY_SCREEN_BRIGHTNESS_BOOST) != 0) {
+        if (mScreenBrightnessBoostInProgress) {
+            final long now = SystemClock.uptimeMillis();
+            //删除屏幕亮度提升超时广播
+            mHandler.removeMessages(MSG_SCREEN_BRIGHTNESS_BOOST_TIMEOUT);
+            if (mLastScreenBrightnessBoostTime > mLastSleepTime) {
+                final long boostTimeout = mLastScreenBrightnessBoostTime +
+                        SCREEN_BRIGHTNESS_BOOST_TIMEOUT;
+                //如果超时还没有发生，则重新发送广播
+                if (boostTimeout > now) {
+                    Message msg = mHandler.obtainMessage(MSG_SCREEN_BRIGHTNESS_BOOST_TIMEOUT);
+                    msg.setAsynchronous(true);
+                    mHandler.sendMessageAtTime(msg, boostTimeout);
+                    return;
+                }
+            }
+            //进行到这里有两个条件
+            //mLastScreenBrightnessBoostTime <= mLastSleepTime 说明还在睡眠中
+            //boostTimeout <= now 说明亮度提升超时发生
+            mScreenBrightnessBoostInProgress = false;
+            mNotifier.onScreenBrightnessBoostChanged();
+            userActivityNoUpdateLocked(now,
+                    PowerManager.USER_ACTIVITY_EVENT_OTHER, 0, Process.SYSTEM_UID);
+        }
+    }
+}
+```
+
+- updateWakeLockSummaryLocked()
+
+在这个方法中，会对当前所有的 WakeLock 锁进行统计，过滤所有的 wakelock 锁状态（wakelock 锁机制在后续进行分析），并更新mWakeLockSummary 的值以汇总所有活动的唤醒锁的状态。
+
+mWakeLockSummary 是一个用来记录所有 WakeLock 锁状态的标识值，该值在请求 Display 状时会用到。当系统处于睡眠状态时，大多数唤醒锁都将被忽略，比如系统在处于唤醒状态(awake)时，会忽略 PowerManager.DOZE_WAKE_LOCK 类型的唤醒锁，系统在处于睡眠状态(asleep)或者 Doze 状态时，会忽略 PowerManager.SCREEN_BRIGHT 类型的锁等等。该方法如下：
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
 
 private void updateWakeLockSummaryLocked(int dirty) {
-        if ((dirty & (DIRTY_WAKE_LOCKS | DIRTY_WAKEFULNESS)) != 0) {
-            mWakeLockSummary = 0;
-            //numWakeLocks 保存了用户创建的所有 wakelock
-            final int numWakeLocks = mWakeLocks.size();
-            for (int i = 0; i < numWakeLocks; i++) {
-                final WakeLock wakeLock = mWakeLocks.get(i);
-                switch (wakeLock.mFlags & PowerManager.WAKE_LOCK_LEVEL_MASK) {
-                    case PowerManager.PARTIAL_WAKE_LOCK:
-                        if (!wakeLock.mDisabled) {
-                            // We only respect this if the wake lock is not disabled.
-                            mWakeLockSummary |= WAKE_LOCK_CPU;
-                        }
-                        break;
-                    case PowerManager.FULL_WAKE_LOCK:
-                        mWakeLockSummary |= WAKE_LOCK_SCREEN_BRIGHT | WAKE_LOCK_BUTTON_BRIGHT;
-                        break;
-                    case PowerManager.SCREEN_BRIGHT_WAKE_LOCK:
-                        mWakeLockSummary |= WAKE_LOCK_SCREEN_BRIGHT;
-                        break;
-                    case PowerManager.SCREEN_DIM_WAKE_LOCK:
-                        mWakeLockSummary |= WAKE_LOCK_SCREEN_DIM;
-                        break;
-                    case PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK:
-                        mWakeLockSummary |= WAKE_LOCK_PROXIMITY_SCREEN_OFF;
-                        break;
-                    case PowerManager.DOZE_WAKE_LOCK:
-                        mWakeLockSummary |= WAKE_LOCK_DOZE;
-                        break;
-                    case PowerManager.DRAW_WAKE_LOCK:
-                        mWakeLockSummary |= WAKE_LOCK_DRAW;
-                        break;
-                }
+    if ((dirty & (DIRTY_WAKE_LOCKS | DIRTY_WAKEFULNESS)) != 0) {
+        mWakeLockSummary = 0;
+        //numWakeLocks 保存了用户创建的所有 wakelock
+        final int numWakeLocks = mWakeLocks.size();
+        //遍历所有的 wakelock
+        for (int i = 0; i < numWakeLocks; i++) {
+            final WakeLock wakeLock = mWakeLocks.get(i);
+            switch (wakeLock.mFlags & PowerManager.WAKE_LOCK_LEVEL_MASK) {
+                case PowerManager.PARTIAL_WAKE_LOCK:
+                    if (!wakeLock.mDisabled) {
+                        // We only respect this if the wake lock is not disabled.
+                        //如果存在 PARTIAL_WAKE_LOCK 并且该 wakelock 可用，通过置位进行记录
+                        mWakeLockSummary |= WAKE_LOCK_CPU;
+                    }
+                    break;
+                case PowerManager.FULL_WAKE_LOCK:
+                    mWakeLockSummary |= WAKE_LOCK_SCREEN_BRIGHT | WAKE_LOCK_BUTTON_BRIGHT;
+                    break;
+                case PowerManager.SCREEN_BRIGHT_WAKE_LOCK:
+                    mWakeLockSummary |= WAKE_LOCK_SCREEN_BRIGHT;
+                    break;
+                case PowerManager.SCREEN_DIM_WAKE_LOCK:
+                    mWakeLockSummary |= WAKE_LOCK_SCREEN_DIM;
+                    break;
+                case PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK:
+                    mWakeLockSummary |= WAKE_LOCK_PROXIMITY_SCREEN_OFF;
+                    break;
+                case PowerManager.DOZE_WAKE_LOCK:
+                    mWakeLockSummary |= WAKE_LOCK_DOZE;
+                    break;
+                case PowerManager.DRAW_WAKE_LOCK:
+                    mWakeLockSummary |= WAKE_LOCK_DRAW;
+                    break;
             }
+        }
 
-            // Cancel wake locks that make no sense based on the current state.
-            //根据 mWakefulness 的状态取消某些锁的作用，意思就是在系统处于特定状态时，
-            //有些锁没有意义，需要取消 mWakeLockSummary 中相对应的标志位
-            if (mWakefulness != WAKEFULNESS_DOZING) {
-                mWakeLockSummary &= ~(WAKE_LOCK_DOZE | WAKE_LOCK_DRAW);
+        // Cancel wake locks that make no sense based on the current state.
+        //设备不处于 Doze 状态时，通过置位操作忽略相关类型 wakelock
+        //PowerManager.DOZE_WAKE_LOCK 和 WAKE_LOCK_DRAW 锁仅仅在 Doze 状态下有效
+        if (mWakefulness != WAKEFULNESS_DOZING) {
+            mWakeLockSummary &= ~(WAKE_LOCK_DOZE | WAKE_LOCK_DRAW);
+        }
+        //如果处于 Doze 状态，忽略三类 Wakelock
+        //如果处于睡眠状态，忽略四类 wakelock
+        if (mWakefulness == WAKEFULNESS_ASLEEP
+                || (mWakeLockSummary & WAKE_LOCK_DOZE) != 0) {
+            mWakeLockSummary &= ~(WAKE_LOCK_SCREEN_BRIGHT | WAKE_LOCK_SCREEN_DIM
+                    | WAKE_LOCK_BUTTON_BRIGHT);
+            if (mWakefulness == WAKEFULNESS_ASLEEP) {
+                mWakeLockSummary &= ~WAKE_LOCK_PROXIMITY_SCREEN_OFF;
             }
-            //注意这里，当 mWakefulless 为 asleep 时，WAKE_LOCK_SCREEN_BRIGHT、WAKE_LOCK_SCREEN_DIM、
-            //WAKE_LOCK_BUTTON_BRIGHT、WAKE_LOCK_PROXIMITY_SCREEN_OFF 这几个中 WakeLock 的标志位都会
-            //被清空，标志位被清空的作用就是类似系统释放了这些锁；
-            //仔细看只有 WAKE_LOCK_CPU 标志位不变，说明 PARTIAL_WAKE_LOCK 在系统休眠的时候是不是自动清空的，
-            //如果系统中存在 PARTIAL_WAKE_LOCK，那么除非手动释放，不然系统将没办法进入休眠。
-            //如果第三方应用获取了 PARTIAL_WAKE_LOCK，但是系统休眠时又不是释放该怎么办呢？
-            if (mWakefulness == WAKEFULNESS_ASLEEP
-                    || (mWakeLockSummary & WAKE_LOCK_DOZE) != 0) {
-                mWakeLockSummary &= ~(WAKE_LOCK_SCREEN_BRIGHT | WAKE_LOCK_SCREEN_DIM
-                        | WAKE_LOCK_BUTTON_BRIGHT);
-                if (mWakefulness == WAKEFULNESS_ASLEEP) {
-                    mWakeLockSummary &= ~WAKE_LOCK_PROXIMITY_SCREEN_OFF;
-                }
-            }
+        }
 
-            // Infer implied wake locks where necessary based on the current state.
-            //根据 mWakefullness 的状态增加某些锁的作用，就是说当系统处于特定状态时，需要某些锁来保持系统的状态，
-            //比如 WAKEFULNESS_AWAKE 状态肯定是要保持 CPU 运行的，
-            //所以需要添加 WAKE_LOCK_CPU 标志位以确保 CPU 处于运行状态
-            if ((mWakeLockSummary & (WAKE_LOCK_SCREEN_BRIGHT | WAKE_LOCK_SCREEN_DIM)) != 0) {
-                if (mWakefulness == WAKEFULNESS_AWAKE) {
-                    mWakeLockSummary |= WAKE_LOCK_CPU | WAKE_LOCK_STAY_AWAKE;
-                } else if (mWakefulness == WAKEFULNESS_DREAMING) {
-                    mWakeLockSummary |= WAKE_LOCK_CPU;
-                }
-            }
-            if ((mWakeLockSummary & WAKE_LOCK_DRAW) != 0) {
+        // Infer implied wake locks where necessary based on the current state.
+        //根据当前状态推断必要的 wakelock
+        //比如 WAKEFULNESS_AWAKE 状态肯定是要保持 CPU 运行的，
+        //所以需要添加 WAKE_LOCK_CPU 标志位以确保 CPU 处于运行状态
+        if ((mWakeLockSummary & (WAKE_LOCK_SCREEN_BRIGHT | WAKE_LOCK_SCREEN_DIM)) != 0) {
+            //处于 awake 状态，WAKE_LOCK_STAY_AWAKE 只用于 awake 状态时
+            if (mWakefulness == WAKEFULNESS_AWAKE) {
+                mWakeLockSummary |= WAKE_LOCK_CPU | WAKE_LOCK_STAY_AWAKE;
+            } else if (mWakefulness == WAKEFULNESS_DREAMING) {//处于屏保状态(dream)
                 mWakeLockSummary |= WAKE_LOCK_CPU;
             }
         }
+        if ((mWakeLockSummary & WAKE_LOCK_DRAW) != 0) {
+            mWakeLockSummary |= WAKE_LOCK_CPU;
+        }
     }
-    
+}
+```
+
+- updateUserActivitySummaryLocked()
+
+该方法用来更新用户活动时间，当设备和用户有交互时，都会根据当前时间和休眠时长、Dim 时长、所处状态而计算下次休眠的时间，从而完成用户活动超时时的操作。如：由亮屏进入 Dim 的时长、Dim 到灭屏的时长、亮屏到屏保的时长，就是在这里计算的。
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
     
 private void updateUserActivitySummaryLocked(long now, int dirty) {
-        // Update the status of the user activity timeout timer.
-        if ((dirty & (DIRTY_WAKE_LOCKS | DIRTY_USER_ACTIVITY
-                | DIRTY_WAKEFULNESS | DIRTY_SETTINGS)) != 0) {
-            mHandler.removeMessages(MSG_USER_ACTIVITY_TIMEOUT);
+    // Update the status of the user activity timeout timer.
+    if ((dirty & (DIRTY_WAKE_LOCKS | DIRTY_USER_ACTIVITY
+            | DIRTY_WAKEFULNESS | DIRTY_SETTINGS)) != 0) {
+        mHandler.removeMessages(MSG_USER_ACTIVITY_TIMEOUT);
 
-            long nextTimeout = 0;
-            if (mWakefulness == WAKEFULNESS_AWAKE
-                    || mWakefulness == WAKEFULNESS_DREAMING
-                    || mWakefulness == WAKEFULNESS_DOZING) {
-                final int sleepTimeout = getSleepTimeoutLocked();
-                final int screenOffTimeout = getScreenOffTimeoutLocked(sleepTimeout);
-                final int screenDimDuration = getScreenDimDurationLocked(screenOffTimeout);
-                final boolean userInactiveOverride = mUserInactiveOverrideFromWindowManager;
+        long nextTimeout = 0;
+        //如果处于休眠状态，则不会执行该方法
+        if (mWakefulness == WAKEFULNESS_AWAKE
+                || mWakefulness == WAKEFULNESS_DREAMING
+                || mWakefulness == WAKEFULNESS_DOZING) {
+            //设备完全进入休眠所需时间，该值为 -1 表示禁用此值，默认 -1
+            final int sleepTimeout = getSleepTimeoutLocked();
+            //用户超时时间，既经过一段时间不活动进入休眠或屏保的时间
+            //特殊情况外，该值为 Settings 中的休眠时长
+            final int screenOffTimeout = getScreenOffTimeoutLocked(sleepTimeout);
+            //Dim 时长，即亮屏不操作，变暗多久休眠
+            final int screenDimDuration = getScreenDimDurationLocked(screenOffTimeout);
+            //通过 WindowManager 的用户交互
+            final boolean userInactiveOverride = mUserInactiveOverrideFromWindowManager;
 
-                mUserActivitySummary = 0;
-                if (mLastUserActivityTime >= mLastWakeTime) {
-                    nextTimeout = mLastUserActivityTime
-                            + screenOffTimeout - screenDimDuration;
+            mUserActivitySummary = 0;
+            //1.亮屏；2.亮屏后进行用户活动
+            if (mLastUserActivityTime >= mLastWakeTime) {
+                //下次睡眠时间 = 上次用户活动时间 + 休眠时间 - Dim时间
+                nextTimeout = mLastUserActivityTime
+                        + screenOffTimeout - screenDimDuration;
+                //如果满足当前时间 < 下次屏幕超时时间，说明此时设备为亮屏状态，
+                //则将用户活动状态置为表示亮屏的 USER_ACTIVITY_SCREEN_BRIGHT
+                if (now < nextTimeout) {
+                    mUserActivitySummary = USER_ACTIVITY_SCREEN_BRIGHT;
+                } else {//如果当前时间 >下次活动时间，此时应有两种情况：已经休眠和 Dim
+                    nextTimeout = mLastUserActivityTime + screenOffTimeout;
+                    //如果当前时间 < 上次活动时间+屏幕超时时间，这个值约为 3s，
+                    //说明此时设备为 Dim 状态，则将用户活动状态置为表示 Dim 的 USER_ACTIVITY_SCREEN_DIM
                     if (now < nextTimeout) {
+                        mUserActivitySummary = USER_ACTIVITY_SCREEN_DIM;
+                    }
+                }
+            }
+            if (mUserActivitySummary == 0
+                    && mLastUserActivityTimeNoChangeLights >= mLastWakeTime) {
+                nextTimeout = mLastUserActivityTimeNoChangeLights + screenOffTimeout;
+                if (now < nextTimeout) {
+                    if (mDisplayPowerRequest.policy == DisplayPowerRequest.POLICY_BRIGHT
+                            || mDisplayPowerRequest.policy == DisplayPowerRequest.POLICY_VR) {
                         mUserActivitySummary = USER_ACTIVITY_SCREEN_BRIGHT;
-                    } else {
-                        nextTimeout = mLastUserActivityTime + screenOffTimeout;
+                    } else if (mDisplayPowerRequest.policy == DisplayPowerRequest.POLICY_DIM) {
+                        mUserActivitySummary = USER_ACTIVITY_SCREEN_DIM;
+                    }
+                }
+            }
+
+            if (mUserActivitySummary == 0) {
+                if (sleepTimeout >= 0) {
+                    final long anyUserActivity = Math.max(mLastUserActivityTime,
+                            mLastUserActivityTimeNoChangeLights);
+                    if (anyUserActivity >= mLastWakeTime) {
+                        nextTimeout = anyUserActivity + sleepTimeout;
                         if (now < nextTimeout) {
-                            mUserActivitySummary = USER_ACTIVITY_SCREEN_DIM;
+                            mUserActivitySummary = USER_ACTIVITY_SCREEN_DREAM;
                         }
                     }
-                }
-                if (mUserActivitySummary == 0
-                        && mLastUserActivityTimeNoChangeLights >= mLastWakeTime) {
-                    nextTimeout = mLastUserActivityTimeNoChangeLights + screenOffTimeout;
-                    if (now < nextTimeout) {
-                        if (mDisplayPowerRequest.policy == DisplayPowerRequest.POLICY_BRIGHT
-                                || mDisplayPowerRequest.policy == DisplayPowerRequest.POLICY_VR) {
-                            mUserActivitySummary = USER_ACTIVITY_SCREEN_BRIGHT;
-                        } else if (mDisplayPowerRequest.policy == DisplayPowerRequest.POLICY_DIM) {
-                            mUserActivitySummary = USER_ACTIVITY_SCREEN_DIM;
-                        }
-                    }
-                }
-
-                if (mUserActivitySummary == 0) {
-                    if (sleepTimeout >= 0) {
-                        final long anyUserActivity = Math.max(mLastUserActivityTime,
-                                mLastUserActivityTimeNoChangeLights);
-                        if (anyUserActivity >= mLastWakeTime) {
-                            nextTimeout = anyUserActivity + sleepTimeout;
-                            if (now < nextTimeout) {
-                                mUserActivitySummary = USER_ACTIVITY_SCREEN_DREAM;
-                            }
-                        }
-                    } else {
-                        mUserActivitySummary = USER_ACTIVITY_SCREEN_DREAM;
-                        nextTimeout = -1;
-                    }
-                }
-
-                if (mUserActivitySummary != USER_ACTIVITY_SCREEN_DREAM && userInactiveOverride) {
-                    if ((mUserActivitySummary &
-                            (USER_ACTIVITY_SCREEN_BRIGHT | USER_ACTIVITY_SCREEN_DIM)) != 0) {
-                        // Device is being kept awake by recent user activity
-                        if (nextTimeout >= now && mOverriddenTimeout == -1) {
-                            // Save when the next timeout would have occurred
-                            mOverriddenTimeout = nextTimeout;
-                        }
-                    }
+                } else {
                     mUserActivitySummary = USER_ACTIVITY_SCREEN_DREAM;
                     nextTimeout = -1;
                 }
-
-                if (mUserActivitySummary != 0 && nextTimeout >= 0) {
-                    Message msg = mHandler.obtainMessage(MSG_USER_ACTIVITY_TIMEOUT);
-                    msg.setAsynchronous(true);
-                    mHandler.sendMessageAtTime(msg, nextTimeout);
-                }
-            } else {
-                mUserActivitySummary = 0;
             }
 
-            if (DEBUG_SPEW) {
-                Slog.d(TAG, "updateUserActivitySummaryLocked: mWakefulness="
-                        + PowerManagerInternal.wakefulnessToString(mWakefulness)
-                        + ", mUserActivitySummary=0x" + Integer.toHexString(mUserActivitySummary)
-                        + ", nextTimeout=" + TimeUtils.formatUptime(nextTimeout));
+            if (mUserActivitySummary != USER_ACTIVITY_SCREEN_DREAM && userInactiveOverride) {
+                if ((mUserActivitySummary &
+                        (USER_ACTIVITY_SCREEN_BRIGHT | USER_ACTIVITY_SCREEN_DIM)) != 0) {
+                    // Device is being kept awake by recent user activity
+                    if (nextTimeout >= now && mOverriddenTimeout == -1) {
+                        // Save when the next timeout would have occurred
+                        mOverriddenTimeout = nextTimeout;
+                    }
+                }
+                mUserActivitySummary = USER_ACTIVITY_SCREEN_DREAM;
+                nextTimeout = -1;
             }
+
+            //发送定时 Handler，到达时间后再次进行 updatePowerStateLocked()
+            if (mUserActivitySummary != 0 && nextTimeout >= 0) {
+                Message msg = mHandler.obtainMessage(MSG_USER_ACTIVITY_TIMEOUT);
+                msg.setAsynchronous(true);
+                mHandler.sendMessageAtTime(msg, nextTimeout);
+            }
+        } else {
+            mUserActivitySummary = 0;
         }
     }
-    
-private boolean updateWakefulnessLocked(int dirty) {
-        boolean changed = false;
-        if ((dirty & (DIRTY_WAKE_LOCKS | DIRTY_USER_ACTIVITY | DIRTY_BOOT_COMPLETED
-                | DIRTY_WAKEFULNESS | DIRTY_STAY_ON | DIRTY_PROXIMITY_POSITIVE
-                | DIRTY_DOCK_STATE)) != 0) {
-            //注意这里改变 mWakefullness 的值，但是 mWakefullness 的值会影响锁的有效性，
-            //因此阶段 2 的处理在一个 for 循环中
-            if (mWakefulness == WAKEFULNESS_AWAKE && isItBedTimeYetLocked()) {
-                if (DEBUG_SPEW) {
-                    Slog.d(TAG, "updateWakefulnessLocked: Bed time...");
-                }
-                final long time = SystemClock.uptimeMillis();
-                if (shouldNapAtBedTimeLocked()) {
-                    changed = napNoUpdateLocked(time, Process.SYSTEM_UID);
-                } else {
-                    changed = goToSleepNoUpdateLocked(time,
-                            PowerManager.GO_TO_SLEEP_REASON_TIMEOUT, 0, Process.SYSTEM_UID);
-                }
-            }
-        }
-        return changed;
-    }
+}
 ```
 
-阶段 2：
+- updateWakefulnessLocked()
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+    
+private boolean updateWakefulnessLocked(int dirty) {
+    boolean changed = false;
+    if ((dirty & (DIRTY_WAKE_LOCKS | DIRTY_USER_ACTIVITY | DIRTY_BOOT_COMPLETED
+            | DIRTY_WAKEFULNESS | DIRTY_STAY_ON | DIRTY_PROXIMITY_POSITIVE
+            | DIRTY_DOCK_STATE)) != 0) {
+        //当前屏幕保持唤醒 && 设备将要退出唤醒状态(睡眠 or 屏保)
+        if (mWakefulness == WAKEFULNESS_AWAKE && isItBedTimeYetLocked()) {
+            final long time = SystemClock.uptimeMillis();
+            //是否在休眠时启用屏保
+            if (shouldNapAtBedTimeLocked()) {
+                changed = napNoUpdateLocked(time, Process.SYSTEM_UID);
+            } else {//进入睡眠，返回 true
+                changed = goToSleepNoUpdateLocked(time,
+                        PowerManager.GO_TO_SLEEP_REASON_TIMEOUT, 0, Process.SYSTEM_UID);
+            }
+        }
+    }
+    return changed;
+}
+```
+
+- updateDisplayPowerStateLocked()
+
+该方法用于更新设备显示状态，在这个方法中，会计算出最终需要显示的亮度值和其他值，然后将这些值封装到 DisplayPowerRequest 对象中，向 DisplayMangerService 请求 Display 状态，完成屏幕亮度显示等。
+
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -756,6 +1144,7 @@ private boolean updateWakefulnessLocked(int dirty) {
                     screenAutoBrightnessAdjustment, 1.0f), -1.0f);
 
             // Update display power request.
+            //封装到 DisplayPowerRequest 中
             mDisplayPowerRequest.screenBrightness = screenBrightness;
             mDisplayPowerRequest.screenAutoBrightnessAdjustment =
                     screenAutoBrightnessAdjustment;
@@ -779,6 +1168,7 @@ private boolean updateWakefulnessLocked(int dirty) {
                 mDisplayPowerRequest.dozeScreenBrightness = PowerManager.BRIGHTNESS_DEFAULT;
             }
 
+            //传给 DisplayManagerService 中处理
             mDisplayReady = mDisplayManagerInternal.requestPowerState(mDisplayPowerRequest,
                     mRequestWaitForNegativeProximity);
             mRequestWaitForNegativeProximity = false;
@@ -786,45 +1176,45 @@ private boolean updateWakefulnessLocked(int dirty) {
             if ((dirty & DIRTY_QUIESCENT) != 0) {
                 sQuiescent = false;
             }
-            if (DEBUG_SPEW) {
-                Slog.d(TAG, "updateDisplayPowerStateLocked: mDisplayReady=" + mDisplayReady
-                        + ", policy=" + mDisplayPowerRequest.policy
-                        + ", mWakefulness=" + mWakefulness
-                        + ", mWakeLockSummary=0x" + Integer.toHexString(mWakeLockSummary)
-                        + ", mUserActivitySummary=0x" + Integer.toHexString(mUserActivitySummary)
-                        + ", mBootCompleted=" + mBootCompleted
-                        + ", mScreenBrightnessBoostInProgress=" + mScreenBrightnessBoostInProgress
-                        + ", mIsVrModeEnabled= " + mIsVrModeEnabled
-                        + ", sQuiescent=" + sQuiescent);
-            }
         }
         return mDisplayReady && !oldDisplayReady;
     }
 ```
 
-阶段3：
+- updateDreamLocked()
+
+该方法用来更新设备 Dream 状态，比如是否继续屏保、Doze 或者开始休眠。
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
 
  private void updateDreamLocked(int dirty, boolean displayBecameReady) {
-        if ((dirty & (DIRTY_WAKEFULNESS
-                | DIRTY_USER_ACTIVITY
-                | DIRTY_WAKE_LOCKS
-                | DIRTY_BOOT_COMPLETED
-                | DIRTY_SETTINGS
-                | DIRTY_IS_POWERED
-                | DIRTY_STAY_ON
-                | DIRTY_PROXIMITY_POSITIVE
-                | DIRTY_BATTERY_STATE)) != 0 || displayBecameReady) {
-            if (mDisplayReady) {
-                scheduleSandmanLocked();
-            }
+    if ((dirty & (DIRTY_WAKEFULNESS
+            | DIRTY_USER_ACTIVITY
+            | DIRTY_WAKE_LOCKS
+            | DIRTY_BOOT_COMPLETED
+            | DIRTY_SETTINGS
+            | DIRTY_IS_POWERED
+            | DIRTY_STAY_ON
+            | DIRTY_PROXIMITY_POSITIVE
+            | DIRTY_BATTERY_STATE)) != 0 || displayBecameReady) {
+        if (mDisplayReady) {
+            //通过 Handler 异步发送一个消息
+            scheduleSandmanLocked();
         }
     }
-    
+}
+```
+
+- scheduleSandmanLocked()
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+ 
 private void scheduleSandmanLocked() {
         if (!mSandmanScheduled) {
+            //由于是异步处理，因此表示是否已经调用该方法且没有被 handler 处理，
+            //如果为 true 就不会进入该方法了
             mSandmanScheduled = true;
             Message msg = mHandler.obtainMessage(MSG_SANDMAN);
             msg.setAsynchronous(true);
@@ -833,13 +1223,16 @@ private void scheduleSandmanLocked() {
     }
 ```
 
-阶段4：
+- finishWakefulnessChangeIfNeededLocked()
+
+该方法主要做 updateWakefulnessLocked() 方法的结束工作，可以说 updateWakefulnessLocked() 方法中做了屏幕改变的前半部分工作，而这个方法中做后半部分工作。当屏幕状态改变后，才会执行该方法。我们已经分析了，屏幕状态有四种：唤醒状态(awake)、休眠状态(asleep)、屏保状态(dream)、打盹状态(doze)，当前屏幕状态由 wakefulness 表示，当 wakefulness 发生改变，布尔值 mWakefulnessChanging 变为 true。该方法涉及 wakefulness 收尾相关内容，用来处理 wakefulness 改变完成后的工作。
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
 
 private void finishWakefulnessChangeIfNeededLocked() {
         if (mWakefulnessChanging && mDisplayReady) {
+            //如果当前处于 Doze 状态，不进行处理
             if (mWakefulness == WAKEFULNESS_DOZING
                     && (mWakeLockSummary & WAKE_LOCK_DOZE) == 0) {
                 return; // wait until dream has enabled dozing
@@ -851,12 +1244,19 @@ private void finishWakefulnessChangeIfNeededLocked() {
                 logScreenOn();
             }
             mWakefulnessChanging = false;
+            //通过 Notifier 进行 wakefulness 改变后的处理
             mNotifier.onWakefulnessChangeFinished();
         }
     }
 ```
 
-阶段5：
+
+## WakeLock
+
+
+- updateSuspendBlockerLocked()
+
+
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -927,162 +1327,18 @@ private void updateSuspendBlockerLocked() {
 ```
 
 
-## startBootPhase() 分析
 
-我们在 SystemServer.startBootstrapServices() 系统启动中可以看到，在启动的的各个阶段都会调用 `startBootPhase()` 方法，下面我们来看下这个方法的作用。
-
-```Java
-//frameworks/base/services/core/java/com/android/server/SystemServiceManager.java
-
-public void startBootPhase(final int phase) {
-        if (phase <= mCurrentPhase) {
-            throw new IllegalArgumentException("Next phase must be larger than previous");
-        }
-        mCurrentPhase = phase;
-
-        Slog.i(TAG, "Starting phase " + mCurrentPhase);
-        try {
-            Trace.traceBegin(Trace.TRACE_TAG_SYSTEM_SERVER, "OnBootPhase " + phase);
-            final int serviceLen = mServices.size();
-            //遍历已经服务列表
-            for (int i = 0; i < serviceLen; i++) {
-                final SystemService service = mServices.get(i);
-                long time = System.currentTimeMillis();
-                Trace.traceBegin(Trace.TRACE_TAG_SYSTEM_SERVER, service.getClass().getName());
-                try {
-                    //调用服务的 onBootPhase() 方法
-                    service.onBootPhase(mCurrentPhase);
-                } catch (Exception ex) {}
-                warnIfTooLong(System.currentTimeMillis() - time, service, "onBootPhase");
-                Trace.traceEnd(Trace.TRACE_TAG_SYSTEM_SERVER);
-            }
-        } finally {
-            Trace.traceEnd(Trace.TRACE_TAG_SYSTEM_SERVER);
-        }
-    }
-```
-
-```Java
-//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
-
-@Override
-public void onBootPhase(int phase) {
-    synchronized (mLock) {
-        if (phase == PHASE_THIRD_PARTY_APPS_CAN_START) {
-            incrementBootCount();
-
-        } else if (phase == PHASE_BOOT_COMPLETED) {
-            final long now = SystemClock.uptimeMillis();
-            //设置 mBootCompleted 状态
-            mBootCompleted = true;
-            mDirty |= DIRTY_BOOT_COMPLETED;
-            //更新 userActivity 及 PowerState
-            userActivityNoUpdateLocked(
-                    now, PowerManager.USER_ACTIVITY_EVENT_OTHER, 0, Process.SYSTEM_UID);
-            updatePowerStateLocked();
-
-            if (!ArrayUtils.isEmpty(mBootCompletedRunnables)) {
-                Slog.d(TAG, "Posting " + mBootCompletedRunnables.length + " delayed runnables");
-                for (Runnable r : mBootCompletedRunnables) {
-                    BackgroundThread.getHandler().post(r);
-                }
-            }
-            mBootCompletedRunnables = null;
-        }
-    }
-}
-```
-
-onBootPhase 中主要设置 mBootCompleted 状态，更新 PowerState 状态，并执行 mBootCompletedRunnables 中的 runnables方法(低电量模式会设置)。
-
-```Java
-//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
-
-private boolean userActivityNoUpdateLocked(long eventTime, int event, int flags, int uid) {
-       //如果发生时间是上一次休眠或唤醒前，或当前没有开机完成到 systemReady，不采取操作直接返回
-        if (eventTime < mLastSleepTime || eventTime < mLastWakeTime
-                || !mBootCompleted || !mSystemReady) {
-            return false;
-        }
-
-        Trace.traceBegin(Trace.TRACE_TAG_POWER, "userActivity");
-        try {
-            //更新 mLastInteractivePowerHintTime 时间
-            if (eventTime > mLastInteractivePowerHintTime) {
-                powerHintInternal(PowerHint.INTERACTION, 0);
-                mLastInteractivePowerHintTime = eventTime;
-            }
-
-            //通过 mNotifier 通知 BatteryStats UserActivity 事件
-            mNotifier.onUserActivity(event, uid);
-
-            if (mUserInactiveOverrideFromWindowManager) {
-                mUserInactiveOverrideFromWindowManager = false;
-                mOverriddenTimeout = -1;
-            }
-
-            //如果系统处于休眠状态，不进行处理
-            if (mWakefulness == WAKEFULNESS_ASLEEP
-                    || mWakefulness == WAKEFULNESS_DOZING
-                    || (flags & PowerManager.USER_ACTIVITY_FLAG_INDIRECT) != 0) {
-                return false;
-            }
-
-            //根据 flag 是否在已变暗的情况下，是否重启活动超时更新 mLastUserActivityTimeNoChangeLights
-            //或 mLastUserActivityTime，并且设置 mDirty -> DIRTY_USER_ACTIVITY
-            if ((flags & PowerManager.USER_ACTIVITY_FLAG_NO_CHANGE_LIGHTS) != 0) {
-                if (eventTime > mLastUserActivityTimeNoChangeLights
-                        && eventTime > mLastUserActivityTime) {
-                    mLastUserActivityTimeNoChangeLights = eventTime;
-                    mDirty |= DIRTY_USER_ACTIVITY;
-                    if (event == PowerManager.USER_ACTIVITY_EVENT_BUTTON) {
-                        mDirty |= DIRTY_QUIESCENT;
-                    }
-
-                    return true;
-                }
-            } else {
-                if (eventTime > mLastUserActivityTime) {
-                    mLastUserActivityTime = eventTime;
-                    mDirty |= DIRTY_USER_ACTIVITY;
-                    if (event == PowerManager.USER_ACTIVITY_EVENT_BUTTON) {
-                        mDirty |= DIRTY_QUIESCENT;
-                    }
-                    return true;
-                }
-            }
-        } finally {
-            Trace.traceEnd(Trace.TRACE_TAG_POWER);
-        }
-        return false;
-    }
-```
-
-
-## userActivity
+## Notifier
 
 
 
 
 
-## WakeLock 分析
-
-- WakeLock 客户端
-- new WakeLock 分析
-- acquire 分析
-- PowerManagerService.acquireWakeLock
-
-## LightService
-
-## userActivity
-
-## BatteryService
-
-## BatteryStatsServic
 
 ## 参考资料
 
 - [](http://www.robinheztto.com/2017/06/14/android-power-pms-1/)
+- [](https://blog.csdn.net/FightFightFight/article/details/79532191)
 
 
 
