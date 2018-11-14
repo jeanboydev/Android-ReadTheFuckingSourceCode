@@ -609,7 +609,7 @@ private void updateSettingsLocked() {
     mSleepTimeoutSetting = Settings.Secure.getIntForUser(resolver,
             Settings.Secure.SLEEP_TIMEOUT, DEFAULT_SLEEP_TIMEOUT,
             UserHandle.USER_CURRENT);
-    /充电时屏幕一直开启
+    //充电时屏幕一直开启
     mStayOnWhilePluggedInSetting = Settings.Global.getInt(resolver,
             Settings.Global.STAY_ON_WHILE_PLUGGED_IN, BatteryManager.BATTERY_PLUGGED_AC);
     //是否支持剧院模式
@@ -878,6 +878,8 @@ private void updateScreenBrightnessBoostLocked(int dirty) {
 }
 ```
 
+### 第一阶段
+
 - updateWakeLockSummaryLocked()
 
 在这个方法中，会对当前所有的 WakeLock 锁进行统计，过滤所有的 wakelock 锁状态（wakelock 锁机制在后续进行分析），并更新mWakeLockSummary 的值以汇总所有活动的唤醒锁的状态。
@@ -1064,6 +1066,8 @@ private void updateUserActivitySummaryLocked(long now, int dirty) {
 
 - updateWakefulnessLocked()
 
+这个方法是退出循环的关键，如果这个方法返回 false，则循环结束，如果返回 true，则进行下一次循环。
+
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
     
@@ -1087,6 +1091,39 @@ private boolean updateWakefulnessLocked(int dirty) {
     return changed;
 }
 ```
+
+- isItBedTimeYetLocked()
+
+该方法判断当前设备是否将要进入睡眠状态，由 mStayOn(是否屏幕常亮)、wakelockSummary、userActivitySummary、mProximityPositive 等决定，只要满足其中之一为 ture，则说明无法进入睡眠，也就说，要满足进入睡眠，相关属性值都为false。
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+    
+private boolean isBeingKeptAwakeLocked() {
+    return mStayOn//屏幕是否保持常亮
+            || mProximityPositive//接近传感器接近屏幕时为 true
+            || (mWakeLockSummary & WAKE_LOCK_STAY_AWAKE) != 0//处于awake状态
+            || (mUserActivitySummary & (USER_ACTIVITY_SCREEN_BRIGHT
+                    | USER_ACTIVITY_SCREEN_DIM)) != 0//屏幕处于亮屏或者dim状态
+            || mScreenBrightnessBoostInProgress; //处于亮度增强中
+}
+```
+
+- shouldNapAtBedTimeLocked()
+
+这个方法用来判断设备是否进入屏保模式：
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+    
+ private boolean shouldNapAtBedTimeLocked() {
+    return mDreamsActivateOnSleepSetting//屏保是否开启
+            || (mDreamsActivateOnDockSetting//插入基座时是否开启屏保
+                    && mDockState != Intent.EXTRA_DOCK_STATE_UNDOCKED);
+}
+```
+
+### 第二阶段
 
 - updateDisplayPowerStateLocked()
 
@@ -1181,6 +1218,47 @@ private boolean updateWakefulnessLocked(int dirty) {
     }
 ```
 
+- getDesiredScreenPolicyLocked()
+
+在请求 DisplayManagerService 时，会将所有的信息封装到 DisplayPowerRequest 对象中，其中需要注意 policy 值。policy 作为 DisplayPowerRequset 的属性，有四种值，分别为 off、doze、dim、bright、vr。在向 DisplayManagerService 请求时，会根据当前 PowerManagerService 中的唤醒状态和统计的 wakelock 来决定要请求的 Display 状态，这部分源码如下：
+
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+private int getDesiredScreenPolicyLocked() {
+    if (mIsVrModeEnabled) {
+        return DisplayPowerRequest.POLICY_VR;
+    }
+
+    if (mWakefulness == WAKEFULNESS_ASLEEP || sQuiescent) {
+        return DisplayPowerRequest.POLICY_OFF;
+    }
+
+    if (mWakefulness == WAKEFULNESS_DOZING) {
+        if ((mWakeLockSummary & WAKE_LOCK_DOZE) != 0) {
+            return DisplayPowerRequest.POLICY_DOZE;
+        }
+        if (mDozeAfterScreenOffConfig) {
+            return DisplayPowerRequest.POLICY_OFF;
+        }
+        // Fall through and preserve the current screen policy if not configured to
+        // doze after screen off.  This causes the screen off transition to be skipped.
+    }
+
+    if ((mWakeLockSummary & WAKE_LOCK_SCREEN_BRIGHT) != 0
+            || (mUserActivitySummary & USER_ACTIVITY_SCREEN_BRIGHT) != 0
+            || !mBootCompleted
+            || mScreenBrightnessBoostInProgress) {
+        return DisplayPowerRequest.POLICY_BRIGHT;
+    }
+
+    return DisplayPowerRequest.POLICY_DIM;
+}
+```
+
+### 第三阶段
+
 - updateDreamLocked()
 
 该方法用来更新设备 Dream 状态，比如是否继续屏保、Doze 或者开始休眠。
@@ -1188,7 +1266,7 @@ private boolean updateWakefulnessLocked(int dirty) {
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
 
- private void updateDreamLocked(int dirty, boolean displayBecameReady) {
+private void updateDreamLocked(int dirty, boolean displayBecameReady) {
     if ((dirty & (DIRTY_WAKEFULNESS
             | DIRTY_USER_ACTIVITY
             | DIRTY_WAKE_LOCKS
@@ -1205,6 +1283,8 @@ private boolean updateWakefulnessLocked(int dirty) {
     }
 }
 ```
+
+从这里可以看到，该方法依赖于 mDisplayReady 值，这个值是上个方法在请求 Display 时的返回值，表示 Display 是否准备就绪，因此，只有在准备就绪的情况下才会进一步调用该方法的方法体。在 scheduleSandmanLocked() 方法中，通过 Handler 发送了一个异步消息，代码如下：
 
 - scheduleSandmanLocked()
 
@@ -1223,6 +1303,126 @@ private void scheduleSandmanLocked() {
     }
 ```
 
+再来看看 handleMessage() 中对接受消息的处理：
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+private final class PowerManagerHandler extends Handler {
+    
+    @Override
+    public void handleMessage(Message msg) {
+        switch (msg.what) {
+            //...
+            case MSG_SANDMAN:
+                handleSandman();
+                break;
+            //...
+        }
+    }
+}
+```
+
+因此，当 updateDreamLocked() 方法调用后，最终会异步执行这个方法，在这个方法中进行屏保相关处理，继续看看这个方法：
+
+- handleSandman()
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+private void handleSandman() { // runs on handler thread
+    //是否开始进入屏保
+    final boolean startDreaming;
+    final int wakefulness;
+    synchronized (mLock) {
+        //为 false 后下次 updateDreamLocked() 可处理
+        mSandmanScheduled = false;
+        wakefulness = mWakefulness;
+        //在进入 asleep 状态后该值为 true，用于判断是否处于 Dream 状态
+        if (mSandmanSummoned && mDisplayReady) {
+            //当前状态能否进入 Dream || 当前 wakefulness 状态为 Doze
+            startDreaming = canDreamLocked() || canDozeLocked();
+            mSandmanSummoned = false;
+        } else {
+            startDreaming = false;
+        }
+    }
+
+    //表示是否正在屏保
+    final boolean isDreaming;
+    if (mDreamManager != null) {
+        //重启屏保
+        if (startDreaming) {
+            mDreamManager.stopDream(false /*immediate*/);
+            mDreamManager.startDream(wakefulness == WAKEFULNESS_DOZING);
+        }
+        isDreaming = mDreamManager.isDreaming();
+    } else {
+        isDreaming = false;
+    }
+
+    synchronized (mLock) {
+        //记录进入屏保时的电池电量
+        if (startDreaming && isDreaming) {
+            mBatteryLevelWhenDreamStarted = mBatteryLevel;
+            if (wakefulness == WAKEFULNESS_DOZING) {
+                Slog.i(TAG, "Dozing...");
+            } else {
+                Slog.i(TAG, "Dreaming...");
+            }
+        }
+
+        //如果 mSandmanSummoned 改变或者 wakefulness 状态改变，
+        //则 return 等待下次处理
+        if (mSandmanSummoned || mWakefulness != wakefulness) {
+            return; // wait for next cycle
+        }
+
+        //决定是否继续 Dream
+        if (wakefulness == WAKEFULNESS_DREAMING) {
+            if (isDreaming && canDreamLocked()) {
+                //表示从开启屏保开始电池电量下降这个值就退出屏保，-1 表示禁用该值
+                if (mDreamsBatteryLevelDrainCutoffConfig >= 0
+                        && mBatteryLevel < mBatteryLevelWhenDreamStarted
+                                - mDreamsBatteryLevelDrainCutoffConfig
+                        && !isBeingKeptAwakeLocked()) {                    
+                } else {
+                    return; // continue dreaming
+                }
+            }
+
+            //退出屏保，进入 Doze 状态
+            if (isItBedTimeYetLocked()) {
+                goToSleepNoUpdateLocked(SystemClock.uptimeMillis(),
+                        PowerManager.GO_TO_SLEEP_REASON_TIMEOUT, 0, Process.SYSTEM_UID);
+                updatePowerStateLocked();
+            } else {
+                //唤醒设备，reason为android.server.power:DREAM
+                wakeUpNoUpdateLocked(SystemClock.uptimeMillis(), "android.server.power:DREAM",
+                        Process.SYSTEM_UID, mContext.getOpPackageName(), Process.SYSTEM_UID);
+                updatePowerStateLocked();
+            }
+        //如果处于 Doze 状态，在 power 键灭屏时，首次会将 wakefulness 设置为该值
+        } else if (wakefulness == WAKEFULNESS_DOZING) {
+            if (isDreaming) {
+                return; // continue dozing
+            }
+
+            //进入 asleep 状态
+            reallyGoToSleepNoUpdateLocked(SystemClock.uptimeMillis(), Process.SYSTEM_UID);
+            updatePowerStateLocked();
+        }
+    }
+
+    //如果正处在 Dream，则只要触发 updatePowerStateLocked()，立即退出 Dream
+    if (isDreaming) {
+        mDreamManager.stopDream(false /*immediate*/);
+    }
+}
+```
+
+### 第四阶段
+
 - finishWakefulnessChangeIfNeededLocked()
 
 该方法主要做 updateWakefulnessLocked() 方法的结束工作，可以说 updateWakefulnessLocked() 方法中做了屏幕改变的前半部分工作，而这个方法中做后半部分工作。当屏幕状态改变后，才会执行该方法。我们已经分析了，屏幕状态有四种：唤醒状态(awake)、休眠状态(asleep)、屏保状态(dream)、打盹状态(doze)，当前屏幕状态由 wakefulness 表示，当 wakefulness 发生改变，布尔值 mWakefulnessChanging 变为 true。该方法涉及 wakefulness 收尾相关内容，用来处理 wakefulness 改变完成后的工作。
@@ -1231,27 +1431,41 @@ private void scheduleSandmanLocked() {
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
 
 private void finishWakefulnessChangeIfNeededLocked() {
-        if (mWakefulnessChanging && mDisplayReady) {
-            //如果当前处于 Doze 状态，不进行处理
-            if (mWakefulness == WAKEFULNESS_DOZING
-                    && (mWakeLockSummary & WAKE_LOCK_DOZE) == 0) {
-                return; // wait until dream has enabled dozing
-            }
-            if (mWakefulness == WAKEFULNESS_DOZING || mWakefulness == WAKEFULNESS_ASLEEP) {
-                logSleepTimeoutRecapturedLocked();
-            }
-            if (mWakefulness == WAKEFULNESS_AWAKE) {
-                logScreenOn();
-            }
-            mWakefulnessChanging = false;
-            //通过 Notifier 进行 wakefulness 改变后的处理
-            mNotifier.onWakefulnessChangeFinished();
+    if (mWakefulnessChanging && mDisplayReady) {
+        //如果当前处于 Doze 状态，不进行处理
+        if (mWakefulness == WAKEFULNESS_DOZING
+                && (mWakeLockSummary & WAKE_LOCK_DOZE) == 0) {
+            return; // wait until dream has enabled dozing
         }
+        if (mWakefulness == WAKEFULNESS_DOZING || mWakefulness == WAKEFULNESS_ASLEEP) {
+            logSleepTimeoutRecapturedLocked();
+        }
+        if (mWakefulness == WAKEFULNESS_AWAKE) {
+            logScreenOn();
+        }
+        mWakefulnessChanging = false;
+        //通过 Notifier 进行 wakefulness 改变后的处理
+        mNotifier.onWakefulnessChangeFinished();
     }
+}
 ```
+
+可以看到，如果当前屏幕状态处于 Doze 模式，则不作处理直接 return。如果是其他模式，则通过调用 Notifier 的方法去处理了，Notifier 好比 PowerManagerService 的一个喇叭，用来发送广播，和其他组件交互等，都是通过 Notifier 进行处理的，这个类也会进行单独的分析。
+此外，该方法中的 logScreenOn() 方法将打印出整个亮屏流程的耗时，在平时处理问题时也很有帮助。
+
+
+### 第五阶段
+
+- updateSuspendBlockerLocked()
+
+在分析这个方法前，先来了解下什么是 Suspend 锁。Suspend 锁机制是 Android 电源管理框架中的一种机制，在前面还提到的 wakelock 锁也是，不过 wakelock 锁是上层向 framwork 层申请，而 Suspend 锁是 framework 层中对 wakelock 锁的表现，也就是说，上层应用申请了 wakelock 锁后，在 PowerManagerService 中最终都会表现为 Suspend 锁，通过 Suspend 锁向 Hal 层写入节点，Kernal 层会读取节点，从而进入唤醒或者休眠。这个方法就是用来申请 Suspend 锁操作，因此，该方法在分析 wakelock 锁申请流程时进行分析，此处暂且不进行分析。
 
 
 ## WakeLock
+
+WakeLock 是 Android 系统中一种锁的机制，只要有进程持有这个锁，系统就无法进入休眠状态。应用程序要申请 WakeLock 时，需要在清单文件中配置 `android.Manifest.permission.WAKE_LOCK` 权限。
+根据作用时间，WakeLock 可以分为永久锁和超时锁，永久锁表示只要获取了 WakeLock 锁，必须显式的进行释放，否则系统会一直持有该锁；后者表示在到达给定时间后，自动释放 WakeLock 锁，其实现原理为方法内部维护了一个 Handler。
+根据释放原则，WakeLock可以分为计数锁和非计数锁，默认为计数锁，如果一个WakeLock对象为计数锁，则一次申请必须对应一次释放；如果为非计数锁，则不管申请多少次，一次就可以释放该WakeLock。以下代码为WakeLock申请释放示例，要申请WakeLock，必须有PowerManager实例，如下：
 
 
 - updateSuspendBlockerLocked()
@@ -1262,68 +1476,68 @@ private void finishWakefulnessChangeIfNeededLocked() {
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
 
 private void updateSuspendBlockerLocked() {
-        final boolean needWakeLockSuspendBlocker = ((mWakeLockSummary & WAKE_LOCK_CPU) != 0);
-        final boolean needDisplaySuspendBlocker = needDisplaySuspendBlockerLocked();
-        final boolean autoSuspend = !needDisplaySuspendBlocker;
-        final boolean interactive = mDisplayPowerRequest.isBrightOrDim();
+    final boolean needWakeLockSuspendBlocker = ((mWakeLockSummary & WAKE_LOCK_CPU) != 0);
+    final boolean needDisplaySuspendBlocker = needDisplaySuspendBlockerLocked();
+    final boolean autoSuspend = !needDisplaySuspendBlocker;
+    final boolean interactive = mDisplayPowerRequest.isBrightOrDim();
 
-        // Disable auto-suspend if needed.
-        // FIXME We should consider just leaving auto-suspend enabled forever since
-        // we already hold the necessary wakelocks.
-        if (!autoSuspend && mDecoupleHalAutoSuspendModeFromDisplayConfig) {
-            setHalAutoSuspendModeLocked(false);
-        }
+    // Disable auto-suspend if needed.
+    // FIXME We should consider just leaving auto-suspend enabled forever since
+    // we already hold the necessary wakelocks.
+    if (!autoSuspend && mDecoupleHalAutoSuspendModeFromDisplayConfig) {
+        setHalAutoSuspendModeLocked(false);
+    }
 
-        // First acquire suspend blockers if needed.
-        //从上面我们知道有 WAKE_LOCK_CPU 标志的话就获取一个 suspendblocker，这才是真正阻止 CPU 待机的东西
-        if (needWakeLockSuspendBlocker && !mHoldingWakeLockSuspendBlocker) {
-            mWakeLockSuspendBlocker.acquire();
-            mHoldingWakeLockSuspendBlocker = true;
-        }
-        //只有屏幕亮的时候才需要 display suspendblocker，当屏幕熄灭或者 doze 的时候这里不会获取 suspendblocker
-        if (needDisplaySuspendBlocker && !mHoldingDisplaySuspendBlocker) {
-            mDisplaySuspendBlocker.acquire();
-            mHoldingDisplaySuspendBlocker = true;
-        }
+    // First acquire suspend blockers if needed.
+    //从上面我们知道有 WAKE_LOCK_CPU 标志的话就获取一个 suspendblocker，这才是真正阻止 CPU 待机的东西
+    if (needWakeLockSuspendBlocker && !mHoldingWakeLockSuspendBlocker) {
+        mWakeLockSuspendBlocker.acquire();
+        mHoldingWakeLockSuspendBlocker = true;
+    }
+    //只有屏幕亮的时候才需要 display suspendblocker，当屏幕熄灭或者 doze 的时候这里不会获取 suspendblocker
+    if (needDisplaySuspendBlocker && !mHoldingDisplaySuspendBlocker) {
+        mDisplaySuspendBlocker.acquire();
+        mHoldingDisplaySuspendBlocker = true;
+    }
 
-        // Inform the power HAL about interactive mode.
-        // Although we could set interactive strictly based on the wakefulness
-        // as reported by isInteractive(), it is actually more desirable to track
-        // the display policy state instead so that the interactive state observed
-        // by the HAL more accurately tracks transitions between AWAKE and DOZING.
-        // Refer to getDesiredScreenPolicyLocked() for details.
-        //这只设备为可交互模式
-        if (mDecoupleHalInteractiveModeFromDisplayConfig) {
-            // When becoming non-interactive, we want to defer sending this signal
-            // until the display is actually ready so that all transitions have
-            // completed.  This is probably a good sign that things have gotten
-            // too tangled over here...
-            if (interactive || mDisplayReady) {
-                setHalInteractiveModeLocked(interactive);
-            }
-        }
-
-        // Then release suspend blockers if needed.
-        //注意这个 needWakeLockSuspendBlocker 为 ture 的话是不会释放 mWakeLockSuspendBlocker 的，
-        //所以系统无法待机，这样就能解释为什么 PARTIAL_WAKE_LOCK 级别的锁不会导致待机了:
-        //app --> newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,flag) 
-        ///--> PMS 设置 mWakeLockSummary 的 WAKE_LOCK_CPU 标志位
-        //--> PMS 因为 WAKE_LOCK_CPU 标志位存在 mWakeLockSuspendBlocker.acquire() --> 待机失败
-        if (!needWakeLockSuspendBlocker && mHoldingWakeLockSuspendBlocker) {
-            mWakeLockSuspendBlocker.release();
-            mHoldingWakeLockSuspendBlocker = false;
-        }
-        if (!needDisplaySuspendBlocker && mHoldingDisplaySuspendBlocker) {
-            mDisplaySuspendBlocker.release();
-            mHoldingDisplaySuspendBlocker = false;
-        }
-
-        // Enable auto-suspend if needed.
-        //如果条件成立的话设置自动待机模式
-        if (autoSuspend && mDecoupleHalAutoSuspendModeFromDisplayConfig) {
-            setHalAutoSuspendModeLocked(true);
+    // Inform the power HAL about interactive mode.
+    // Although we could set interactive strictly based on the wakefulness
+    // as reported by isInteractive(), it is actually more desirable to track
+    // the display policy state instead so that the interactive state observed
+    // by the HAL more accurately tracks transitions between AWAKE and DOZING.
+    // Refer to getDesiredScreenPolicyLocked() for details.
+    //这只设备为可交互模式
+    if (mDecoupleHalInteractiveModeFromDisplayConfig) {
+        // When becoming non-interactive, we want to defer sending this signal
+        // until the display is actually ready so that all transitions have
+        // completed.  This is probably a good sign that things have gotten
+        // too tangled over here...
+        if (interactive || mDisplayReady) {
+            setHalInteractiveModeLocked(interactive);
         }
     }
+
+    // Then release suspend blockers if needed.
+    //注意这个 needWakeLockSuspendBlocker 为 ture 的话是不会释放 mWakeLockSuspendBlocker 的，
+    //所以系统无法待机，这样就能解释为什么 PARTIAL_WAKE_LOCK 级别的锁不会导致待机了:
+    //app --> newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,flag) 
+    ///--> PMS 设置 mWakeLockSummary 的 WAKE_LOCK_CPU 标志位
+    //--> PMS 因为 WAKE_LOCK_CPU 标志位存在 mWakeLockSuspendBlocker.acquire() --> 待机失败
+    if (!needWakeLockSuspendBlocker && mHoldingWakeLockSuspendBlocker) {
+        mWakeLockSuspendBlocker.release();
+        mHoldingWakeLockSuspendBlocker = false;
+    }
+    if (!needDisplaySuspendBlocker && mHoldingDisplaySuspendBlocker) {
+        mDisplaySuspendBlocker.release();
+        mHoldingDisplaySuspendBlocker = false;
+    }
+
+    // Enable auto-suspend if needed.
+    //如果条件成立的话设置自动待机模式
+    if (autoSuspend && mDecoupleHalAutoSuspendModeFromDisplayConfig) {
+        setHalAutoSuspendModeLocked(true);
+    }
+}
 ```
 
 
