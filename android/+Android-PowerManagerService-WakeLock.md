@@ -1,4 +1,4 @@
-# Android - 大标题
+# Android - PowerManagerService - WakeLock
 
 ## WakeLock
 
@@ -213,8 +213,294 @@ public void acquireWakeLock(IBinder lock, int flags, String tag,
 - acquireWakeLockInternal()
 
 ```Java
-
+private void acquireWakeLockInternal(IBinder lock, int flags, String tag, String packageName,
+        WorkSource ws, String historyTag, int uid, int pid) {
+    synchronized (mLock) {
+        //PMS 中的 WakeLock 类
+        WakeLock wakeLock;
+        //查找是否已存在该 PM.WakeLock 实例
+        int index = findWakeLockIndexLocked(lock);
+        boolean notifyAcquire;
+        //是否存在 wakelock
+        if (index >= 0) {
+            wakeLock = mWakeLocks.get(index);
+            if (!wakeLock.hasSameProperties(flags, tag, ws, uid, pid)) {
+            	//更新 wakelock
+                notifyWakeLockChangingLocked(wakeLock, flags, tag, packageName,
+                        uid, pid, ws, historyTag);
+                wakeLock.updateProperties(flags, tag, packageName, 
+                                ws, historyTag, uid, pid);
+            }
+            notifyAcquire = false;
+        } else {
+              //从SpareArray<UidState> 中查找是否存在该 uid
+              UidState state = mUidState.get(uid);
+              if (state == null) {
+                  state = new UidState(uid);
+                  //设置该 Uid 的进程状态
+                  state.mProcState = ActivityManager.PROCESS_STATE_NONEXISTENT;
+                  mUidState.put(uid, state);
+              }
+            //将该 uid 申请的 WakeLock 计数加 1
+            //创建新的 PMS.WakeLock 实例
+            wakeLock = new WakeLock(lock, flags, tag, packageName, ws, 
+                              historyTag, uid, pid);
+            try {
+                lock.linkToDeath(wakeLock, 0);
+            } catch (RemoteException ex) {
+                throw new IllegalArgumentException("Wake lock is already dead.");
+            }
+            //添加到 wakelock 集合中
+            mWakeLocks.add(wakeLock);
+            //用于设置 PowerManger.PARTIAL_WAKE_LOCK 能否可用
+            //1.缓存的不活动进程不能持有 wakelock 锁               
+            //2.如果处于 idle 模式，则会忽略掉所有未处于白名单中的应用申请的锁
+            setWakeLockDisabledStateLocked(wakeLock);
+            //表示有新的wakelock申请了
+            notifyAcquire = true;
+        }
+        //判断是否直接点亮屏幕，如果带有点亮屏幕标志值，并且 wakelock 类型为
+        //FULL_WAKE_LOCK，SCREEN_BRIGHT_WAKE_LOCK，SCREEN_DIM_WAKE_LOCK，则进行下 
+        //步处理
+        applyWakeLockFlagsOnAcquireLocked(wakeLock, uid);
+        //更新标志位
+        mDirty |= DIRTY_WAKE_LOCKS;
+        updatePowerStateLocked();//分析详见上一章【PackageManagerService 启动】
+        if (notifyAcquire) {
+           //当申请了锁后，在该方法中进行长时锁的判断，通知 BatteryStatsService      
+           // 进行统计持锁时间等
+            notifyWakeLockAcquiredLocked(wakeLock);
+        }
+    }
+}
 ```
+
+首先通过传入的第一个参数 IBinder 进行查找 WakeLock 是否已经存在，若存在，则不再进行实例化，在原有的 WakeLock 上更新其属性值；若不存在，则创建一个 WakeLock 对象，同时将该 WakeLock 保存到 List 中。此时已经获取到了 WakeLock 对象，这里需要注意的是，此处的 WakeLock 对象和 PowerManager 中获取的不是同一个 WakeLock 哦！
+
+获取到 WakeLock 实例后，还通过 setWakeLockDisabledStateLocked(wakeLock) 进行了判断该 WakeLock 是否可用，主要有两种情况：
+
+- 缓存的不活动进程不能持有WakeLock锁；
+- 如果处于idle模式，则会忽略掉所有未处于白名单中的应用申请的锁。
+
+根据情况会设置 WakeLock 实例的 disable 属性值表示该 WakeLock 是否不可用。下一步进行判断是否直接点亮屏幕。
+
+```Java
+private void applyWakeLockFlagsOnAcquireLocked(WakeLock wakeLock, int uid) {
+    if ((wakeLock.mFlags & PowerManager.ACQUIRE_CAUSES_WAKEUP) != 0
+            && isScreenLock(wakeLock)) {
+        //...
+        wakeUpNoUpdateLocked(SystemClock.uptimeMillis(), wakeLock.mTag, opUid,
+                opPackageName, opUid);
+    }
+}
+
+private boolean wakeUpNoUpdateLocked(long eventTime, String reason, int reasonUid,
+        String opPackageName, int opUid) {
+    //如果 eventTime < 上次休眠时间、设备当前处于唤醒状态、没有启动完成、没有准备
+    //完成，则不需要更新，返回 false
+    if (eventTime < mLastSleepTime || mWakefulness == WAKEFULNESS_AWAKE
+            || !mBootCompleted || !mSystemReady) {
+        return false;
+    }
+    try {
+        //...
+        //更新最后一次唤醒时间值
+        mLastWakeTime = eventTime;
+        //设置wakefulness
+        setWakefulnessLocked(WAKEFULNESS_AWAKE, 0);
+        //通知BatteryStatsService/AppService屏幕状态发生改变
+        mNotifier.onWakeUp(reason, reasonUid, opPackageName, opUid);
+        //更新用户活动事件时间值
+        userActivityNoUpdateLocked(
+                eventTime, PowerManager.USER_ACTIVITY_EVENT_OTHER, 0, reasonUid);
+    } finally {
+        Trace.traceEnd(Trace.TRACE_TAG_POWER);
+    }
+    return true;
+}
+```
+
+wakeUpNoUpdateLocked() 方法是唤醒设备的主要方法。在这个方法中，首先更新了 mLastWakeTime 这个值，表示上次唤醒设备的时间，在系统超时休眠时用到这个值进行判断。现在，只需要知道每次亮屏，都走的是这个方法，关于具体是如何唤醒屏幕的，在第 5 节中进行分析。
+
+## 未完成
+
+- notifyWakeLockAcquiredLocked()
+
+如果有新的 WakeLock 实例创建，则 notifyAcquire 值为 true，通过以下这个方法通知 Notifier，Notifier 中则会根据该锁申请的时间开始计时，并以此来判断是否是一个长时间持有的锁。
+
+```Java
+private void notifyWakeLockAcquiredLocked(WakeLock wakeLock) {
+    if (mSystemReady && !wakeLock.mDisabled) {
+        wakeLock.mNotifiedAcquired = true;
+        wakeLock.mStartTimeStamp = SystemClock.elapsedRealtime();
+        //Called when a wake lock is acquired.
+        mNotifier.onWakeLockAcquired(wakeLock.mFlags, 
+                        wakeLock.mTag, wakeLock.mPackageName,
+                wakeLock.mOwnerUid, wakeLock.mOwnerPid, wakeLock.mWorkSource,
+                wakeLock.mHistoryTag);
+        //...
+        //重新开始检查持锁时间
+        restartNofifyLongTimerLocked(wakeLock);
+    }
+}
+```
+
+
+- updateSuspendBlockerLocked()
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+private void updateSuspendBlockerLocked() {
+    //是否需要保持 CPU 活动状态的 SuspendBlocker 锁，具体表现为持有 Partical WakeLock
+    final boolean needWakeLockSuspendBlocker = ((mWakeLockSummary & WAKE_LOCK_CPU) != 0);
+    //是否需要保持 CPU 活动状态的 SuspendBlocker 锁，具体表现保持屏幕亮度
+    final boolean needDisplaySuspendBlocker = needDisplaySuspendBlockerLocked();
+    //是否自动挂起，如果不需要屏幕保持唤醒，则说明可以自动挂起 CPU
+    final boolean autoSuspend = !needDisplaySuspendBlocker;
+    //是否处于交互模式，屏幕处于 Bright 或者 Dim 状态时为 true
+    final boolean interactive = mDisplayPowerRequest.isBrightOrDim();
+
+    //mDecoupleHalAutoSuspendModeFromDisplayConfig:自动挂起模式和显示状态解偶
+    if (!autoSuspend && mDecoupleHalAutoSuspendModeFromDisplayConfig) {
+        //禁止 CPU 自动挂起模式
+        setHalAutoSuspendModeLocked(false);
+    }
+
+    //如果存在 PARTIAL_WAKE_LOCK 类型的 WakeLock，申请 mWakeLockSuspendBlocker 锁
+    //从上面我们知道有 WAKE_LOCK_CPU 标志的话就获取一个 suspendblocker，这才是真正阻止 CPU 待机的东西
+    if (needWakeLockSuspendBlocker && !mHoldingWakeLockSuspendBlocker) {
+        mWakeLockSuspendBlocker.acquire();
+        mHoldingWakeLockSuspendBlocker = true;
+    }
+    //只有屏幕亮的时候才需要 display suspendblocker，当屏幕熄灭或者 doze 的时候这里不会获取 suspendblocker
+    if (needDisplaySuspendBlocker && !mHoldingDisplaySuspendBlocker) {
+        mDisplaySuspendBlocker.acquire();
+        mHoldingDisplaySuspendBlocker = true;
+    }
+
+    // Inform the power HAL about interactive mode.
+    // Although we could set interactive strictly based on the wakefulness
+    // as reported by isInteractive(), it is actually more desirable to track
+    // the display policy state instead so that the interactive state observed
+    // by the HAL more accurately tracks transitions between AWAKE and DOZING.
+    // Refer to getDesiredScreenPolicyLocked() for details.
+    //这只设备为可交互模式
+    if (mDecoupleHalInteractiveModeFromDisplayConfig) {
+        // When becoming non-interactive, we want to defer sending this signal
+        // until the display is actually ready so that all transitions have
+        // completed.  This is probably a good sign that things have gotten
+        // too tangled over here...
+        if (interactive || mDisplayReady) {
+            setHalInteractiveModeLocked(interactive);
+        }
+    }
+
+    //如果不再持有 PARTIAL_WAKELOCK 类型的 WakeLock 锁，释放 mWakeLockSuspendBlocker 锁
+    if (!needWakeLockSuspendBlocker && mHoldingWakeLockSuspendBlocker) {
+        mWakeLockSuspendBlocker.release();
+        mHoldingWakeLockSuspendBlocker = false;
+    }
+    //如果不再需要屏幕保持亮屏，释放 mDisplaySuspendBlocker 锁
+    if (!needDisplaySuspendBlocker && mHoldingDisplaySuspendBlocker) {
+        mDisplaySuspendBlocker.release();
+        mHoldingDisplaySuspendBlocker = false;
+    }
+
+    //启动自动挂起模式
+    if (autoSuspend && mDecoupleHalAutoSuspendModeFromDisplayConfig) {
+        setHalAutoSuspendModeLocked(true);
+    }
+}
+```
+
+在 updateSuspendBlockerLocked() 方法中，会根据当前系统是否持有 PARTIAL_WAKELOCK 类型的锁，来决定是否要申请或释放 mWakeLockSuspendBlocker 锁，然后会根据当前系统是否要屏幕亮屏来决定是否要申请或释放 mDisplaySuspendBlocker锁。
+
+在PMS的构造方法中创建了两个 SuspendBlocker 对象：mWakeLockSuspendBlocker 和 mDisplaySuspendBlocker，前者表示获取一个 PARTIAL_WAKELOCK 类型的 WakeLock 使 CPU 保持活动状态，后者表示当屏幕亮屏、用户活动时使 CPU 保持活动状态。因此实际上，上层 PowerManager 申请和释放锁，最终在PMS中都交给了 SuspendBlocker 去申请和释放锁。也可以说 SuspendBlocker 类的两个对象是 WakeLock 锁反映到底层的对象。只要持有二者任意锁，都会使得CPU处于活动状态。
+
+- needDisplaySuspendBlockerLocked()
+
+```Java
+private boolean needDisplaySuspendBlockerLocked() {
+    //mDisplayReady 表示显示器是否准备完毕
+    if (!mDisplayReady) {
+        return true;
+    }
+    //请求 Display 策略状态为 Bright 或 DIM，这个 if 语句用来判断当 PSensor 灭屏时是否需要 Display 锁
+    if (mDisplayPowerRequest.isBrightOrDim()) {
+        // If we asked for the screen to be on but it is off due to the proximity
+        // sensor then we may suspend but only if the configuration allows it.
+        // On some hardware it may not be safe to suspend because the proximity
+        // sensor may not be correctly configured as a wake-up source.
+        //如果没有 PROXIMITY_SCREEN_OFF_WAKE_LOCK 类型的 WakeLock 锁 || PSensor 正在处于远离状态
+        //或在 PSensor 灭屏后不允许进入 Suspend 状态，满足之一，则申请 misplaySuspendBlocker 锁
+        if (!mDisplayPowerRequest.useProximitySensor || !mProximityPositive
+                || !mSuspendWhenScreenOffDueToProximityConfig) {
+            return true;
+        }
+    }
+    if (mScreenBrightnessBoostInProgress) {
+        return true;
+    }
+    // Let the system suspend if the screen is off or dozing.
+    return false;
+}
+```
+
+SuspendBlocker 是一个接口，并且只有 acquire() 和 release() 两个方法，PMS.SuspendBlockerImpl 实现了该接口，因此，最终申请流程执行到了 PMS.SuspendBlockerImpl的acquire() 中。
+
+在 PMS.SuspendBlockerImpl.acquire() 中进行申请时，首先将成员变量计数加 1，然后调用到JNI层去进行申请。
+
+```C++
+//frameworks\base\services\core\jni\com_android_server_power_PowerManagerService.cpp
+
+@Override
+public void acquire() {
+    synchronized (this) {
+        //引用计数
+        mReferenceCount += 1;  
+        if (mReferenceCount == 1) {
+            nativeAcquireSuspendBlocker(mName);
+        }
+    }
+}
+```
+
+这里使用了引用计数法，如果 mReferenceCount > 1，则不会进行锁的申请，而是仅仅将 mReferenceCount + 1，只有当没有申请的锁时，才会其正真执行申请锁操作，之后不管申请几次，都是 mReferenceCount 加 1。
+
+在 JNI 层中可以明确的看到有一个申请锁的 acquire_wake_lock() 方法，代码如下：
+
+```C++
+///hardware/libhardware_legacy/power/power.c
+
+static void nativeAcquireSuspendBlocker(JNIEnv *env, jclass /* clazz */, jstring nameStr) {
+    ScopedUtfChars name(env, nameStr);
+    acquire_wake_lock(PARTIAL_WAKE_LOCK, name.c_str());
+}
+
+int acquire_wake_lock(int lock, const char* id) {
+    initialize_fds();
+    ALOGI("acquire_wake_lock lock=%d id='%s'\n", lock, id);
+    if (g_error) return g_error;
+    int fd;
+    size_t len;
+    ssize_t ret;
+    if (lock != PARTIAL_WAKE_LOCK) {
+        return -EINVAL;
+    }
+    fd = g_fds[ACQUIRE_PARTIAL_WAKE_LOCK];
+    ret = write(fd, id, strlen(id));
+    if (ret < 0) {
+        return -errno;
+    }
+    return ret;
+}
+```
+
+在这里，向 `/sys/power/wake_lock` 文件写入了 id，这个 id 就是我们上层中实例化 SuspendBlocker 时传入的 String 类型的 name，这里在这个节点写入文件以后，就说明获得了 wakelock。到这里，整个 WakeLock 的申请流程就结束了。
+
+
+
 
 
 ## 释放 WakeLock
@@ -273,6 +559,172 @@ public void release(int flags) {
 ```
 
 对于计数锁的释放，每次都会对内部计数值减一，只有当你内部计数值减为 0 时，才会去调用 PowerManagerService 去真正的释放锁；如果释放非计数锁，则每次都会调用 PowerManagerService 进行释放。
+
+```Java
+@Override // Binder call
+public void releaseWakeLock(IBinder lock, int flags) {
+    if (lock == null) {
+        throw new IllegalArgumentException("lock must not be null");
+    }
+    //检查权限
+    mContext.enforceCallingOrSelfPermission(android.Manifest.permission.
+         WAKE_LOCK, null);
+    //重置当前线程的 IPC 标志
+    final long ident = Binder.clearCallingIdentity();
+    try {
+        //去释放锁
+        releaseWakeLockInternal(lock, flags);
+    } finally {
+        //设置新的 IPC 标志
+        Binder.restoreCallingIdentity(ident);
+    }
+}
+```
+
+在这个方法中，进行了权限检查后，就交给下一个方法去处理了，具体代码如下：
+
+```Java
+private void releaseWakeLockInternal(IBinder lock, int flags) {
+    synchronized (mLock) {
+        //查找 WakeLock 是否存在
+        int index = findWakeLockIndexLocked(lock);
+        if (index < 0) {
+            return;
+        }
+        WakeLock wakeLock = mWakeLocks.get(index);
+            //该 flag 用来推迟释放 PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK 类型的锁，
+            //它会在传感器感觉不在靠近的时候才释放该锁
+            if ((flags & PowerManager.RELEASE_FLAG_WAIT_FOR_NO_PROXIMITY) != 0) {
+                //表示在点亮屏幕前需要等待 PSensor 返回负值
+                mRequestWaitForNegativeProximity = true;
+            }
+        if ((flags & PowerManager.RELEASE_FLAG_WAIT_FOR_NO_PROXIMITY) != 0) {
+            mRequestWaitForNegativeProximity = true;
+        }
+        //取消 Binder 的死亡代理
+        wakeLock.mLock.unlinkToDeath(wakeLock, 0);
+        //释放锁
+        removeWakeLockLocked(wakeLock, index);
+    }
+}
+```
+
+在 releaseWakeLockInternal() 中处理时，首先查找 WakeLock 是否存在，若不存在，直接返回；然后检查是否带有影响释放行为的标志值，上面已经提到过，目前只有一个值，之后取消了 Binder 的死亡代理，最后调用了 removeWakeLockLocked() 方法：
+
+```Java
+private void removeWakeLockLocked(WakeLock wakeLock, int index) {
+    //从 List中 移除
+    mWakeLocks.remove(index);
+    //得到该 wakelock 中的 UidState 属性
+    UidState state = wakeLock.mUidState;
+    state.mNumWakeLocks--;
+    if (state.mNumWakeLocks <= 0 &&
+            state.mProcState == ActivityManager.PROCESS_STATE_NONEXISTENT) {
+        //从 SpareArray<UidState> 中移除该 wakelock 的 UidState
+        //注意,下面的 mUidState 是 SpareArray<UidState>，而上面的 mUidState 是 wakeLock.mUidState
+        mUidState.remove(state.mUid);
+    }
+    //使用 Notifier 通知其他应用
+    notifyWakeLockReleasedLocked(wakeLock);
+    //对带有 ON_AFTER_RELEASE 标志的 wakelock 进行处理
+    applyWakeLockFlagsOnReleaseLocked(wakeLock);
+    mDirty |= DIRTY_WAKE_LOCKS;
+    //更新电源状态信息
+    updatePowerStateLocked();
+}
+```
+
+在 removeWakeLockLocked() 中，对带有 ON_AFTER_RELEASE 标志的 wakelock 进行处理，前面分析过了，该标志和用户体验相关，当有该标志时，释放锁后会亮一段时间后灭屏，这里来看看 applyWakeLockFlagsOnReleaseLocked(wakeLock) 方法：
+
+- applyWakeLockFlagsOnReleaseLocked()
+
+```Java
+/**
+ *如果当前释放的 wakelock 带有 PowerManager.ON_AFTER_RELEASE 标志，则会屏幕在灭屏时小亮一会儿才会熄灭
+ */
+private void applyWakeLockFlagsOnReleaseLocked(WakeLock wakeLock) {
+    if ((wakeLock.mFlags & PowerManager.ON_AFTER_RELEASE) != 0
+            && isScreenLock(wakeLock)) {
+        //更新用户活动时间，并带有 PowerManager.USER_ACTIVITY_FLAG_NO_CHANGE_LIGHTS 标志，用于延缓灭屏时间
+        userActivityNoUpdateLocked(SystemClock.uptimeMillis(),
+                PowerManager.USER_ACTIVITY_EVENT_OTHER,
+                PowerManager.USER_ACTIVITY_FLAG_NO_CHANGE_LIGHTS,
+                wakeLock.mOwnerUid);
+    }
+}
+```
+
+最后，又将调用updatePowerStateLocked()，其中和 WakeLock 申请和释放相关的都 updateSuspendBlockerLocked() 中，释放相关代码如下：
+
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+private void updateSuspendBlockerLocked() {
+    //...
+    //如果不再持有 PARTIAL_WAKELOCK 类型的 WakeLock 锁，释放 mWakeLockSuspendBlocker 锁
+    if (!needWakeLockSuspendBlocker && mHoldingWakeLockSuspendBlocker) {
+        mWakeLockSuspendBlocker.release();
+        mHoldingWakeLockSuspendBlocker = false;
+    }
+    //如果不再需要屏幕保持亮屏，释放 mDisplaySuspendBlocker 锁
+    if (!needDisplaySuspendBlocker && mHoldingDisplaySuspendBlocker) {
+        mDisplaySuspendBlocker.release();
+        mHoldingDisplaySuspendBlocker = false;
+    }
+    //...
+}
+```
+
+如果满足条件，则释放 SuspendBlocker 锁。申请 SuspendBlocker 流程已经分析过了，接下来我们分析释放 SuspendBlocker 流程。在 SuspendBlocker 中释放锁如下：
+
+```Java
+@Override
+public void release() {
+    synchronized (this) {
+    	//计数-1
+        mReferenceCount -= 1;
+        if (mReferenceCount == 0) {
+        	//调用 JNI 层进行释放
+            nativeReleaseSuspendBlocker(mName);
+        } else if (mReferenceCount < 0) {
+            mReferenceCount = 0;
+        }
+    }
+}
+```
+
+在释放锁时，如果有多个锁，实际上是对锁计数的属性减1，直到剩余一个时才会调用 JNI 层执行释放操作。具体代码如下：
+
+```C++
+//frameworks\base\services\core\jni\com_android_server_power_PowerManagerService.cpp
+
+static void nativeReleaseSuspendBlocker(JNIEnv *env, jclass /* clazz */, jstring nameStr) {
+    ScopedUtfChars name(env, nameStr);
+    release_wake_lock(name.c_str());
+}
+```
+
+在JNI层方法中，调用了HAL层的方法，通过文件描述符向 `/sys/power/wake_unlock` 中写值完成释放：
+
+```C++
+int release_wake_lock(const char* id) {
+    initialize_fds();
+    //    ALOGI("release_wake_lock id='%s'\n", id);
+    if (g_error) return g_error;
+    ssize_t len = write(g_fds[RELEASE_WAKE_LOCK], id, strlen(id));
+    if (len < 0) {
+        return -errno;
+    }
+    return len;
+}
+```
+
+到这里为止，WakeLock 的释放流程也就分析完毕了。
+
+## PowerManagerService.Broadcasts 锁
+
+这个类型的 SuspendBlocker 并没有在 PMS 中进行实例化，它以构造方法的形式传入了 Notifier 中，Notifier 类相当于是 PMS 的”中介“，PMS 中和其他服务的部分交互通过 Notifier 进行，还有比如亮屏广播、灭屏广播等，都是由 PMS 交给 Notifier 来发送，这点在下篇文章中进行分析。因此，如果 CPU 在广播发送过程中进入休眠，则广播无法发送完成，因此，需要一个锁来保证 Notifier 中广播的成功发送，这就是 PowerManagerService.Broadcasts 锁的作用，当广播发送完毕后，该锁立即就释放了。
 
 ## 参考资料
 
