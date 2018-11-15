@@ -1464,8 +1464,54 @@ private void finishWakefulnessChangeIfNeededLocked() {
 ## WakeLock
 
 WakeLock 是 Android 系统中一种锁的机制，只要有进程持有这个锁，系统就无法进入休眠状态。应用程序要申请 WakeLock 时，需要在清单文件中配置 `android.Manifest.permission.WAKE_LOCK` 权限。
+
 根据作用时间，WakeLock 可以分为永久锁和超时锁，永久锁表示只要获取了 WakeLock 锁，必须显式的进行释放，否则系统会一直持有该锁；后者表示在到达给定时间后，自动释放 WakeLock 锁，其实现原理为方法内部维护了一个 Handler。
-根据释放原则，WakeLock可以分为计数锁和非计数锁，默认为计数锁，如果一个WakeLock对象为计数锁，则一次申请必须对应一次释放；如果为非计数锁，则不管申请多少次，一次就可以释放该WakeLock。以下代码为WakeLock申请释放示例，要申请WakeLock，必须有PowerManager实例，如下：
+
+根据释放原则，WakeLock 可以分为计数锁和非计数锁，默认为计数锁，如果一个 WakeLock 对象为计数锁，则一次申请必须对应一次释放；如果为非计数锁，则不管申请多少次，一次就可以释放该 WakeLock。以下代码为 WakeLock 申请释放示例，要申请 WakeLock，必须有 PowerManager 实例，如下：
+
+```Java
+ PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+ //获取 WakeLock 对象
+ PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+ wl.acquire();
+ Wl.acquire(int timeout);//超时锁
+ wl.release();//释放锁
+```
+
+在整个 WakeLock 机制中，对应不同的范围，有三种表现形式：
+
+- PowerManger.WakeLock：PowerManagerService 和其他应用、服务交互的接口；
+- PowerManagerService.WakeLock：PowerManager.WakeLock 在 PMS 中的表现形式；
+- SuspendBlocker：PowerManagerService.WakeLock 在向底层节点操作时的表现形式。
+
+下面开始对 WakeLock 的详细分析。
+
+应用中获取 WakeLock 对象，获取的是位于 PowerManager 中的内部类 —— WakeLock 的实例，在 PowerManager 中看看相关方法：
+
+```Java
+public WakeLock newWakeLock(int levelAndFlags, String tag) {
+    validateWakeLockParameters(levelAndFlags, tag);
+    return new WakeLock(levelAndFlags, tag, mContext.getOpPackageName());
+}
+```
+
+在 PowerManager 的 newWakeLock() 方法中，首先进行了参数的校验，然后调用 WakeLock 构造方法获取实例，构造方法如下：
+
+```Java
+WakeLock(int flags, String tag, String packageName) {
+    //表示 wakelock 类型或等级
+    mFlags = flags;
+    //一个 tag，一般为当前类名
+    mTag = tag;
+    //获取 wakelock 的包名
+    mPackageName = packageName;
+    //一个 Binder 标记
+    mToken = new Binder();
+    mTraceName = "WakeLock (" + mTag + ")";
+}
+```
+
+
 
 
 - updateSuspendBlockerLocked()
