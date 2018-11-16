@@ -148,7 +148,7 @@ private void acquireLocked() {
     //应用每次申请 wakelock，内部计数和外部计数加 1
     mInternalCount++;
     mExternalCount++;
-    //如果是非计数锁或者内部计数值为1,即第一次申请该锁，才会真正去申请
+    //如果是非计数锁或者内部计数值为 1，即第一次申请该锁，才会真正去申请
     if (!mRefCounted || mInternalCount == 1) {
         mHandler.removeCallbacks(mReleaser);
         Trace.asyncTraceBegin(Trace.TRACE_TAG_POWER, mTraceName, 0);
@@ -414,9 +414,9 @@ private void updateSuspendBlockerLocked() {
 }
 ```
 
-在 updateSuspendBlockerLocked() 方法中，会根据当前系统是否持有 PARTIAL_WAKELOCK 类型的锁，来决定是否要申请或释放 mWakeLockSuspendBlocker 锁，然后会根据当前系统是否要屏幕亮屏来决定是否要申请或释放 mDisplaySuspendBlocker锁。
+在 updateSuspendBlockerLocked() 方法中，会根据当前系统是否持有 PARTIAL_WAKELOCK 类型的锁，来决定是否要申请或释放 mWakeLockSuspendBlocker 锁，然后会根据当前系统是否要屏幕亮屏来决定是否要申请或释放 mDisplaySuspendBlocker 锁。
 
-在PMS的构造方法中创建了两个 SuspendBlocker 对象：mWakeLockSuspendBlocker 和 mDisplaySuspendBlocker，前者表示获取一个 PARTIAL_WAKELOCK 类型的 WakeLock 使 CPU 保持活动状态，后者表示当屏幕亮屏、用户活动时使 CPU 保持活动状态。因此实际上，上层 PowerManager 申请和释放锁，最终在PMS中都交给了 SuspendBlocker 去申请和释放锁。也可以说 SuspendBlocker 类的两个对象是 WakeLock 锁反映到底层的对象。只要持有二者任意锁，都会使得CPU处于活动状态。
+在 PMS 的构造方法中创建了两个 SuspendBlocker 对象：mWakeLockSuspendBlocker 和 mDisplaySuspendBlocker，前者表示获取一个 PARTIAL_WAKELOCK 类型的 WakeLock 使 CPU 保持活动状态，后者表示当屏幕亮屏、用户活动时使 CPU 保持活动状态。因此实际上，上层 PowerManager 申请和释放锁，最终在 PMS 中都交给了 SuspendBlocker 去申请和释放锁。也可以说 SuspendBlocker 类的两个对象是 WakeLock 锁反映到底层的对象。只要持有二者任意锁，都会使得 CPU 处于活动状态。
 
 - needDisplaySuspendBlockerLocked()
 
@@ -447,7 +447,7 @@ private boolean needDisplaySuspendBlockerLocked() {
 }
 ```
 
-SuspendBlocker 是一个接口，并且只有 acquire() 和 release() 两个方法，PMS.SuspendBlockerImpl 实现了该接口，因此，最终申请流程执行到了 PMS.SuspendBlockerImpl的acquire() 中。
+SuspendBlocker 是一个接口，并且只有 acquire() 和 release() 两个方法，PMS.SuspendBlockerImpl 实现了该接口，因此，最终申请流程执行到了 PMS.SuspendBlockerImpl 的 acquire() 中。
 
 在 PMS.SuspendBlockerImpl.acquire() 中进行申请时，首先将成员变量计数加 1，然后调用到JNI层去进行申请。
 
@@ -705,7 +705,7 @@ static void nativeReleaseSuspendBlocker(JNIEnv *env, jclass /* clazz */, jstring
 }
 ```
 
-在JNI层方法中，调用了HAL层的方法，通过文件描述符向 `/sys/power/wake_unlock` 中写值完成释放：
+在 JNI 层方法中，调用了 HAL 层的方法，通过文件描述符向 `/sys/power/wake_unlock` 中写值完成释放：
 
 ```C++
 int release_wake_lock(const char* id) {

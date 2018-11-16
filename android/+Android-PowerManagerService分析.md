@@ -360,56 +360,7 @@ private boolean userActivityNoUpdateLocked(long eventTime, int event, int flags,
             || !mBootCompleted || !mSystemReady) {
         return false;
     }
-
-    Trace.traceBegin(Trace.TRACE_TAG_POWER, "userActivity");
-    try {
-        //更新 mLastInteractivePowerHintTime 时间
-        if (eventTime > mLastInteractivePowerHintTime) {
-            powerHintInternal(PowerHint.INTERACTION, 0);
-            mLastInteractivePowerHintTime = eventTime;
-        }
-
-        //通过 mNotifier 通知 BatteryStats UserActivity 事件
-        mNotifier.onUserActivity(event, uid);
-
-        if (mUserInactiveOverrideFromWindowManager) {
-            mUserInactiveOverrideFromWindowManager = false;
-            mOverriddenTimeout = -1;
-        }
-
-        //如果系统处于休眠状态，不进行处理
-        if (mWakefulness == WAKEFULNESS_ASLEEP
-                || mWakefulness == WAKEFULNESS_DOZING
-                || (flags & PowerManager.USER_ACTIVITY_FLAG_INDIRECT) != 0) {
-            return false;
-        }
-
-        //根据 flag 是否在已变暗的情况下，是否重启活动超时更新 mLastUserActivityTimeNoChangeLights
-        //或 mLastUserActivityTime，并且设置 mDirty -> DIRTY_USER_ACTIVITY
-        if ((flags & PowerManager.USER_ACTIVITY_FLAG_NO_CHANGE_LIGHTS) != 0) {
-            if (eventTime > mLastUserActivityTimeNoChangeLights
-                    && eventTime > mLastUserActivityTime) {
-                mLastUserActivityTimeNoChangeLights = eventTime;
-                mDirty |= DIRTY_USER_ACTIVITY;
-                if (event == PowerManager.USER_ACTIVITY_EVENT_BUTTON) {
-                    mDirty |= DIRTY_QUIESCENT;
-                }
-
-                return true;
-            }
-        } else {
-            if (eventTime > mLastUserActivityTime) {
-                mLastUserActivityTime = eventTime;
-                mDirty |= DIRTY_USER_ACTIVITY;
-                if (event == PowerManager.USER_ACTIVITY_EVENT_BUTTON) {
-                    mDirty |= DIRTY_QUIESCENT;
-                }
-                return true;
-            }
-        }
-    } finally {
-        Trace.traceEnd(Trace.TRACE_TAG_POWER);
-    }
+    //...
     return false;
 }
 ```
@@ -822,7 +773,68 @@ private void updateIsPoweredLocked(int dirty) {
 
 - userActivityNoUpdateLocked()
 
-上面已经分析过
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+private boolean userActivityNoUpdateLocked(long eventTime, int event, int flags, int uid) {
+    //如果发生时间是上一次休眠或唤醒前，或当前没有开机完成到 systemReady，不采取操作直接返回
+    if (eventTime < mLastSleepTime || eventTime < mLastWakeTime
+            || !mBootCompleted || !mSystemReady) {
+        return false;
+    }
+
+    Trace.traceBegin(Trace.TRACE_TAG_POWER, "userActivity");
+    try {
+        //更新 mLastInteractivePowerHintTime 时间
+        if (eventTime > mLastInteractivePowerHintTime) {
+            powerHintInternal(PowerHint.INTERACTION, 0);
+            mLastInteractivePowerHintTime = eventTime;
+        }
+
+        //通过 mNotifier 通知 BatteryStats UserActivity 事件
+        mNotifier.onUserActivity(event, uid);
+
+        if (mUserInactiveOverrideFromWindowManager) {
+            mUserInactiveOverrideFromWindowManager = false;
+            mOverriddenTimeout = -1;
+        }
+
+        //如果系统处于休眠状态，不进行处理
+        if (mWakefulness == WAKEFULNESS_ASLEEP
+                || mWakefulness == WAKEFULNESS_DOZING
+                || (flags & PowerManager.USER_ACTIVITY_FLAG_INDIRECT) != 0) {
+            return false;
+        }
+
+        //根据 flag 是否在已变暗的情况下，是否重启活动超时更新 mLastUserActivityTimeNoChangeLights
+        //或 mLastUserActivityTime，并且设置 mDirty -> DIRTY_USER_ACTIVITY
+        if ((flags & PowerManager.USER_ACTIVITY_FLAG_NO_CHANGE_LIGHTS) != 0) {
+            if (eventTime > mLastUserActivityTimeNoChangeLights
+                    && eventTime > mLastUserActivityTime) {
+                mLastUserActivityTimeNoChangeLights = eventTime;
+                mDirty |= DIRTY_USER_ACTIVITY;
+                if (event == PowerManager.USER_ACTIVITY_EVENT_BUTTON) {
+                    mDirty |= DIRTY_QUIESCENT;
+                }
+
+                return true;
+            }
+        } else {
+            if (eventTime > mLastUserActivityTime) {
+                mLastUserActivityTime = eventTime;
+                mDirty |= DIRTY_USER_ACTIVITY;
+                if (event == PowerManager.USER_ACTIVITY_EVENT_BUTTON) {
+                    mDirty |= DIRTY_QUIESCENT;
+                }
+                return true;
+            }
+        }
+    } finally {
+        Trace.traceEnd(Trace.TRACE_TAG_POWER);
+    }
+    return false;
+}
+```
 
 - updateLowPowerModeLocked()
 
