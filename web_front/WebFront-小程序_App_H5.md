@@ -87,7 +87,7 @@ H5 的开发，涉及开发工具（vscode、Atom等）、前端框架（Angular
 
 ## 小程序多平台互转原理
 
-![04](/Users/next/Desktop/小程序分享/images/04.png)
+![04](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/web_front_app/04.png)
 
 微信小程序与支付宝小程序有很多相似之处，可以封装两个小程序之间的差异进行转换，从而实现一套逻辑代码运行在两个平台。
 
