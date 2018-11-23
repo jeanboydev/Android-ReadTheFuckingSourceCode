@@ -1,4 +1,4 @@
-# Android - PowerManagerService
+# Android - PowerManagerService 启动
 
 ## 一、PowerManagerService 启动
 
@@ -1518,8 +1518,6 @@ private void finishWakefulnessChangeIfNeededLocked() {
 
 在分析这个方法前，先来了解下什么是 Suspend 锁。Suspend 锁机制是 Android 电源管理框架中的一种机制，在前面还提到的 wakelock 锁也是，不过 wakelock 锁是上层向 framwork 层申请，而 Suspend 锁是 framework 层中对 wakelock 锁的表现，也就是说，上层应用申请了 wakelock 锁后，在 PowerManagerService 中最终都会表现为 Suspend 锁，通过 Suspend 锁向 Hal 层写入节点，Kernal 层会读取节点，从而进入唤醒或者休眠。
 
-这里涉及到 WakeLock 相关的知识，我们将在下一章节进行介绍。
-
 #### 2.4.6.1 updateSuspendBlockerLocked()
 
 ```Java
@@ -1621,11 +1619,11 @@ private boolean needDisplaySuspendBlockerLocked() {
 }
 ```
 
-SuspendBlocker 是一个接口，并且只有 acquire() 和 release() 两个方法，PMS.SuspendBlockerImpl 实现了该接口，因此，最终申请流程执行到了 PMS.SuspendBlockerImpl 的 acquire() 中。
-
 ##### 2.4.6.1.2 acquire()
 
-在 PMS.SuspendBlockerImpl.acquire() 中进行申请时，首先将成员变量计数加 1，然后调用到JNI层去进行申请。
+SuspendBlocker 是一个接口，并且只有 acquire() 和 release() 两个方法，PMS.SuspendBlockerImpl 实现了该接口，因此，最终申请流程执行到了 PMS.SuspendBlockerImpl 的 acquire() 中。
+
+在 PMS.SuspendBlockerImpl.acquire() 中进行申请时，首先将成员变量计数加 1，然后调用到 JNI 层去进行申请。
 
 ```C++
 //frameworks\base\services\core\jni\com_android_server_power_PowerManagerService.cpp
@@ -1759,6 +1757,8 @@ public void onBootPhase(int phase) {
 #### 3.1.3 updatePowerStateLocked()
 
 上面已经分析过，详见【2.4】
+
+到这里 PowerManagerService 的启动过程已经分析完毕，接下来分析下 WakeLock 机制。
 
 ## 参考资料
 
