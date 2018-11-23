@@ -1317,6 +1317,8 @@ private int getDesiredScreenPolicyLocked() {
 }
 ```
 
+##### *2.4.3.1.2 requestPowerState()
+
 ### 2.4.4 第 3 阶段
 
 #### 2.4.4.1 updateDreamLocked()
