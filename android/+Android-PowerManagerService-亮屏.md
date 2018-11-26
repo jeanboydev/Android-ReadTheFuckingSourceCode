@@ -419,14 +419,6 @@ private boolean userActivityNoUpdateLocked(long eventTime, int event, int flags,
 
 这些方法执行完后,执行 `updatePowerStateLocked()` 方法更新所有信息，这个方法作为 PowerManagerService 的核心方法，在【PowerManagerService 启动流程】中【2.4】章节已经分析过了。
 
-
-
-```java
-
-```
-
-
-
 ## 二、USB 插入亮屏
 
 
