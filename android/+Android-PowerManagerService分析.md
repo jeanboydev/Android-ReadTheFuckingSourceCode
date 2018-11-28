@@ -715,7 +715,51 @@ private void updateIsPoweredLocked(int dirty) {
 
 因此可以看到，这个方法跟电池有关，只要电池状态发生变化，就能够调用执行到这个方法进行操作。
 
-##### 2.4.1.1.1 wakeUpNoUpdateLocked()
+##### 2.4.1.1.1 shouldWakeUpWhenPluggedOrUnpluggedLocked()
+
+```java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+private boolean shouldWakeUpWhenPluggedOrUnpluggedLocked(
+    boolean wasPowered, int oldPlugType, boolean dockedOnWirelessCharger) {
+    // 如果配置 config_unplugTurnsOnScreen 为 false，则不会亮屏
+    if (!mWakeUpWhenPluggedOrUnpluggedConfig) {
+        return false;
+    }
+
+    //断开无线充电不会亮屏
+    if (wasPowered && !mIsPowered
+        && oldPlugType == BatteryManager.BATTERY_PLUGGED_WIRELESS) {
+        return false;
+    }
+
+    //连接无线充电不会亮屏
+    if (!wasPowered && mIsPowered
+        && mPlugType == BatteryManager.BATTERY_PLUGGED_WIRELESS
+        && !dockedOnWirelessCharger) {
+        return false;
+    }
+
+    //插入充电时屏保状态下不会亮屏
+    if (mIsPowered && mWakefulness == WAKEFULNESS_DREAMING) {
+        return false;
+    }
+
+    //剧院模式下，且配置了剧院模式下充电是否亮屏为 false，则不会亮屏
+    if (mTheaterModeEnabled && !mWakeUpWhenPluggedOrUnpluggedInTheaterModeConfig) {
+        return false;
+    }
+
+    //如果屏幕保持常亮且当前 wakefulness 为 Doze 状态
+    if (mAlwaysOnEnabled && mWakefulness == WAKEFULNESS_DOZING) {
+        return false;
+    }
+
+    //其他情况下则亮屏
+    return true;
+}
+```
+
+##### 2.4.1.1.2 wakeUpNoUpdateLocked()
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -746,7 +790,7 @@ private boolean wakeUpNoUpdateLocked(long eventTime, String reason, int reasonUi
 }
 ```
 
-##### 2.4.1.1.2 userActivityNoUpdateLocked()
+##### 2.4.1.1.3 userActivityNoUpdateLocked()
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -811,7 +855,7 @@ private boolean userActivityNoUpdateLocked(long eventTime, int event, int flags,
 }
 ```
 
-##### 2.4.1.1.3 updateLowPowerModeLocked()
+##### 2.4.1.1.4 updateLowPowerModeLocked()
 
 ```java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
