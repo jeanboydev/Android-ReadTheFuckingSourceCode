@@ -2,7 +2,7 @@
 
 1. 创建 `github.io` 仓库
 
-   仓库名：<username>.github.io
+   仓库名：`<username>`.github.io
 
    > 例如：jeanboydev.github.io
    >
