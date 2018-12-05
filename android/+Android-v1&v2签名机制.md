@@ -196,13 +196,13 @@ CERT.RSA 文件中的内容：
 
 这里我们看到的都是二进制文件，因为RSA文件加密了，所以我们需要用openssl命令才能查看其内容：
 
-> $ openssl pkcs7 -inform DER -in /<文件存放路径>/Sample-release_new/original/META-INF/DEMOKEY_.RSA -text -noout -print_certs
+> $ openssl pkcs7 -inform DER -in /<文件存放路径>/Sample-release_new/original/META-INF/CERT.RSA -text -noout -print_certs
 
-![](http://5b0988e595225.cdn.sohucs.com/images/20180126/83b3143f68ea48bcb2e16dbaaf47bc08.jpeg)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/08.png)
 
 综上所述，一个完整的签名过程如下所示：
 
-![](http://5b0988e595225.cdn.sohucs.com/images/20180126/4fc34dd3e3a04407a1b918ff770ef6d7.jpeg)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/09.png)
 
 ### 2.3 签名校验过程
 
@@ -216,7 +216,7 @@ CERT.RSA 文件中的内容：
 
 综上所述，一个完整的签名验证过程如下所示：
 
-![](http://5b0988e595225.cdn.sohucs.com/images/20180126/25196208a8934ebeb97bd9bc6826874e.jpeg)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/10.png)
 
 为什么使用这样的签名流程呢？
 
