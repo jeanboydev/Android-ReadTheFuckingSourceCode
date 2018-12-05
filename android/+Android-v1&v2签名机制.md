@@ -135,7 +135,7 @@ RSA 密码体制是一种公钥密码体制，公钥公开，私钥保密，它�
 
 综上所述，总结一下，数字签名和签名验证的大体流程如下图所示：
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/01.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/01.png)
 
 ## 二、APK Signature Scheme v1
 
@@ -154,7 +154,7 @@ Android 应用的签名工具有两种：`jarsigner` 和 `signAPK`。它们的�
 
 首先我们任意选取一个签名后的 APK（Sample-release.APK）解压：
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/02.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/02.png)
 
 在 `META-INF` 文件夹下有三个文件：`MANIFEST.MF`、`CERT.SF`、`CERT.RSA`。它们就是签名过程中生成的文件，姑且叫他们“签名三兄弟”吧，把它们搞清楚了，你就精通签名了。
 
@@ -162,7 +162,7 @@ Android 应用的签名工具有两种：`jarsigner` 和 `signAPK`。它们的�
 
 该文件中保存的内容其实就是逐一遍历 APK 中的所有条目，如果是目录就跳过，如果是一个文件，就用 SHA1（或者 SHA256）消息摘要算法提取出该文件的摘要然后进行 BASE64 编码后，作为“SHA1-Digest”属性的值写入到 MANIFEST.MF 文件中的一个块中。该块有一个“Name”属性， 其值就是该文件在 APK 包中的路径。
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/03.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/03.png)
 
 #### 2.2.2 CERT.SF
 
@@ -172,11 +172,11 @@ Android 应用的签名工具有两种：`jarsigner` 和 `signAPK`。它们的�
 
 - SHA1-Digest：对 MANIFEST.MF 的各个条目做 SHA1（或者 SHA256）后再用 Base64 编码
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/04.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/04.png)
 
 对于 SHA1-Digest 值的验证可以手动进行，将 MANIFEST.MF 中任意一个块的内容复制并保存在一个新的文档中，注意文末需要加两个换行（这是由 signAPK 的源码决定的）
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/05.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/05.png)
 
 #### 2.2.3 CERT.RSA
 
@@ -188,21 +188,21 @@ Android 应用的签名工具有两种：`jarsigner` 和 `signAPK`。它们的�
 
 在 HTTPS 通信中使用自签名证书时浏览器的显示效果：
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/06.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/06.png)
 
 CERT.RSA 文件中的内容：
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/07.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/07.png)
 
 这里我们看到的都是二进制文件，因为RSA文件加密了，所以我们需要用openssl命令才能查看其内容：
 
 > $ openssl pkcs7 -inform DER -in /<文件存放路径>/Sample-release_new/original/META-INF/CERT.RSA -text -noout -print_certs
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/08.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/08.png)
 
 综上所述，一个完整的签名过程如下所示：
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/09.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/09.png)
 
 ### 2.3 签名校验过程
 
@@ -216,7 +216,7 @@ CERT.RSA 文件中的内容：
 
 综上所述，一个完整的签名验证过程如下所示：
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/10.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/10.png)
 
 为什么使用这样的签名流程呢？
 
@@ -256,7 +256,7 @@ v2 签名将验证归档中的所有字节，而不是单个 ZIP 条目，因此
 
 简单来说，v2 签名模式在原先 APK 块中增加了一个新的块（签名块），新的块存储了签名，摘要，签名算法，证书链，额外属性等信息，这个块有特定的格式，具体格式分析见后文，先看下现在 APK 成什么样子了。
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/11.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/11.png)
 
 为了保护 APK 内容，整个 APK（ZIP文件格式）被分为以下 4 个区块：
 
@@ -265,7 +265,7 @@ v2 签名将验证归档中的所有字节，而不是单个 ZIP 条目，因此
 - ZIP 中央目录
 - ZIP 中央目录结尾
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/12.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/12.png)
 
 其中，应用签名方案的签名信息会被保存在 区块 2（APK Signing Block）中，而区块 1（Contents of ZIP entries）、区块 3（ZIP Central Directory）、区块 4（ZIP End of Central Directory）是受保护的，在签名后任何对区块 1、3、4 的修改都逃不过新的应用签名方案的检查。
 
@@ -273,7 +273,7 @@ v2 签名将验证归档中的所有字节，而不是单个 ZIP 条目，因此
 
 从上面我们可以看到 v2 模式块有点类似于我们 `META-INF` 文件夹下的信息内容。那么对于上述当中摘要的信息又是怎么计算出来的呢。
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/13.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/13.png)
 
 首先，说一下 APK 摘要计算规则，对于每个摘要算法，计算结果如下:
 
@@ -287,7 +287,7 @@ v2 签名将验证归档中的所有字节，而不是单个 ZIP 条目，因此
 
 接下来我们来看v2签名的校验过程，整体大概流程如下图所示：
 
-![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/14.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/14.png)
 
 其中 v2 签名机制是在 Android 7.0 以及以上版本才支持。因此对于 Android 7.0 以及以上版本，在安装过程中，如果发现有 v2 签名块，则必须走 v2 签名机制，不能绕过。否则降级走 v1 签名机制。
 v1 和 v2 签名机制是可以同时存在的，其中对于 v1 和 v2 版本同时存在的时候，v1 版本的 META_INF 的 `.SF` 文件属性当中有一个 `X-Android-APK-Signed` 属性：
@@ -308,5 +308,5 @@ X-Android-APK-Signed: 2
 
 - [APK 签名方案 v2](https://source.android.com/security/apksigning/v2)
 - [分析Android V2新签名打包机制](https://mp.weixin.qq.com/s?__biz=MzI1NjEwMTM4OA==&mid=2651232457&idx=1&sn=90b16c3868a341272b8f1aa26d6c0122&chksm=f1d9e5aac6ae6cbcfaecb07bdd280abf81a46f1937c43f61e69d7f78d64350943356f5443d58&scene=27#wechat_redirect)
-- [3个知识点让你了解Android签名机制](http://www.apkbus.com/blog-942559-76948.html)
+- [3个知识点让你了解Android签名机制](https://www.apkbus.com/blog-942559-76948.html)
 - [新一代开源Android渠道包生成工具Walle](https://tech.meituan.com/android_apk_v2-signature_scheme.html)
