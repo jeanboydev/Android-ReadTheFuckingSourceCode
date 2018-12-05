@@ -135,7 +135,7 @@ RSA 密码体制是一种公钥密码体制，公钥公开，私钥保密，它�
 
 综上所述，总结一下，数字签名和签名验证的大体流程如下图所示：
 
-![](https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Digital_Signature_diagram_zh-CN.svg/1920px-Digital_Signature_diagram_zh-CN.svg.png)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/01.png)
 
 ## 二、APK Signature Scheme v1
 
@@ -154,7 +154,7 @@ Android 应用的签名工具有两种：`jarsigner` 和 `signAPK`。它们的�
 
 首先我们任意选取一个签名后的 APK（Sample-release.APK）解压：
 
-![](http://5b0988e595225.cdn.sohucs.com/images/20180126/9ed148f1d448413a8e9687cf085e535b.jpeg)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/02.png)
 
 在 `META-INF` 文件夹下有三个文件：`MANIFEST.MF`、`CERT.SF`、`CERT.RSA`。它们就是签名过程中生成的文件，姑且叫他们“签名三兄弟”吧，把它们搞清楚了，你就精通签名了。
 
@@ -162,7 +162,7 @@ Android 应用的签名工具有两种：`jarsigner` 和 `signAPK`。它们的�
 
 该文件中保存的内容其实就是逐一遍历 APK 中的所有条目，如果是目录就跳过，如果是一个文件，就用 SHA1（或者 SHA256）消息摘要算法提取出该文件的摘要然后进行 BASE64 编码后，作为“SHA1-Digest”属性的值写入到 MANIFEST.MF 文件中的一个块中。该块有一个“Name”属性， 其值就是该文件在 APK 包中的路径。
 
-![](http://5b0988e595225.cdn.sohucs.com/images/20180126/0e7c01d8df664d2bb527317e9d3b3b69.jpeg)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/03.png)
 
 #### 2.2.2 CERT.SF
 
@@ -172,11 +172,11 @@ Android 应用的签名工具有两种：`jarsigner` 和 `signAPK`。它们的�
 
 - SHA1-Digest：对 MANIFEST.MF 的各个条目做 SHA1（或者 SHA256）后再用 Base64 编码
 
-![](http://5b0988e595225.cdn.sohucs.com/images/20180126/8f01b608ae484b2a8ce3f89e6fb450df.jpeg)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/04.png)
 
 对于 SHA1-Digest 值的验证可以手动进行，将 MANIFEST.MF 中任意一个块的内容复制并保存在一个新的文档中，注意文末需要加两个换行（这是由 signAPK 的源码决定的）
 
-![](http://5b0988e595225.cdn.sohucs.com/images/20180126/0a86fc39f3294f8e8ea566581c34a181.jpeg)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/05.png)
 
 #### 2.2.3 CERT.RSA
 
@@ -188,11 +188,11 @@ Android 应用的签名工具有两种：`jarsigner` 和 `signAPK`。它们的�
 
 在 HTTPS 通信中使用自签名证书时浏览器的显示效果：
 
-![](http://5b0988e595225.cdn.sohucs.com/images/20180126/d168c2d47c41409694460c3119a5f9af.jpeg)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/06.png)
 
 CERT.RSA 文件中的内容：
 
-![](http://5b0988e595225.cdn.sohucs.com/images/20180126/2654a8f4a257456ba0b9e09f55250128.jpeg)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/07.png)
 
 这里我们看到的都是二进制文件，因为RSA文件加密了，所以我们需要用openssl命令才能查看其内容：
 
@@ -256,7 +256,7 @@ v2 签名将验证归档中的所有字节，而不是单个 ZIP 条目，因此
 
 简单来说，v2 签名模式在原先 APK 块中增加了一个新的块（签名块），新的块存储了签名，摘要，签名算法，证书链，额外属性等信息，这个块有特定的格式，具体格式分析见后文，先看下现在 APK 成什么样子了。
 
-![](http://source.android.com/security/images/apk-before-after-signing.png)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/11.png)
 
 为了保护 APK 内容，整个 APK（ZIP文件格式）被分为以下 4 个区块：
 
@@ -265,7 +265,7 @@ v2 签名将验证归档中的所有字节，而不是单个 ZIP 条目，因此
 - ZIP 中央目录
 - ZIP 中央目录结尾
 
-![](http://source.android.com/security/images/apk-sections.png)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/12.png)
 
 其中，应用签名方案的签名信息会被保存在 区块 2（APK Signing Block）中，而区块 1（Contents of ZIP entries）、区块 3（ZIP Central Directory）、区块 4（ZIP End of Central Directory）是受保护的，在签名后任何对区块 1、3、4 的修改都逃不过新的应用签名方案的检查。
 
@@ -273,7 +273,7 @@ v2 签名将验证归档中的所有字节，而不是单个 ZIP 条目，因此
 
 从上面我们可以看到 v2 模式块有点类似于我们 `META-INF` 文件夹下的信息内容。那么对于上述当中摘要的信息又是怎么计算出来的呢。
 
-![](http://source.android.com/security/images/apk-integrity-protection.png)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/13.png)
 
 首先，说一下 APK 摘要计算规则，对于每个摘要算法，计算结果如下:
 
@@ -287,7 +287,7 @@ v2 签名将验证归档中的所有字节，而不是单个 ZIP 条目，因此
 
 接下来我们来看v2签名的校验过程，整体大概流程如下图所示：
 
-![](http://source.android.com/security/images/apk-v2-validation.png)
+![](http://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_sign/14.png)
 
 其中 v2 签名机制是在 Android 7.0 以及以上版本才支持。因此对于 Android 7.0 以及以上版本，在安装过程中，如果发现有 v2 签名块，则必须走 v2 签名机制，不能绕过。否则降级走 v1 签名机制。
 v1 和 v2 签名机制是可以同时存在的，其中对于 v1 和 v2 版本同时存在的时候，v1 版本的 META_INF 的 `.SF` 文件属性当中有一个 `X-Android-APK-Signed` 属性：
