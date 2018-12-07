@@ -118,7 +118,7 @@ public PowerManagerService(Context context) {
         mWakefulness = WAKEFULNESS_AWAKE;
 
         sQuiescent = SystemProperties.get(SYSTEM_PROPERTY_QUIESCENT, "0").equals("1");
-        //初始化电源相关设置，通过 jni 调用 native 方法
+        //初始化电源相关设置，通过 jni 调用 native 方法，详见下面分析
         nativeInit();
         nativeSetAutoSuspend(false);
         nativeSetInteractive(true);
@@ -645,9 +645,9 @@ private void updatePowerStateLocked() {
 
 如果没有进行特定场景的分析，这块可能很难理解，在后续的分析中会对特定场景进行分析，这样更能理解方法的使用，如果这里还不太理解，不用太担心。
 
-### 2.4.1 第 0 阶段
+#### 2.4.1 第 0 阶段
 
-#### 2.4.1.1 updateIsPoweredLocked()
+##### 2.4.1.1 updateIsPoweredLocked()
 
 这个方法主要功能有两个：USB 插入亮屏，更新低电量模式。
 
@@ -683,12 +683,12 @@ private void updateIsPoweredLocked(int dirty) {
             //特别是在设备没有充电指示灯时，所以一般插拔充电器时会唤醒设备
             final long now = SystemClock.uptimeMillis();
             if (shouldWakeUpWhenPluggedOrUnpluggedLocked(wasPowered, oldPlugType,
-                    dockedOnWirelessCharger)) {
-                //屏幕唤醒，详见【2.4.1.1.1】
+                    dockedOnWirelessCharger)) {//详见【2.4.1.1.1】
+                //屏幕唤醒，详见【2.4.1.1.2】
                 wakeUpNoUpdateLocked(now, "android.server.power:POWER", Process.SYSTEM_UID,
                         mContext.getOpPackageName(), Process.SYSTEM_UID);
             }
-            //如果设置了插拔充电器时需要唤醒设备，则在这里唤醒设备，详见【2.4.1.1.2】
+            //如果设置了插拔充电器时需要唤醒设备，则在这里唤醒设备，详见【2.4.1.1.3】
             userActivityNoUpdateLocked(
                     now, PowerManager.USER_ACTIVITY_EVENT_OTHER, 0, Process.SYSTEM_UID);
 
@@ -706,7 +706,7 @@ private void updateIsPoweredLocked(int dirty) {
                 mAutoLowPowerModeSnoozing = false;
             }
             //发送广播 ACTION_POWER_SAVE_MODE_CHANGED，该广播在系统中多出进行处理，
-            //在 SystemUI 中进行处理，如果低电量则给出提示，详见【2.4.1.1.3】
+            //在 SystemUI 中进行处理，如果低电量则给出提示，详见【2.4.1.1.4】
             updateLowPowerModeLocked();
         }
     }
@@ -715,7 +715,7 @@ private void updateIsPoweredLocked(int dirty) {
 
 因此可以看到，这个方法跟电池有关，只要电池状态发生变化，就能够调用执行到这个方法进行操作。
 
-##### 2.4.1.1.1 shouldWakeUpWhenPluggedOrUnpluggedLocked()
+###### 2.4.1.1.1 shouldWakeUpWhenPluggedOrUnpluggedLocked()
 
 ```java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -759,7 +759,7 @@ private boolean shouldWakeUpWhenPluggedOrUnpluggedLocked(
 }
 ```
 
-##### 2.4.1.1.2 wakeUpNoUpdateLocked()
+###### 2.4.1.1.2 wakeUpNoUpdateLocked()
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -780,7 +780,7 @@ private boolean wakeUpNoUpdateLocked(long eventTime, String reason, int reasonUi
         setWakefulnessLocked(WAKEFULNESS_AWAKE, 0);
         //通知 BatteryStatsService/AppService 屏幕状态发生改变
         mNotifier.onWakeUp(reason, reasonUid, opPackageName, opUid);
-        //更新用户活动事件时间值，详见【2.4.1.1.2】
+        //更新用户活动事件时间值，详见【2.4.1.1.3】
         userActivityNoUpdateLocked(
                 eventTime, PowerManager.USER_ACTIVITY_EVENT_OTHER, 0, reasonUid);
     } finally {
@@ -790,7 +790,7 @@ private boolean wakeUpNoUpdateLocked(long eventTime, String reason, int reasonUi
 }
 ```
 
-##### 2.4.1.1.3 userActivityNoUpdateLocked()
+###### 2.4.1.1.3 userActivityNoUpdateLocked()
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -855,7 +855,7 @@ private boolean userActivityNoUpdateLocked(long eventTime, int event, int flags,
 }
 ```
 
-##### 2.4.1.1.4 updateLowPowerModeLocked()
+###### 2.4.1.1.4 updateLowPowerModeLocked()
 
 ```java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -917,7 +917,7 @@ private void updateLowPowerModeLocked() {
 
 mLowPowerModeEnabled 变量表示当前是否进入低电量省电模式，当手机的低电量模式发生了变化，就发送 ACTION_POWER_SAVE_MODE_CHANGING 的通知，回调关于该模式变化的监听，通知相关的服务 Power Save Mode 发生了变化。PowerUI 接收到低电量省电模式的广播，就会弹出低电量省电模式的提醒界面。
 
-#### 2.4.1.2 updateStayOnLocked()
+##### 2.4.1.2 updateStayOnLocked()
 
 这个方法主要用于判断系统是否在 Settings 中设置了充电时保持屏幕亮屏后，根据是否充电来决定是否亮屏。
 
@@ -944,7 +944,7 @@ private void updateStayOnLocked(int dirty) {
 }
 ```
 
-#### 2.4.1.3 updateScreenBrightnessBoostLocked()
+##### 2.4.1.3 updateScreenBrightnessBoostLocked()
 
 
 ```Java
@@ -979,9 +979,9 @@ private void updateScreenBrightnessBoostLocked(int dirty) {
 }
 ```
 
-### 2.4.2 第 1 阶段
+#### 2.4.2 第 1 阶段
 
-#### 2.4.2.1 updateWakeLockSummaryLocked()
+##### 2.4.2.1 updateWakeLockSummaryLocked()
 
 在这个方法中，会对当前所有的 WakeLock 锁进行统计，过滤所有的 wakelock 锁状态（wakelock 锁机制在后续进行分析），并更新mWakeLockSummary 的值以汇总所有活动的唤醒锁的状态。
 
@@ -1063,7 +1063,7 @@ private void updateWakeLockSummaryLocked(int dirty) {
 }
 ```
 
-#### 2.4.2.2 updateUserActivitySummaryLocked()
+##### 2.4.2.2 updateUserActivitySummaryLocked()
 
 该方法用来更新用户活动时间，当设备和用户有交互时，都会根据当前时间和休眠时长、Dim 时长、所处状态而计算下次休眠的时间，从而完成用户活动超时时的操作。如：由亮屏进入 Dim 的时长、Dim 到灭屏的时长、亮屏到屏保的时长，就是在这里计算的。
 
@@ -1165,7 +1165,7 @@ private void updateUserActivitySummaryLocked(long now, int dirty) {
 }
 ```
 
-#### 2.4.2.3 updateWakefulnessLocked()
+##### 2.4.2.3 updateWakefulnessLocked()
 
 这个方法是退出循环的关键，如果这个方法返回 false，则循环结束，如果返回 true，则进行下一次循环。
 
@@ -1193,7 +1193,7 @@ private boolean updateWakefulnessLocked(int dirty) {
 }
 ```
 
-##### 2.4.2.3.1 isItBedTimeYetLocked()
+###### 2.4.2.3.1 isItBedTimeYetLocked()
 
 该方法判断当前设备是否将要进入睡眠状态，由 mStayOn(是否屏幕常亮)、wakelockSummary、userActivitySummary、mProximityPositive 等决定，只要满足其中之一为 ture，则说明无法进入睡眠，也就说，要满足进入睡眠，相关属性值都为false。
 
@@ -1210,7 +1210,7 @@ private boolean isBeingKeptAwakeLocked() {
 }
 ```
 
-##### 2.4.2.3.2 shouldNapAtBedTimeLocked()
+###### 2.4.2.3.2 shouldNapAtBedTimeLocked()
 
 这个方法用来判断设备是否进入屏保模式：
 
@@ -1224,11 +1224,11 @@ private boolean isBeingKeptAwakeLocked() {
 }
 ```
 
-##### 2.4.2.3.3 goToSleepNoUpdateLocked()
+###### 2.4.2.3.3 *goToSleepNoUpdateLocked()
 
-### 2.4.3 第 2 阶段
+#### 2.4.3 第 2 阶段
 
-#### 2.4.3.1 updateDisplayPowerStateLocked()
+##### 2.4.3.1 updateDisplayPowerStateLocked()
 
 该方法用于更新设备显示状态，在这个方法中，会计算出最终需要显示的亮度值和其他值，然后将这些值封装到 DisplayPowerRequest 对象中，向 DisplayMangerService 请求 Display 状态，完成屏幕亮度显示等。
 
@@ -1309,7 +1309,7 @@ private boolean isBeingKeptAwakeLocked() {
                 mDisplayPowerRequest.dozeScreenBrightness = PowerManager.BRIGHTNESS_DEFAULT;
             }
 
-            //传给 DisplayManagerService 中处理
+            //传给 DisplayManagerService 中处理，详见【2.4.3.1.2】
             mDisplayReady = mDisplayManagerInternal.requestPowerState(mDisplayPowerRequest,
                     mRequestWaitForNegativeProximity);
             mRequestWaitForNegativeProximity = false;
@@ -1322,7 +1322,7 @@ private boolean isBeingKeptAwakeLocked() {
     }
 ```
 
-##### 2.4.3.1.1 getDesiredScreenPolicyLocked()
+###### 2.4.3.1.1 getDesiredScreenPolicyLocked()
 
 在请求 DisplayManagerService 时，会将所有的信息封装到 DisplayPowerRequest 对象中，其中需要注意 policy 值。policy 作为 DisplayPowerRequset 的属性，有四种值，分别为 off、doze、dim、bright、vr。在向 DisplayManagerService 请求时，会根据当前 PowerManagerService 中的唤醒状态和统计的 wakelock 来决定要请求的 Display 状态，这部分源码如下：
 
@@ -1334,9 +1334,9 @@ private int getDesiredScreenPolicyLocked() {
     if (mIsVrModeEnabled) {
         return DisplayPowerRequest.POLICY_VR;
     }
-
+    //asleep 时，policy 值为 0
     if (mWakefulness == WAKEFULNESS_ASLEEP || sQuiescent) {
-        return DisplayPowerRequest.POLICY_OFF;
+        return DisplayPowerRequest.POLICY_OFF;//0
     }
 
     if (mWakefulness == WAKEFULNESS_DOZING) {
@@ -1361,11 +1361,73 @@ private int getDesiredScreenPolicyLocked() {
 }
 ```
 
-##### *2.4.3.1.2 requestPowerState()
+###### *2.4.3.1.2 requestPowerState()
 
-### 2.4.4 第 3 阶段
+```java
+//frameworks/base/services/core/java/com/android/server/display/DisplayManagerService.java
 
-#### 2.4.4.1 updateDreamLocked()
+@Override
+public boolean requestPowerState(DisplayPowerRequest request,
+                                 boolean waitForNegativeProximity) {
+    return mDisplayPowerController.requestPowerState(request,
+                                                     waitForNegativeProximity);
+}
+```
+
+接下来调用了 DisplayPowerController.requestPowerState()。
+
+```java
+//frameworks/base/services/core/java/com/android/server/display/DisplayPowerController.java
+
+public boolean requestPowerState(DisplayPowerRequest request,
+            boolean waitForNegativeProximity) {
+    synchronized (mLock) {
+        boolean changed = false;
+
+        if (waitForNegativeProximity
+            && !mPendingWaitForNegativeProximityLocked) {
+            mPendingWaitForNegativeProximityLocked = true;
+            changed = true;
+        }
+		//开机后第一次进入
+        if (mPendingRequestLocked == null) {
+            mPendingRequestLocked = new DisplayPowerRequest(request);
+            changed = true;
+        } else if (!mPendingRequestLocked.equals(request)) {
+            //如果该次请求和上次请求不同，说明已经改变，需要更新 Display
+            mPendingRequestLocked.copyFrom(request);
+            changed = true;
+        }
+        /**
+         * changed 为 true，说明有改变发生，这个改变交给 Handler 异步去处理，此时说
+         * 明显示没有准备好，mDisplayReadyLocked = false
+         * 直到改变处理成功，mDisplayReadyLocked 又被置为 true，
+         */
+        if (changed) {
+            mDisplayReadyLocked = false;
+        }
+        //mPendingRequestChangedLocked：用于标识电源请求状态或者 PSensor 标签是否改变
+        if (changed && !mPendingRequestChangedLocked) {
+            mPendingRequestChangedLocked = true;
+            sendUpdatePowerStateLocked();
+        }
+
+        return mDisplayReadyLocked;
+    }
+}
+```
+
+在这个方法中，会判断请求时携带的 DisplayPowerRequest 对象是否和上一次发生请求的 DisplayRequest 对象相同，如果相同，则返回值 mDisplayReadyLocked 为 true，如果不同，则表示发生了改变。此时会异步去请求新的 Display 状态，并向 PMS 返回 false，表示 Display 状态正在更新，没有准备完成。直到更新完成后，会将 mDisplayReadyLocked 值置为 true，表示更新完成。同时回调 PMS.onStateChanged() 方法通知 PMS 更新完成。这个返回值会在 PMS 中作为下一步的执行条件。
+
+处理完成后回调 PMS中 的 onStateChanged() 方法通知 PMS，最终完成 Display 的更新。关于 DisplayPowerController 和 DisplayManagerService 以及其他模块中如何处理的，这里暂不分析。只需要知道当 DisplayPowerController 处理完请求后，回调 DisplayManagerInternal.DisplayPowerCallbacks 的 onStateChanged() 方法，再来看看这个方法：
+
+###### 2.4.3.1.3 onStateChanged()
+
+
+
+#### 2.4.4 第 3 阶段
+
+##### 2.4.4.1 updateDreamLocked()
 
 该方法用来更新设备 Dream 状态，比如是否继续屏保、Doze 或者开始休眠。
 
@@ -1392,7 +1454,7 @@ private void updateDreamLocked(int dirty, boolean displayBecameReady) {
 
 从这里可以看到，该方法依赖于 mDisplayReady 值，这个值是上个方法在请求 Display 时的返回值，表示 Display 是否准备就绪，因此，只有在准备就绪的情况下才会进一步调用该方法的方法体。在 scheduleSandmanLocked() 方法中，通过 Handler 发送了一个异步消息，代码如下：
 
-##### 2.4.4.1.1 scheduleSandmanLocked()
+###### 2.4.4.1.1 scheduleSandmanLocked()
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -1431,7 +1493,7 @@ private final class PowerManagerHandler extends Handler {
 
 因此，当 updateDreamLocked() 方法调用后，最终会异步执行这个方法，在这个方法中进行屏保相关处理，继续看看这个方法：
 
-##### 2.4.4.1.2 handleSandman()
+###### 2.4.4.1.2 handleSandman()
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -1527,9 +1589,9 @@ private void handleSandman() { // runs on handler thread
 }
 ```
 
-### 2.4.5 第 4 阶段
+#### 2.4.5 第 4 阶段
 
-#### 2.4.5.1 finishWakefulnessChangeIfNeededLocked()
+##### 2.4.5.1 finishWakefulnessChangeIfNeededLocked()
 
 该方法主要做 updateWakefulnessLocked() 方法的结束工作，可以说 updateWakefulnessLocked() 方法中做了屏幕改变的前半部分工作，而这个方法中做后半部分工作。当屏幕状态改变后，才会执行该方法。我们已经分析了，屏幕状态有四种：唤醒状态(awake)、休眠状态(asleep)、屏保状态(dream)、打盹状态(doze)，当前屏幕状态由 wakefulness 表示，当 wakefulness 发生改变，布尔值 mWakefulnessChanging 变为 true。该方法涉及 wakefulness 收尾相关内容，用来处理 wakefulness 改变完成后的工作。
 
@@ -1560,11 +1622,11 @@ private void finishWakefulnessChangeIfNeededLocked() {
 此外，该方法中的 logScreenOn() 方法将打印出整个亮屏流程的耗时，在平时处理问题时也很有帮助。
 
 
-### 2.4.6 第 5 阶段
+#### 2.4.6 第 5 阶段
 
 在分析这个方法前，先来了解下什么是 Suspend 锁。Suspend 锁机制是 Android 电源管理框架中的一种机制，在前面还提到的 wakelock 锁也是，不过 wakelock 锁是上层向 framwork 层申请，而 Suspend 锁是 framework 层中对 wakelock 锁的表现，也就是说，上层应用申请了 wakelock 锁后，在 PowerManagerService 中最终都会表现为 Suspend 锁，通过 Suspend 锁向 Hal 层写入节点，Kernal 层会读取节点，从而进入唤醒或者休眠。
 
-#### 2.4.6.1 updateSuspendBlockerLocked()
+##### 2.4.6.1 updateSuspendBlockerLocked()
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -1636,7 +1698,7 @@ private void updateSuspendBlockerLocked() {
 
 在 PMS 的构造方法中创建了两个 SuspendBlocker 对象：mWakeLockSuspendBlocker 和 mDisplaySuspendBlocker，前者表示获取一个 PARTIAL_WAKELOCK 类型的 WakeLock 使 CPU 保持活动状态，后者表示当屏幕亮屏、用户活动时使 CPU 保持活动状态。因此实际上，上层 PowerManager 申请和释放锁，最终在 PMS 中都交给了 SuspendBlocker 去申请和释放锁。也可以说 SuspendBlocker 类的两个对象是 WakeLock 锁反映到底层的对象。只要持有二者任意锁，都会使得 CPU 处于活动状态。
 
-##### 2.4.6.1.1 needDisplaySuspendBlockerLocked()
+###### 2.4.6.1.1 needDisplaySuspendBlockerLocked()
 
 ```Java
 private boolean needDisplaySuspendBlockerLocked() {
@@ -1665,7 +1727,7 @@ private boolean needDisplaySuspendBlockerLocked() {
 }
 ```
 
-##### 2.4.6.1.2 acquire()
+###### 2.4.6.1.2 acquire()
 
 SuspendBlocker 是一个接口，并且只有 acquire() 和 release() 两个方法，PMS.SuspendBlockerImpl 实现了该接口，因此，最终申请流程执行到了 PMS.SuspendBlockerImpl 的 acquire() 中。
 
@@ -1688,7 +1750,7 @@ public void acquire() {
 
 这里使用了引用计数法，如果 mReferenceCount > 1，则不会进行锁的申请，而是仅仅将 mReferenceCount + 1，只有当没有申请的锁时，才会其正真执行申请锁操作，之后不管申请几次，都是 mReferenceCount 加 1。
 
-###### 2.4.6.1.2.1 nativeAcquireSuspendBlocker()
+###### 2.4.6.1.3 nativeAcquireSuspendBlocker()
 
 在 JNI 层中可以明确的看到有一个申请锁的 acquire_wake_lock() 方法，代码如下：
 
