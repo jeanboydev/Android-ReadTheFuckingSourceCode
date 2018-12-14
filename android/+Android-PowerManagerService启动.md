@@ -1224,7 +1224,83 @@ private boolean isBeingKeptAwakeLocked() {
 }
 ```
 
-###### 2.4.2.3.3 *goToSleepNoUpdateLocked()
+###### 2.4.2.3.3 goToSleepNoUpdateLocked()
+
+```java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+@SuppressWarnings("deprecation")
+private boolean goToSleepNoUpdateLocked(long eventTime, int reason, int flags, int uid) {
+    if (eventTime < mLastWakeTime
+        || mWakefulness == WAKEFULNESS_ASLEEP
+        || mWakefulness == WAKEFULNESS_DOZING
+        || !mBootCompleted || !mSystemReady) {
+        return false;
+    }
+
+    try {
+        switch (reason) {
+            case PowerManager.GO_TO_SLEEP_REASON_DEVICE_ADMIN:
+                Slog.i(TAG, "Going to sleep due to device administration policy "
+                       + "(uid " + uid +")...");
+                break;
+            case PowerManager.GO_TO_SLEEP_REASON_TIMEOUT:
+                Slog.i(TAG, "Going to sleep due to screen timeout (uid " + uid +")...");
+                break;
+            case PowerManager.GO_TO_SLEEP_REASON_LID_SWITCH:
+                Slog.i(TAG, "Going to sleep due to lid switch (uid " + uid +")...");
+                break;
+            case PowerManager.GO_TO_SLEEP_REASON_POWER_BUTTON:
+                Slog.i(TAG, "Going to sleep due to power button (uid " + uid +")...");
+                break;
+            case PowerManager.GO_TO_SLEEP_REASON_SLEEP_BUTTON:
+                Slog.i(TAG, "Going to sleep due to sleep button (uid " + uid +")...");
+                break;
+            case PowerManager.GO_TO_SLEEP_REASON_HDMI:
+                Slog.i(TAG, "Going to sleep due to HDMI standby (uid " + uid +")...");
+                break;
+            default:
+                Slog.i(TAG, "Going to sleep by application request (uid " + uid +")...");
+                reason = PowerManager.GO_TO_SLEEP_REASON_APPLICATION;
+                break;
+        }
+
+        //标记最后一次灭屏时间
+        mLastSleepTime = eventTime;
+        //用于判定是否进入屏保
+        mSandmanSummoned = true;
+        //设置 wakefulness 值为 WAKEFULNESS_DOZING，
+        //因此先进 Doze 状态，详见【1.5.1】
+        setWakefulnessLocked(WAKEFULNESS_DOZING, reason);
+
+        // Report the number of wake locks that will be cleared by going to sleep.
+        //灭屏时，将清楚以下三种使得屏幕保持亮屏的 wakelock 锁，numWakeLocksCleared 统计下个数
+        int numWakeLocksCleared = 0;
+        final int numWakeLocks = mWakeLocks.size();
+        for (int i = 0; i < numWakeLocks; i++) {
+            final WakeLock wakeLock = mWakeLocks.get(i);
+            switch (wakeLock.mFlags & PowerManager.WAKE_LOCK_LEVEL_MASK) {
+                case PowerManager.FULL_WAKE_LOCK:
+                case PowerManager.SCREEN_BRIGHT_WAKE_LOCK:
+                case PowerManager.SCREEN_DIM_WAKE_LOCK:
+                    numWakeLocksCleared += 1;
+                    break;
+            }
+        }
+
+        // Skip dozing if requested.
+        //如果带有 PowerManager.GO_TO_SLEEP_FLAG_NO_DOZE 的 flag，
+        //则直接进入 Sleep 状态，不再进入 Doze 状态
+        if ((flags & PowerManager.GO_TO_SLEEP_FLAG_NO_DOZE) != 0) {
+            //该方法才会真正地进入睡眠，详见【1.5.2】
+            reallyGoToSleepNoUpdateLocked(eventTime, uid);
+        }
+    } finally {
+        Trace.traceEnd(Trace.TRACE_TAG_POWER);
+    }
+    return true;
+}
+```
 
 #### 2.4.3 第 2 阶段
 
@@ -1361,7 +1437,7 @@ private int getDesiredScreenPolicyLocked() {
 }
 ```
 
-###### *2.4.3.1.2 requestPowerState()
+###### 2.4.3.1.2 requestPowerState()
 
 ```java
 //frameworks/base/services/core/java/com/android/server/display/DisplayManagerService.java
@@ -1421,7 +1497,7 @@ public boolean requestPowerState(DisplayPowerRequest request,
 
 处理完成后回调 PMS中 的 onStateChanged() 方法通知 PMS，最终完成 Display 的更新。关于 DisplayPowerController 和 DisplayManagerService 以及其他模块中如何处理的，这里暂不分析。只需要知道当 DisplayPowerController 处理完请求后，回调 DisplayManagerInternal.DisplayPowerCallbacks 的 onStateChanged() 方法，再来看看这个方法：
 
-###### 2.4.3.1.3 onStateChanged()
+###### *2.4.3.1.3 onStateChanged()
 
 
 

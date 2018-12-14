@@ -237,7 +237,7 @@ private void acquireWakeLockInternal(IBinder lock, int flags, String tag, String
             }
             notifyAcquire = false;
         } else {
-              //从SpareArray<UidState> 中查找是否存在该 uid
+              //从 SpareArray<UidState> 中查找是否存在该 uid
               UidState state = mUidState.get(uid);
               if (state == null) {
                   state = new UidState(uid);
@@ -266,13 +266,13 @@ private void acquireWakeLockInternal(IBinder lock, int flags, String tag, String
         //判断是否直接点亮屏幕，如果带有点亮屏幕标志值，并且 wakelock 类型为
         //FULL_WAKE_LOCK，SCREEN_BRIGHT_WAKE_LOCK，SCREEN_DIM_WAKE_LOCK，则进行下 
         //步处理
-        applyWakeLockFlagsOnAcquireLocked(wakeLock, uid);
+        applyWakeLockFlagsOnAcquireLocked(wakeLock, uid);//更新电源状态，详见【3.6】
         //更新标志位
         mDirty |= DIRTY_WAKE_LOCKS;
-        updatePowerStateLocked();//更新电源状态，详见【3.6】
+        updatePowerStateLocked();//更新电源状态，详见【3.7】
         if (notifyAcquire) {
            //当申请了锁后，在该方法中进行长时锁的判断，通知 BatteryStatsService      
-           // 进行统计持锁时间等，详见【3.7】
+           // 进行统计持锁时间等，详见【3.8】
             notifyWakeLockAcquiredLocked(wakeLock);
         }
     }
@@ -283,16 +283,12 @@ private void acquireWakeLockInternal(IBinder lock, int flags, String tag, String
 
 获取到 WakeLock 实例后，还通过 setWakeLockDisabledStateLocked(wakeLock) 进行了判断该 WakeLock 是否可用，主要有两种情况：
 
-- 缓存的不活动进程不能持有WakeLock锁；
-- 如果处于idle模式，则会忽略掉所有未处于白名单中的应用申请的锁。
+- 缓存的不活动进程不能持有 WakeLock 锁；
+- 如果处于 idle 模式，则会忽略掉所有未处于白名单中的应用申请的锁。
 
 根据情况会设置 WakeLock 实例的 disable 属性值表示该 WakeLock 是否不可用。下一步进行判断是否直接点亮屏幕。
 
-### 3.6 updatePowerStateLocked()
-
-该流程分析详见上一章【PackageManagerService 启动 - 2.4】
-
-### 3.7 applyWakeLockFlagsOnAcquireLocked()
+### 3.6 applyWakeLockFlagsOnAcquireLocked()
 
 ```Java
 private void applyWakeLockFlagsOnAcquireLocked(WakeLock wakeLock, int uid) {
@@ -307,6 +303,10 @@ private void applyWakeLockFlagsOnAcquireLocked(WakeLock wakeLock, int uid) {
 ```
 
 wakeUpNoUpdateLocked() 方法是唤醒设备的主要方法。在这个方法中，首先更新了 mLastWakeTime 这个值，表示上次唤醒设备的时间，在系统超时休眠时用到这个值进行判断。现在，只需要知道每次亮屏，都走的是这个方法，详细分析请看上一章中的内容。
+
+### 3.7 updatePowerStateLocked()
+
+该流程分析详见上一章【PackageManagerService 启动 - 2.4】
 
 ### 3.8 notifyWakeLockAcquiredLocked()
 
@@ -387,13 +387,13 @@ public void release(int flags) {
         if ((flags & RELEASE_FLAG_TIMEOUT) == 0) {
             mExternalCount--;
         }
-        //如果释放非计数锁或内部计数为 0,并且该锁还在持有,则通过 PowerManagerService 去释放
+        //如果释放非计数锁或内部计数为 0，并且该锁还在持有，则通过 PowerManagerService 去释放
         if (!mRefCounted || mInternalCount == 0) {
             mHandler.removeCallbacks(mReleaser);
             if (mHeld) {
                 Trace.asyncTraceEnd(Trace.TRACE_TAG_POWER, mTraceName, 0);
                 try {
-                    mService.releaseWakeLock(mToken, flags);
+                    mService.releaseWakeLock(mToken, flags);//详见下面分析
                 } catch (RemoteException e) {
                     throw e.rethrowFromSystemServer();
                 }
@@ -456,7 +456,7 @@ private void releaseWakeLockInternal(IBinder lock, int flags) {
         }
         //取消 Binder 的死亡代理
         wakeLock.mLock.unlinkToDeath(wakeLock, 0);
-        //释放锁
+        //释放锁，详见下面分析
         removeWakeLockLocked(wakeLock, index);
     }
 }
@@ -509,7 +509,7 @@ private void applyWakeLockFlagsOnReleaseLocked(WakeLock wakeLock) {
 }
 ```
 
-最后，又将调用updatePowerStateLocked()，其中和 WakeLock 申请和释放相关的都 updateSuspendBlockerLocked() 中。
+最后，又将调用 updatePowerStateLocked()，其中和 WakeLock 申请和释放相关的都 updateSuspendBlockerLocked() 中。
 
 ### 4.5 updateSuspendBlockerLocked()
 
