@@ -1,8 +1,8 @@
-# HashMap
+# HashMap 源码分析
 
 ## 简介
 
-HashMap 是 Java 语言中常用的用于存放键值对数据类型的集合类。随着 JDK（Java Developmet Kit）版本的更新，JDK 1.8 对 HashMap 底层的实现进行了优化，底层实现由之前的 `数组+链表` 改为 `数组+链表+红黑树` ，HashMap 的常用方法如下：
+HashMap 是 Java 语言中常用的用于存放键值对数据类型的集合类。随着 JDK（Java Developmet Kit）版本的更新，JDK 1.8 对 HashMap 底层的实现进行了优化，底层实现也由之前的 `数组 + 链表` 改为 `数组 + 链表 + 红黑树` 。HashMap 的常用方法如下：
 
 ```java
 //创建一个 map
@@ -28,20 +28,20 @@ for (String key : map.keySet()) {
 
 ## 原理分析
 
-从 JDK 1.8 开始 HashMap 底层采用  `数组+链表+红黑树` 来实现，如下图：
+从 JDK 1.8 开始 HashMap 底层采用  `数组 + 链表 + 红黑树` 来实现，如下图：
 
 ![](https://tech.meituan.com/img/java-hashmap/hashMap%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84%E5%9B%BE.png)
 
 从源码可知，HashMap 类中有一个非常重要的字段，就是 `Node[] table` 即哈希桶数组，明显它是一个Node 的数组。我们来看下 Node 是什么。
 
 ```java
-static class Node<K,V> implements Map.Entry<K,V> {
+static class Node<K, V> implements Map.Entry<K, V> {
     final int hash;//用来定位数组索引位置
     final K key;
     V value;
-    Node<K,V> next;//链表的下一个 node
+    Node<K, V> next;//链表的下一个 node
 
-    Node(int hash, K key, V value, Node<K,V> next) { ... }
+    Node(int hash, K key, V value, Node<K, V> next) { ... }
     public final K getKey(){ ... }
     public final V getValue() { ... }
     public final String toString() { ... }
@@ -214,7 +214,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 
 1. 判断键值对数组 table[i] 是否为空或为 null，否则执行 resize() 进行扩容；
 
-2. 根据键值 key 计算 hash 值得到插入的数组索引 i，如果 `table[i]==null`，直接新建节点添加，转向 6，如果 table[i] 不为空，转向 3；
+2. 根据键值 key 计算 hash 值得到插入的数组索引 i，如果 `table[i] == null`，直接新建节点添加，转向 6，如果 table[i] 不为空，转向 3；
 
 3. 判断 table[i] 的首个元素是否和 key 一样，如果相同直接覆盖 value，否则转向 4，这里的相同指的是 hashCode 以及 equals；
 
@@ -235,7 +235,7 @@ void resize(int newCapacity) {   //传入新的容量
     Entry[] oldTable = table;    //引用扩容前的 Entry 数组
     int oldCapacity = oldTable.length;         
     if (oldCapacity == MAXIMUM_CAPACITY) {  //扩容前的数组大小如果已经达到最大(2^30)了
-        threshold = Integer.MAX_VALUE; //修改阈值为int的最大值(2^31-1)，这样以后就不会扩容了
+        threshold = Integer.MAX_VALUE; //修改阈值为 int 的最大值(2^31-1)，这样以后就不会扩容了
         return;
     }
   
@@ -270,7 +270,7 @@ void transfer(Entry[] newTable) {
 
 newTable[i] 的引用赋给了 e.next，也就是使用了单链表的头插入方式，同一位置上新元素总会被放在链表的头部位置；这样先放在一个索引上的元素终会被放到 Entry 链的尾部（如果发生了 hash 冲突的话），这一点和 Jdk 1.8 有区别，下文详解。在旧数组中同一条 Entry 链上的元素，通过重新计算索引位置后，有可能被放到了新数组的不同位置上。
 
-下面举个例子说明下扩容过程。假设了我们的hash算法就是简单的用 key mod 一下表的大小（也就是数组的长度）。其中的哈希桶数组 table 的 size =2， 所以 key = 3、7、5，put 顺序依次为 5、7、3。在 mod 2 以后都冲突在 table[1] 这里了。这里假设负载因子 loadFactor = 1，即当键值对的实际大小 size 大于 table 的实际大小时进行扩容。接下来的三个步骤是哈希桶数组 resize 成 4，然后所有的 Node 重新 rehash 的过程。
+下面举个例子说明下扩容过程。假设了我们的 hash 算法就是简单的用 key mod（%） 一下表的大小（也就是数组的长度）。其中的哈希桶数组 table 的 size =2， 所以 key = 3、7、5，put 顺序依次为 5、7、3。在 mod（%） 2 以后都冲突在 table[1] 这里了。这里假设负载因子 loadFactor = 1，即当键值对的实际大小 size 大于 table 的实际大小时进行扩容。接下来的三个步骤是哈希桶数组 resize 成 4，然后所有的 Node 重新 rehash 的过程。
 
 ![](https://tech.meituan.com/img/java-hashmap/jdk1.7%E6%89%A9%E5%AE%B9%E4%BE%8B%E5%9B%BE.png)
 

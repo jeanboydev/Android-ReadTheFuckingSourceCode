@@ -19,11 +19,8 @@
 
 ## 基础知识
 
-- [Java 基础知识](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/Java-基础知识.md)
-- [Android 基础知识](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/Android-基础知识.md)
-- [网络通信](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/网络通信基础知识.md)
-- [数据结构与算法](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/数据结构与算法.md)
-- [人事相关问题](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/interview/人事相关问题.md)
+- [精华面试题，长期更新！](https://github.com/android-exchange/Android-Interview)
+- [一篇文章看明白 HashMap 工作原理](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/java/Java_HashMap.md)
 
 ## 网络通信
 
