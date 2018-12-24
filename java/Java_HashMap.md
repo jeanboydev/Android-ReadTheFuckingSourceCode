@@ -214,13 +214,13 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 
 1. 判断键值对数组 table[i] 是否为空或为 null，否则执行 resize() 进行扩容；
 
-2. 根据键值 key 计算 hash 值得到插入的数组索引 i，如果 `table[i] == null`，直接新建节点添加，转向 6，如果 table[i] 不为空，转向 3；
+2. 根据键值 key 计算 hash 值得到插入的数组索引 i，如果 `table[i] == null`，直接新建节点添加，转向 6，如果 table[i] 不为空，转向 3；
 
-3. 判断 table[i] 的首个元素是否和 key 一样，如果相同直接覆盖 value，否则转向 4，这里的相同指的是 hashCode 以及 equals；
+3. 判断 table[i] 的首个元素是否和 key 一样，如果相同直接覆盖 value，否则转向 4，这里的相同指的是 hashCode 以及 equals；
 
 4. 判断 table[i] 是否为 treeNode，即 table[i] 是否是红黑树，如果是红黑树，则直接在树中插入键值对，否则转向 5；
 
-5. 遍历 table[i]，判断链表长度是否大于 8，大于 8 的话把链表转换为红黑树，在红黑树中执行插入操作，否则进行链表的插入操作；遍历过程中若发现 key 已经存在直接覆盖 value 即可；
+5. 遍历 table[i]，判断链表长度是否大于 8，大于 8 的话把链表转换为红黑树，在红黑树中执行插入操作，否则进行链表的插入操作；遍历过程中若发现 key 已经存在直接覆盖 value 即可；
 
 6. 插入成功后，判断实际存在的键值对数量 size 是否超多了最大容量 threshold，如果超过，进行扩容。
 
@@ -270,7 +270,7 @@ void transfer(Entry[] newTable) {
 
 newTable[i] 的引用赋给了 e.next，也就是使用了单链表的头插入方式，同一位置上新元素总会被放在链表的头部位置；这样先放在一个索引上的元素终会被放到 Entry 链的尾部（如果发生了 hash 冲突的话），这一点和 Jdk 1.8 有区别，下文详解。在旧数组中同一条 Entry 链上的元素，通过重新计算索引位置后，有可能被放到了新数组的不同位置上。
 
-下面举个例子说明下扩容过程。假设了我们的 hash 算法就是简单的用 key mod（%） 一下表的大小（也就是数组的长度）。其中的哈希桶数组 table 的 size =2， 所以 key = 3、7、5，put 顺序依次为 5、7、3。在 mod（%） 2 以后都冲突在 table[1] 这里了。这里假设负载因子 loadFactor = 1，即当键值对的实际大小 size 大于 table 的实际大小时进行扩容。接下来的三个步骤是哈希桶数组 resize 成 4，然后所有的 Node 重新 rehash 的过程。
+下面举个例子说明下扩容过程。假设了我们的 hash 算法就是简单的用 key mod（%） 一下表的大小（也就是数组的长度）。其中的哈希桶数组 table 的 size =2， 所以 key = 3、7、5，put 顺序依次为 5、7、3。在 mod（%） 2 以后都冲突在 table[1] 这里了。这里假设负载因子 loadFactor = 1，即当键值对的实际大小 size 大于 table 的实际大小时进行扩容。接下来的三个步骤是哈希桶数组 resize 成 4，然后所有的 Node 重新 rehash 的过程。
 
 ![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/java_hashmap/03.png)
 
