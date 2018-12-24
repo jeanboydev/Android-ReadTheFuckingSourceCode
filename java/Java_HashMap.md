@@ -30,7 +30,7 @@ for (String key : map.keySet()) {
 
 从 JDK 1.8 开始 HashMap 底层采用  `数组 + 链表 + 红黑树` 来实现，如下图：
 
-![](https://tech.meituan.com/img/java-hashmap/hashMap%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84%E5%9B%BE.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/java_hashmap/01.png)
 
 从源码可知，HashMap 类中有一个非常重要的字段，就是 `Node[] table` 即哈希桶数组，明显它是一个Node 的数组。我们来看下 Node 是什么。
 
@@ -146,7 +146,7 @@ static int indexFor(int h, int length) {
 
 但是问题又来了，这样就算我们的散列值分布再松散，仅仅是取最后几位的话，碰撞也会很严重，更何况散列本身也不是很完美。所以这里源码做了一下高位移位，将高位也加入计算。
 
-![](https://tech.meituan.com/img/java-hashmap/hashMap%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95%E4%BE%8B%E5%9B%BE.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/java_hashmap/02.png)
 
 这里右移 16 位正好是 32bit 的一半，将高半区与低半区做异或，就是为了混合原始哈希码的高位和低位来加大低位的随机性。并且混合后的低位加入了高位的部分特征，高位的信息也被保留了下来。
 
@@ -272,19 +272,19 @@ newTable[i] 的引用赋给了 e.next，也就是使用了单链表的头插入�
 
 下面举个例子说明下扩容过程。假设了我们的 hash 算法就是简单的用 key mod（%） 一下表的大小（也就是数组的长度）。其中的哈希桶数组 table 的 size =2， 所以 key = 3、7、5，put 顺序依次为 5、7、3。在 mod（%） 2 以后都冲突在 table[1] 这里了。这里假设负载因子 loadFactor = 1，即当键值对的实际大小 size 大于 table 的实际大小时进行扩容。接下来的三个步骤是哈希桶数组 resize 成 4，然后所有的 Node 重新 rehash 的过程。
 
-![](https://tech.meituan.com/img/java-hashmap/jdk1.7%E6%89%A9%E5%AE%B9%E4%BE%8B%E5%9B%BE.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/java_hashmap/03.png)
 
 下面我们讲解下 JDK1.8 做了哪些优化。经过观测可以发现，我们使用的是 2 次幂的扩展(指长度扩为原来2倍)，所以，元素的位置要么是在原位置，要么是在原位置再移动 2 次幂的位置。看下图可以明白这句话的意思，n 为 table 的长度，图（a）表示扩容前的 key1 和 key2 两种key确定索引位置的示例，图（b）表示扩容后 key1 和 key2 两种 key 确定索引位置的示例，其中 hash1 是 key1 对应的哈希与高位运算结果。
 
-![](https://tech.meituan.com/img/java-hashmap/hashMap%201.8%20%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95%E4%BE%8B%E5%9B%BE1.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/java_hashmap/04.png)
 
 元素在重新计算 hash 之后，因为 n 变为 2 倍，那么 n-1 的 mask 范围在高位多 1bit（红色），因此新的 index 就会发生这样的变化：
 
-![hashMap 1.8 åå¸ç®æ³ä¾å¾2](https://tech.meituan.com/img/java-hashmap/hashMap%201.8%20%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95%E4%BE%8B%E5%9B%BE2.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/java_hashmap/05.png)
 
 因此，我们在扩充 HashMap 的时候，不需要像 JDK1.7 的实现那样重新计算 hash，只需要看看原来的 hash 值新增的那个 bit 是 1 还是 0 就好了，是 0 的话索引没变，是1的话索引变成“原索引+oldCap”，可以看看下图为 16 扩充为 32 的 resize 示意图：
 
-![](https://tech.meituan.com/img/java-hashmap/jdk1.8%20hashMap%E6%89%A9%E5%AE%B9%E4%BE%8B%E5%9B%BE.png)
+![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/java_hashmap/06.png)
 
 这个设计确实非常的巧妙，既省去了重新计算 hash 值的时间，而且同时，由于新增的 1bit 是 0 还是 1 可以认为是随机的，因此 resize 的过程，均匀的把之前的冲突的节点分散到新的 bucket 了。这一块就是 JDK 1.8 新增的优化点。有一点注意区别，JDK 1.7 中 rehash 的时候，旧链表迁移新链表的时候，如果在新表的数组索引位置相同，则链表元素会倒置，但是从上图可以看出，JDK 1.8 不会倒置。有兴趣的同学可以研究下 JDK 1.8 的 resize 源码，写的很赞，如下:
 
