@@ -1946,8 +1946,8 @@ public void onBootPhase(int phase) {
 
 ## 参考资料
 
-- [](http://www.robinheztto.com/2017/06/14/android-power-pms-1/)
-- [](https://blog.csdn.net/FightFightFight/article/details/79532191)
+- [Android电源管理系列之 PowerManagerService](http://www.robinheztto.com/2017/06/14/android-power-pms-1/)
+- [PowerManagerService 分析](https://blog.csdn.net/FightFightFight/article/details/79532191)
 
 
 
