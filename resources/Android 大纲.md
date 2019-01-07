@@ -72,6 +72,8 @@
 
 ## ListView
 
+### 图片加载错乱的原理和解决方案
+
 ### 常见优化
 
 ## RecylerView
@@ -134,6 +136,9 @@
 
 ### SharedPreferences
 
+- 实现原理
+- 是否进程同步。如何做到同步
+
 ### 文件与文件目录操作
 
 ### SQLite 使用
@@ -168,14 +173,28 @@
 
 ### Context
 
+### LRUCache
+
 ### Handler
 
-- ThreadLocal
+- Thread
+- Looper
+- MessageQueue
+- Handler
+- Message
 - AsyncTask
+
+### ThreadLocal 原理
+
+### SpareArray 原理
 
 ### Binder
 
 - aidl
+
+### 动画实现原理
+
+### App 保活
 
 ### 编译打包
 
@@ -237,6 +256,8 @@
 
 - WakeLock
 
+### 缩小 Apk 体积
+
 ## Gradle
 
 ### 构建流程
@@ -252,6 +273,10 @@
 ### Flutter
 
 ### ReactNative
+
+## NDK
+
+### 如何加载 ndk 库？如何在 jni 中注册 native 函数，有几种注册方式?
 
 ## 架构能力
 
