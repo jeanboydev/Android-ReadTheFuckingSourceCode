@@ -1,8 +1,8 @@
 # Android 基础
 
-## 四大组件
+## 一、基础组件
 
-### Activity
+### 1.1 Activity
 
 - LifeCycle（生命周期）
   1. 通知栏对生命周期的影响
@@ -20,13 +20,13 @@
   2. onRestoreInstanceState()
 - 转场动画
 
-### Fragment
+### 1.2 Fragment
 
 - LifeCycle（生命周期）
 - 与 Activity 交互
 - 与 ViewPager 结合
 
-### Service
+### 1.3 Service
 
 - 生命周期
 - startService()
@@ -37,22 +37,26 @@
 - Service 与 IntentService
 - aidl 的使用
 
-### BroadcastReceiver
+### 1.4 BroadcastReceiver
 
 - 静态广播
 - 动态广播
 - 有序广播
 
-### ContentProvider
+### 1.5 ContentProvider
 
 - 增删改查
 - 共享数据
 
-## 屏幕适配
+### 1.6 RemotView
 
-### drawable 与 mipmap
+### 1.7 AppWidget
 
-### layout
+## 二、屏幕适配
+
+### 2.1 使用限定符
+
+### 2.2 layout
 
 - RelativeLayout
 
@@ -60,66 +64,76 @@
 
 - LinerLayout（weight 机制）
 
-### 点 9 图片
+### 2.3 drawable 与 mipmap
 
-## 通知栏与状态栏
+### 2.4 NinePatch(.9) 图片
 
-### RemotView
+## 三、运行时权限
 
-### 沉浸式状态栏
+## 四、ListView
 
-## 运行时权限
+### 4.1 图片加载错乱的原理和解决方案
 
-## ListView
+### 4.2 常见优化
 
-### 图片加载错乱的原理和解决方案
+## 五、RecylerView
 
-### 常见优化
+### 5.1 基本使用
 
-## RecylerView
+### 5.2 动画与分割线
 
-### 基本使用
+### 5.3 自定义 LayoutManager
 
-### 动画与分割线
+### 5.4 源码分析
 
-### 自定义 LayoutManager
+## 六、Material Design（材料设计）
 
-### 源码分析
+### 6.1 ToolBar
 
-## Material Design（材料设计）
+### 6.2 CardView
 
-### 介绍
+### 6.3 FloatingActionButton
 
-### ToolBar、CardView、沉浸标题栏
+### 6.4 Snackbar
 
-### FloatingActionButton、Snackbar、SheetX3
+### 6.5 SheetX3
 
-### BottomNavigationBar、TabLayout
+### 6.6 BottomNavigationBar
 
-### AppBarLayout、CoordinatorLayout
+### 6.7 TabLayout
 
-### CollapsingToolbarLayout、Palette
+### 6.8 AppBarLayout
 
-### DrawerLayout、NavigationView、TextInputLayout
+### 6.9 CoordinatorLayout
 
-### Behavior
+### 6.10 CollapsingToolbarLayout
 
-## 自定义 View
+### 6.11 Palette
 
-### 绘制原理
+### 6.12 DrawerLayout
+
+### 6.13 NavigationView
+
+### 6.14 TextInputLayout
+
+### 6.15 Behavior
+
+## 七、自定义 View
+
+### 7.1 绘制原理
 
 - measure
 - layout
 - draw
 - invalidate() 与 postInvalidate()
 
-### 事件传递机制
+### 7.2 事件传递机制
 
 - dispatchTouchEvent()
 - onInterceptTouchEvent()
 - onTouchEvent()
 
-### 动画处理
+### 7.3 动画处理
 
 - Frame Animation（帧动画）
 - Tweened Animation（补间动画）
@@ -128,54 +142,54 @@
   2. Interpolator（插值器）
   3. TypeEvaluator（估值器）
 
-### 自定义属性
+### 7.4 自定义属性
 
-### 贝塞尔曲线、粒子效果
+### 7.5 贝塞尔曲线、粒子效果
 
-## 数据持久化
+## 八、数据持久化
 
-### SharedPreferences
+### 8.1 SharedPreferences
 
 - 实现原理
-- 是否进程同步。如何做到同步
+- 是否进程同步，如何做到同步
 
-### 文件与文件目录操作
+### 8.2 文件与文件目录操作
 
-### SQLite 使用
+### 8.3 SQLite 使用
 
-### JSON 解析
+### 8.4 JSON 解析
 
-## 多媒体
+## 九、多媒体
 
-### 相机与相册
+### 9.1 相机与相册
 
-### 图片与 bitmap
+### 9.2 图片与 bitmap
 
-### 音频与视频
+### 9.3 音频与视频
 
-## 第三方开源库
+## 十、第三方开源库
 
-### OkHttp
+### 10.1 OkHttp
 
-### Retrofit
+### 10.2 Retrofit
 
-### Volley
+### 10.3 Volley
 
-### Glide
+### 10.4 Glide
 
-### ButterKnife
+### 10.5 ButterKnife
 
-### EventBus
+### 10.6 EventBus
 
-## 相关原理
+## 十一、相关原理
 
-### Application
+### 11.1 Application
 
-### Context
+### 11.2 Context
 
-### LRUCache
+### 11.3 LRUCache
 
-### Handler
+### 11.4 Handler
 
 - Thread
 - Looper
@@ -184,24 +198,24 @@
 - Message
 - AsyncTask
 
-### ThreadLocal 原理
+### 11.5 ThreadLocal 原理
 
-### SpareArray 原理
+### 11.6 SpareArray 原理
 
-### Binder
+### 11.7 Binder
 
 - aidl
 
-### 动画实现原理
+### 11.8 动画实现原理
 
-### App 保活
+### 11.6 App 保活
 
-### 编译打包
+### 11.8 编译打包
 
 - AssertManager
 - V1、V2 签名机制
 
-### 虚拟机
+### 11.9 虚拟机
 
 - ClassLoader
   1. 类加载机制
@@ -214,7 +228,7 @@
 - 插件化
 - Hook
 
-### 系统服务
+### 11.20 系统服务
 
 - Binder
 - ActivityManagerService
@@ -224,9 +238,9 @@
 - PackageManagerService
 - PowerManagerService
 
-## 相关优化
+## 十二、相关优化
 
-### 性能优化
+### 12.1 性能优化
 
 - 布局优化
   1. ViewStub
@@ -238,7 +252,7 @@
   1. 埋点
   2. Crash 上报
 
-### 内存优化
+### 12.2 内存优化
 
 - OOM（内存溢出）
 - Memory Leak（内存泄漏）
@@ -246,48 +260,50 @@
 - 内存分析
 - Bitmap 优化
 
-### 网络优化
+### 12.3 网络优化
 
 - API 优化
 - 流量优化
 - 弱网优化
 
-### 电量优化
+### 12.4 电量优化
 
 - WakeLock
 
-### 缩小 Apk 体积
+### 12.5 缩小 Apk 体积
 
-## Gradle
+## 十三、Gradle
 
-### 构建流程
+### 13.1 构建流程
 
-### 自动化构建
+### 13.2 自动化构建
 
-### 组件开发
+### 13.3 组件开发
 
-## Kotlin
+## 十四、Kotlin
 
-## 混合开发
+## 十五、混合开发
 
-### Flutter
+### 15.1 Flutter
 
-### ReactNative
+### 15.2 ReactNative
 
-## NDK
+## 十六、NDK
 
-### 如何加载 ndk 库？如何在 jni 中注册 native 函数，有几种注册方式?
+### 16.1 加载 ndk 库
 
-## 架构能力
+### 16.2 在 jni 中注册 native 函数
 
-### 常见设计模式
+## 十七、架构能力
 
-1. OOD 原则
+### 17.1 常见设计模式
 
-### 组件化
+- OOD 原则
 
-1. ARouter
+### 17.2 组件化
 
-### MVC、MVP、MVVM
+- ARouter
 
-### Jetpack
+### 17.3 MVC、MVP、MVVM
+
+### 17.4 Jetpack

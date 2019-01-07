@@ -1,69 +1,101 @@
 # Java 基础
 
-## 常用技术
+## 一、常用技术
 
-- OOP 原则
-- 重载与重写
-- 接口与抽象类
-- 内部类与匿名内部类
-- 注解
-- 泛型
-  1. extends 和 super 的区别
-- 反射原理
-- 异常体系
+### OOP 原则
 
-## 流程控制
+### 重载与重写
 
-- for 循环执行流程
+### 接口与抽象类
 
-## 工具类
+### 内部类与匿名内部类
 
-- int 与 Integer 区别
-- 自动装箱原理
-- equals 与 == 区别
-- String、StringBuffer、StringBuilder
-- String 常量池
+### 注解
 
-## 集合类
+### 泛型
 
-- ArrayList
-- LinkedList
+- extends 和 super 的区别
 
-- HashMap
-- HashTable
-- ConcurrentHashMap
-- LinkedHashMap
+### 反射原理
 
-## 文件与 I/O
+### 异常体系
 
-- 字符流与字符编码
-- 字节流与字符流转化
-- File 类和 Properties 类
-- IO 流对象
-- Serializable（序列化）
-- 深拷贝与浅拷贝
+## 二、流程控制
 
-## 关键字
+### for 循环执行流程
 
-- final 关键字
-- static 关键字
+## 三、工具类
 
-- synchronized 关键字
-- volatile 关键字
-- transient 关键字
+### int 与 Integer 区别
 
-## 并发编程
+### 自动装箱原理
 
-- Thread、Runnable、run()、start()
-- sleep()、join()、yield()
-- stop()、interrupt()
-- wait()、notify()、notifyAll()
-- 锁、乐观锁、悲观锁
-- 数据库索引实现原理
+### equals 与 == 区别
 
-## 虚拟机
+### String、StringBuffer、StringBuilder
 
-- 内存模型
-- ClassLoader（类加载机制）
-- 双亲委派模型
-- GC（垃圾回收机制）
+### String 常量池
+
+## 四、集合类
+
+### ArrayList
+
+### LinkedList
+
+### HashMap
+
+### HashTable
+
+### ConcurrentHashMap
+
+### LinkedHashMap
+
+## 五、文件与 I/O
+
+### 字符流与字符编码
+
+### 字节流与字符流转化
+
+### File 类和 Properties 类
+
+### IO 流对象
+
+### Serializable（序列化）
+
+### 深拷贝与浅拷贝
+
+## 六、关键字
+
+### final 关键字
+
+### static 关键字
+
+### synchronized 关键字
+
+### volatile 关键字
+
+### transient 关键字
+
+## 七、并发编程
+
+### Thread、Runnable、run()、start()
+
+### sleep()、join()、yield()
+
+### stop()、interrupt()
+
+### wait()、notify()、notifyAll()
+
+### 锁、乐观锁、悲观锁
+
+### 数据库索引实现原理
+
+## 八、虚拟机
+
+### 内存模型
+
+### ClassLoader（类加载机制）
+
+### 双亲委派模型
+
+### GC（垃圾回收机制）
