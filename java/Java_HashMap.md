@@ -212,7 +212,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 }
 ```
 
-1. 判断键值对数组 table[i] 是否为空或为 null，否则执行 resize() 进行扩容；
+1. 判断键值对数组 table[] 是否为空或为 null，否则执行 resize() 进行扩容；
 
 2. 根据键值 key 计算 hash 值得到插入的数组索引 i，如果 `table[i] == null`，直接新建节点添加，转向 6，如果 table[i] 不为空，转向 3；
 
