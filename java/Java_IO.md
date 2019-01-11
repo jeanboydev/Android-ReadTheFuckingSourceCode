@@ -93,7 +93,11 @@ BIO（Blocking I/O）、NIO（New I/O）、AIO（Asynchronous I/O，NIO 2.0）
 
 ### Sington
 
-
+- 饿汉式
+- 懒汉式
+- 静态内部类
+- static 代码块
+- enum 枚举数据类型
 
 ## 小标题
 
