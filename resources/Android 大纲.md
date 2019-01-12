@@ -8,16 +8,18 @@
   1. 通知栏对生命周期的影响
   2. Dialog（对话框）对生命周期的影响
   3. 屏幕旋转对生命周期的影响
+
 - LaunchMode（启动模式）
   1. standard
   2. singleTop
   3. singleTask
   4. singleInstance
-  5. onNewIntent()
-  6. Intent Filter
+- onNewIntent()
+- Intent Filter
 - 状态保存与恢复
   1. onSaveInstanceState()
   2. onRestoreInstanceState()
+
 - 转场动画
 
 ### 1.2 Fragment
