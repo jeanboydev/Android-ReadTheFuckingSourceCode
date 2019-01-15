@@ -306,7 +306,7 @@ wakeUpNoUpdateLocked() 方法是唤醒设备的主要方法。在这个方法中
 
 ### 3.7 updatePowerStateLocked()
 
-该流程分析详见上一章【PackageManagerService 启动 - 2.4】
+该流程分析详见上一章【PackageManagerService 启动 - updatePowerStateLocked() 分析】
 
 ### 3.8 notifyWakeLockAcquiredLocked()
 
@@ -351,6 +351,10 @@ private void restartNofifyLongTimerLocked(WakeLock wakeLock) {
      mHandler.sendMessageAtTime(msg, time);
  }
 ```
+
+到这里 WakeLock 的申请已经分析完了，我们来看下整体流程。
+
+
 
 ## 四、释放 WakeLock
 
