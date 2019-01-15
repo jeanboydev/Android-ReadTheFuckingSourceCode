@@ -576,11 +576,100 @@ private void updateSettingsLocked() {
 
 在 systemReady() 方法的最后，调用了 updatePowerStateLocked() 方法，它是整个 PowerManagerService 中的核心方法，也是整个 PowerManagerService 中最重要的一个方法，这个流程比较复杂我们先走完 PowerManagerService 启动流程，待会儿再分析。
 
+## 三、startBootPhase() 分析
+
+### 3.1 startBootPhase()
+
+systemReady() 方法调用完毕后会回到 SytemServer 中，然后根据 SystemService 的生命周期，会开始执行 onBootPhase()，这个方法的功能是为所有的已启动的服务指定启动阶段，从而可以在指定的启动阶段来做指定的工作。
+
+```Java
+//frameworks/base/services/core/java/com/android/server/SystemServiceManager.java
+
+public void startBootPhase(final int phase) {
+    if (phase <= mCurrentPhase) {
+        throw new IllegalArgumentException("Next phase must be larger than previous");
+    }
+    mCurrentPhase = phase;
+    try {
+        final int serviceLen = mServices.size();
+        //遍历已经服务列表
+        for (int i = 0; i < serviceLen; i++) {
+            final SystemService service = mServices.get(i);
+            try {
+                //调用服务的 onBootPhase() 方法，详见【3.1.1】
+                service.onBootPhase(mCurrentPhase);
+            } catch (Exception ex) {}
+        }
+    } finally {}
+}
+```
+
+在 SystemServiceManager 的 startBootPhase() 中，调用 SystemService 的 onBootPhase(int) 方法，此时每个 SystemService 都会执行其对应的 onBootPhase() 方法。通过在 SystemServiceManager 中传入不同的形参，回调所有 SystemService的onBootPhase()，根据形参的不同，在方法实现中完成不同的工作，在 SystemService 中定义了五个阶段：
+
+- SystemService.PHASE_WAIT_FOR_DEFAULT_DISPLAY：这是一个依赖 项，只有DisplayManagerService中进行了对应处理；
+- SystemService.PHASE_LOCK_SETTINGS_READY：经过这个引导阶段后，服务才可以接收到wakelock相关设置数据；
+- SystemService.PHASE_SYSTEM_SERVICES_READY：经过这个引导阶段 后，服务才可以安全地使用核心系统服务
+- SystemService.PHASE_ACTIVITY_MANAGER_READY：经过这个引导阶 段后，服务可以发送广播
+- SystemService.PHASE_THIRD_PARTY_APPS_CAN_START：经过这个引 导阶段后，服务可以启动第三方应用，第三方应用也可以通过Binder来调 用服务。
+- SystemService.PHASE_BOOT_COMPLETED：经过这个引导阶段后，说明服务启动完成，这时用户就可以和设备进行交互。
+
+### 3.2 onBootPhase()
+
+因此，只要在其他模块中调用了 SystemServiceManager.startBootPhase()，都会触发各自的 onBootPhase()。PowerManagerService 的 onBootPhase() 方法只对引导阶段的 2 个阶段做了处理，具体代码如下：
+
+```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+@Override
+public void onBootPhase(int phase) {
+    synchronized (mLock) {
+        if (phase == PHASE_THIRD_PARTY_APPS_CAN_START) {
+            //统计启动的 Apk 个数
+            incrementBootCount();
+        } else if (phase == PHASE_BOOT_COMPLETED) {
+            final long now = SystemClock.uptimeMillis();
+            //设置 mBootCompleted 状态
+            mBootCompleted = true;
+            mDirty |= DIRTY_BOOT_COMPLETED;
+            //更新用户活动时间，详见【3.1.2】
+            userActivityNoUpdateLocked(
+                    now, PowerManager.USER_ACTIVITY_EVENT_OTHER, 0, Process.SYSTEM_UID);
+            //更新电源状态信息，详见【3.1.3】
+            updatePowerStateLocked();
+
+            if (!ArrayUtils.isEmpty(mBootCompletedRunnables)) {
+                Slog.d(TAG, "Posting " + mBootCompletedRunnables.length + " delayed runnables");
+                for (Runnable r : mBootCompletedRunnables) {
+                    BackgroundThread.getHandler().post(r);
+                }
+            }
+            mBootCompletedRunnables = null;
+        }
+    }
+}
+```
+
+在这个方法中，mDirty 是一个二进制的标记位，用来表示电源状态哪一部分发生了改变，通过对其进行置位（| 操作）、清零（～ 操作），得到二进制数各个位的值(0 或 1)，进行不同的处理。我们接着来看下 userActivityNoUpdateLocked() 方法：
+
+### 3.3 userActivityNoUpdateLocked()
+
+详见下面 updatePowerStateLocked() 中的分析。
+
+### 3.4 updatePowerStateLocked()
+
+详见下面 updatePowerStateLocked() 中的分析。
+
+到这里 PowerManagerService 的启动过程已经分析完毕，我们来看一下整体启动流程。
+
+![PMS 启动流程](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_pms_start/01.png)
 
 
 
+## 四、updatePowerStateLocked() 分析
 
-updatePowerStateLocked() 用来更新整个电源状态的改变，并进行重新计算。PowerManagerService 中使用一个 int 值 mDirty 作为标志位判断电源状态是否发生变化。当电源状态发生改变时，如亮灭屏、电池状态改变、暗屏等等都会调用该方法，在该方法中调用了其他同级方法进行更新，下面逐个进行分析：
+### 4.1 updatePowerStateLocked()
+
+updatePowerStateLocked() 方法用来更新整个电源状态的改变，并进行重新计算。PowerManagerService 中使用一个 int 值 mDirty 作为标志位判断电源状态是否发生变化。当电源状态发生改变时，如亮灭屏、电池状态改变、暗屏等等都会调用该方法，在该方法中调用了其他同级方法进行更新，下面逐个进行分析：
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -650,9 +739,9 @@ private void updatePowerStateLocked() {
 
 如果没有进行特定场景的分析，这块可能很难理解，在后续的分析中会对特定场景进行分析，这样更能理解方法的使用，如果这里还不太理解，不用太担心。
 
-#### 2.4.1 第 0 阶段
+### 4.2 第 0 阶段
 
-##### 2.4.1.1 updateIsPoweredLocked()
+#### 4.2.1 updateIsPoweredLocked()
 
 这个方法主要功能有两个：USB 插入亮屏，更新低电量模式。
 
@@ -720,7 +809,7 @@ private void updateIsPoweredLocked(int dirty) {
 
 因此可以看到，这个方法跟电池有关，只要电池状态发生变化，就能够调用执行到这个方法进行操作。
 
-###### 2.4.1.1.1 shouldWakeUpWhenPluggedOrUnpluggedLocked()
+##### 4.2.1.1 shouldWakeUpWhenPluggedOrUnpluggedLocked()
 
 ```java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -764,7 +853,7 @@ private boolean shouldWakeUpWhenPluggedOrUnpluggedLocked(
 }
 ```
 
-###### 2.4.1.1.2 wakeUpNoUpdateLocked()
+##### 4.2.1.2 wakeUpNoUpdateLocked()
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -795,7 +884,7 @@ private boolean wakeUpNoUpdateLocked(long eventTime, String reason, int reasonUi
 }
 ```
 
-###### 2.4.1.1.3 userActivityNoUpdateLocked()
+##### 4.2.1.3 userActivityNoUpdateLocked()
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -860,7 +949,7 @@ private boolean userActivityNoUpdateLocked(long eventTime, int event, int flags,
 }
 ```
 
-###### 2.4.1.1.4 updateLowPowerModeLocked()
+##### 4.2.1.4 updateLowPowerModeLocked()
 
 ```java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -922,7 +1011,7 @@ private void updateLowPowerModeLocked() {
 
 mLowPowerModeEnabled 变量表示当前是否进入低电量省电模式，当手机的低电量模式发生了变化，就发送 ACTION_POWER_SAVE_MODE_CHANGING 的通知，回调关于该模式变化的监听，通知相关的服务 Power Save Mode 发生了变化。PowerUI 接收到低电量省电模式的广播，就会弹出低电量省电模式的提醒界面。
 
-##### 2.4.1.2 updateStayOnLocked()
+##### 4.2.1.5 updateStayOnLocked()
 
 这个方法主要用于判断系统是否在 Settings 中设置了充电时保持屏幕亮屏后，根据是否充电来决定是否亮屏。
 
@@ -949,8 +1038,7 @@ private void updateStayOnLocked(int dirty) {
 }
 ```
 
-##### 2.4.1.3 updateScreenBrightnessBoostLocked()
-
+##### 4.2.1.6 updateScreenBrightnessBoostLocked()
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -984,9 +1072,9 @@ private void updateScreenBrightnessBoostLocked(int dirty) {
 }
 ```
 
-#### 2.4.2 第 1 阶段
+### 4.3 第 1 阶段
 
-##### 2.4.2.1 updateWakeLockSummaryLocked()
+##### 4.3.1 updateWakeLockSummaryLocked()
 
 在这个方法中，会对当前所有的 WakeLock 锁进行统计，过滤所有的 wakelock 锁状态（wakelock 锁机制在后续进行分析），并更新mWakeLockSummary 的值以汇总所有活动的唤醒锁的状态。
 
@@ -1068,7 +1156,7 @@ private void updateWakeLockSummaryLocked(int dirty) {
 }
 ```
 
-##### 2.4.2.2 updateUserActivitySummaryLocked()
+##### 4.3.2 updateUserActivitySummaryLocked()
 
 该方法用来更新用户活动时间，当设备和用户有交互时，都会根据当前时间和休眠时长、Dim 时长、所处状态而计算下次休眠的时间，从而完成用户活动超时时的操作。如：由亮屏进入 Dim 的时长、Dim 到灭屏的时长、亮屏到屏保的时长，就是在这里计算的。
 
@@ -1170,7 +1258,7 @@ private void updateUserActivitySummaryLocked(long now, int dirty) {
 }
 ```
 
-##### 2.4.2.3 updateWakefulnessLocked()
+##### 4.3.3 updateWakefulnessLocked()
 
 这个方法是退出循环的关键，如果这个方法返回 false，则循环结束，如果返回 true，则进行下一次循环。
 
@@ -1198,7 +1286,7 @@ private boolean updateWakefulnessLocked(int dirty) {
 }
 ```
 
-###### 2.4.2.3.1 isItBedTimeYetLocked()
+###### 4.3.3.1 isItBedTimeYetLocked()
 
 该方法判断当前设备是否将要进入睡眠状态，由 mStayOn(是否屏幕常亮)、wakelockSummary、userActivitySummary、mProximityPositive 等决定，只要满足其中之一为 ture，则说明无法进入睡眠，也就说，要满足进入睡眠，相关属性值都为false。
 
@@ -1215,7 +1303,7 @@ private boolean isBeingKeptAwakeLocked() {
 }
 ```
 
-###### 2.4.2.3.2 shouldNapAtBedTimeLocked()
+###### 4.3.3.2 shouldNapAtBedTimeLocked()
 
 这个方法用来判断设备是否进入屏保模式：
 
@@ -1229,7 +1317,7 @@ private boolean isBeingKeptAwakeLocked() {
 }
 ```
 
-###### 2.4.2.3.3 goToSleepNoUpdateLocked()
+###### 4.3.3.3 goToSleepNoUpdateLocked()
 
 ```java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -1307,12 +1395,11 @@ private boolean goToSleepNoUpdateLocked(long eventTime, int reason, int flags, i
 }
 ```
 
-#### 2.4.3 第 2 阶段
+### 4.4 第 2 阶段
 
-##### 2.4.3.1 updateDisplayPowerStateLocked()
+##### 4.4.1 updateDisplayPowerStateLocked()
 
 该方法用于更新设备显示状态，在这个方法中，会计算出最终需要显示的亮度值和其他值，然后将这些值封装到 DisplayPowerRequest 对象中，向 DisplayMangerService 请求 Display 状态，完成屏幕亮度显示等。
-
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -1403,10 +1490,9 @@ private boolean goToSleepNoUpdateLocked(long eventTime, int reason, int flags, i
     }
 ```
 
-###### 2.4.3.1.1 getDesiredScreenPolicyLocked()
+##### 4.4.2 getDesiredScreenPolicyLocked()
 
 在请求 DisplayManagerService 时，会将所有的信息封装到 DisplayPowerRequest 对象中，其中需要注意 policy 值。policy 作为 DisplayPowerRequset 的属性，有四种值，分别为 off、doze、dim、bright、vr。在向 DisplayManagerService 请求时，会根据当前 PowerManagerService 中的唤醒状态和统计的 wakelock 来决定要请求的 Display 状态，这部分源码如下：
-
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -1442,7 +1528,7 @@ private int getDesiredScreenPolicyLocked() {
 }
 ```
 
-###### 2.4.3.1.2 requestPowerState()
+##### 4.4.3 requestPowerState()
 
 ```java
 //frameworks/base/services/core/java/com/android/server/display/DisplayManagerService.java
@@ -1502,13 +1588,29 @@ public boolean requestPowerState(DisplayPowerRequest request,
 
 处理完成后回调 PMS中 的 onStateChanged() 方法通知 PMS，最终完成 Display 的更新。关于 DisplayPowerController 和 DisplayManagerService 以及其他模块中如何处理的，这里暂不分析。只需要知道当 DisplayPowerController 处理完请求后，回调 DisplayManagerInternal.DisplayPowerCallbacks 的 onStateChanged() 方法，再来看看这个方法：
 
-###### *2.4.3.1.3 onStateChanged()
+##### 4.4.4 onStateChanged()
 
+```java
+private final DisplayManagerInternal.DisplayPowerCallbacks mDisplayPowerCallbacks =
+            new DisplayManagerInternal.DisplayPowerCallbacks() {
+    private int mDisplayState = Display.STATE_UNKNOWN;
 
+    @Override
+    public void onStateChanged() {
+        synchronized (mLock) {
+            mDirty |= DIRTY_ACTUAL_DISPLAY_POWER_STATE_UPDATED;
+            updatePowerStateLocked();
+        }
+    }
+    //...
+};
+```
 
-#### 2.4.4 第 3 阶段
+这个方法最终会回调到 updatePowerStateLocked() 方法，然后继续处理下次的屏幕更新。
 
-##### 2.4.4.1 updateDreamLocked()
+#### 4.5 第 3 阶段
+
+##### 4.5.1 updateDreamLocked()
 
 该方法用来更新设备 Dream 状态，比如是否继续屏保、Doze 或者开始休眠。
 
@@ -1535,7 +1637,7 @@ private void updateDreamLocked(int dirty, boolean displayBecameReady) {
 
 从这里可以看到，该方法依赖于 mDisplayReady 值，这个值是上个方法在请求 Display 时的返回值，表示 Display 是否准备就绪，因此，只有在准备就绪的情况下才会进一步调用该方法的方法体。在 scheduleSandmanLocked() 方法中，通过 Handler 发送了一个异步消息，代码如下：
 
-###### 2.4.4.1.1 scheduleSandmanLocked()
+##### 4.5.2 scheduleSandmanLocked()
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -1574,7 +1676,7 @@ private final class PowerManagerHandler extends Handler {
 
 因此，当 updateDreamLocked() 方法调用后，最终会异步执行这个方法，在这个方法中进行屏保相关处理，继续看看这个方法：
 
-###### 2.4.4.1.2 handleSandman()
+##### 4.5.3 handleSandman()
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -1670,9 +1772,9 @@ private void handleSandman() { // runs on handler thread
 }
 ```
 
-#### 2.4.5 第 4 阶段
+### 4.6 第 4 阶段
 
-##### 2.4.5.1 finishWakefulnessChangeIfNeededLocked()
+##### 4.6.1 finishWakefulnessChangeIfNeededLocked()
 
 该方法主要做 updateWakefulnessLocked() 方法的结束工作，可以说 updateWakefulnessLocked() 方法中做了屏幕改变的前半部分工作，而这个方法中做后半部分工作。当屏幕状态改变后，才会执行该方法。我们已经分析了，屏幕状态有四种：唤醒状态(awake)、休眠状态(asleep)、屏保状态(dream)、打盹状态(doze)，当前屏幕状态由 wakefulness 表示，当 wakefulness 发生改变，布尔值 mWakefulnessChanging 变为 true。该方法涉及 wakefulness 收尾相关内容，用来处理 wakefulness 改变完成后的工作。
 
@@ -1702,12 +1804,11 @@ private void finishWakefulnessChangeIfNeededLocked() {
 可以看到，如果当前屏幕状态处于 Doze 模式，则不作处理直接 return。如果是其他模式，则通过调用 Notifier 的方法去处理了，Notifier 好比 PowerManagerService 的一个喇叭，用来发送广播，和其他组件交互等，都是通过 Notifier 进行处理的，这个类也会进行单独的分析。
 此外，该方法中的 logScreenOn() 方法将打印出整个亮屏流程的耗时，在平时处理问题时也很有帮助。
 
-
-#### 2.4.6 第 5 阶段
+### 4.7 第 5 阶段
 
 在分析这个方法前，先来了解下什么是 Suspend 锁。Suspend 锁机制是 Android 电源管理框架中的一种机制，在前面还提到的 wakelock 锁也是，不过 wakelock 锁是上层向 framwork 层申请，而 Suspend 锁是 framework 层中对 wakelock 锁的表现，也就是说，上层应用申请了 wakelock 锁后，在 PowerManagerService 中最终都会表现为 Suspend 锁，通过 Suspend 锁向 Hal 层写入节点，Kernal 层会读取节点，从而进入唤醒或者休眠。
 
-##### 2.4.6.1 updateSuspendBlockerLocked()
+##### 4.7.1 updateSuspendBlockerLocked()
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -1779,7 +1880,7 @@ private void updateSuspendBlockerLocked() {
 
 在 PMS 的构造方法中创建了两个 SuspendBlocker 对象：mWakeLockSuspendBlocker 和 mDisplaySuspendBlocker，前者表示获取一个 PARTIAL_WAKELOCK 类型的 WakeLock 使 CPU 保持活动状态，后者表示当屏幕亮屏、用户活动时使 CPU 保持活动状态。因此实际上，上层 PowerManager 申请和释放锁，最终在 PMS 中都交给了 SuspendBlocker 去申请和释放锁。也可以说 SuspendBlocker 类的两个对象是 WakeLock 锁反映到底层的对象。只要持有二者任意锁，都会使得 CPU 处于活动状态。
 
-###### 2.4.6.1.1 needDisplaySuspendBlockerLocked()
+##### 4.7.2 needDisplaySuspendBlockerLocked()
 
 ```Java
 private boolean needDisplaySuspendBlockerLocked() {
@@ -1808,7 +1909,7 @@ private boolean needDisplaySuspendBlockerLocked() {
 }
 ```
 
-###### 2.4.6.1.2 acquire()
+##### 4.7.3 acquire()
 
 SuspendBlocker 是一个接口，并且只有 acquire() 和 release() 两个方法，PMS.SuspendBlockerImpl 实现了该接口，因此，最终申请流程执行到了 PMS.SuspendBlockerImpl 的 acquire() 中。
 
@@ -1831,7 +1932,7 @@ public void acquire() {
 
 这里使用了引用计数法，如果 mReferenceCount > 1，则不会进行锁的申请，而是仅仅将 mReferenceCount + 1，只有当没有申请的锁时，才会其正真执行申请锁操作，之后不管申请几次，都是 mReferenceCount 加 1。
 
-###### 2.4.6.1.3 nativeAcquireSuspendBlocker()
+##### 4.7.4 nativeAcquireSuspendBlocker()
 
 在 JNI 层中可以明确的看到有一个申请锁的 acquire_wake_lock() 方法，代码如下：
 
@@ -1862,94 +1963,11 @@ int acquire_wake_lock(int lock, const char* id) {
 }
 ```
 
-在这里，向 `/sys/power/wake_lock` 文件写入了 id，这个 id 就是我们上层中实例化 SuspendBlocker 时传入的 String 类型的 name，这里在这个节点写入文件以后，就说明获得了 wakelock。到这里，整个 WakeLock 的申请流程就结束了。
+在这里，向 `/sys/power/wake_lock` 文件写入了 id，这个 id 就是我们上层中实例化 SuspendBlocker 时传入的 String 类型的 name，这里在这个节点写入文件以后，就说明获得了 wakelock。到这里，整个 updatePowerStateLocked() 方法的流程就分析完了，我们来看下整体流程。
 
-## 三、startBootPhase() 分析
+![PMS-updatePowerStateLocked() 处理流程](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_pms_start/02.png)
 
-### 3.1 startBootPhase()
-
-systemReady() 方法调用完毕后会回到 SytemServer 中，然后根据 SystemService 的生命周期，会开始执行 onBootPhase()，这个方法的功能是为所有的已启动的服务指定启动阶段，从而可以在指定的启动阶段来做指定的工作。
-
-```Java
-//frameworks/base/services/core/java/com/android/server/SystemServiceManager.java
-
-public void startBootPhase(final int phase) {
-    if (phase <= mCurrentPhase) {
-        throw new IllegalArgumentException("Next phase must be larger than previous");
-    }
-    mCurrentPhase = phase;
-    try {
-        final int serviceLen = mServices.size();
-        //遍历已经服务列表
-        for (int i = 0; i < serviceLen; i++) {
-            final SystemService service = mServices.get(i);
-            try {
-                //调用服务的 onBootPhase() 方法，详见【3.1.1】
-                service.onBootPhase(mCurrentPhase);
-            } catch (Exception ex) {}
-        }
-    } finally {}
-}
-```
-
-在 SystemServiceManager 的 startBootPhase() 中，调用 SystemService 的 onBootPhase(int) 方法，此时每个 SystemService 都会执行其对应的 onBootPhase() 方法。通过在 SystemServiceManager 中传入不同的形参，回调所有 SystemService的onBootPhase()，根据形参的不同，在方法实现中完成不同的工作，在 SystemService 中定义了五个阶段：
-
-- SystemService.PHASE_WAIT_FOR_DEFAULT_DISPLAY：这是一个依赖 项，只有DisplayManagerService中进行了对应处理；
-- SystemService.PHASE_LOCK_SETTINGS_READY：经过这个引导阶段后，服务才可以接收到wakelock相关设置数据；
-- SystemService.PHASE_SYSTEM_SERVICES_READY：经过这个引导阶段 后，服务才可以安全地使用核心系统服务
-- SystemService.PHASE_ACTIVITY_MANAGER_READY：经过这个引导阶 段后，服务可以发送广播
-- SystemService.PHASE_THIRD_PARTY_APPS_CAN_START：经过这个引 导阶段后，服务可以启动第三方应用，第三方应用也可以通过Binder来调 用服务。
-- SystemService.PHASE_BOOT_COMPLETED：经过这个引导阶段后，说明服务启动完成，这时用户就可以和设备进行交互。
-
-#### 3.1.1 onBootPhase()
-
-因此，只要在其他模块中调用了 SystemServiceManager.startBootPhase()，都会触发各自的 onBootPhase()。PowerManagerService 的 onBootPhase() 方法只对引导阶段的 2 个阶段做了处理，具体代码如下：
-
-```Java
-//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
-
-@Override
-public void onBootPhase(int phase) {
-    synchronized (mLock) {
-        if (phase == PHASE_THIRD_PARTY_APPS_CAN_START) {
-            //统计启动的 Apk 个数
-            incrementBootCount();
-        } else if (phase == PHASE_BOOT_COMPLETED) {
-            final long now = SystemClock.uptimeMillis();
-            //设置 mBootCompleted 状态
-            mBootCompleted = true;
-            mDirty |= DIRTY_BOOT_COMPLETED;
-            //更新用户活动时间，详见【3.1.2】
-            userActivityNoUpdateLocked(
-                    now, PowerManager.USER_ACTIVITY_EVENT_OTHER, 0, Process.SYSTEM_UID);
-            //更新电源状态信息，详见【3.1.3】
-            updatePowerStateLocked();
-
-            if (!ArrayUtils.isEmpty(mBootCompletedRunnables)) {
-                Slog.d(TAG, "Posting " + mBootCompletedRunnables.length + " delayed runnables");
-                for (Runnable r : mBootCompletedRunnables) {
-                    BackgroundThread.getHandler().post(r);
-                }
-            }
-            mBootCompletedRunnables = null;
-        }
-    }
-}
-```
-
-在这个方法中，mDirty 是一个二进制的标记位，用来表示电源状态哪一部分发生了改变，通过对其进行置位（| 操作）、清零（～ 操作），得到二进制数各个位的值(0 或 1)，进行不同的处理。我们接着来看下 userActivityNoUpdateLocked() 方法：
-
-#### 3.1.2 userActivityNoUpdateLocked()
-
-详见下面 updatePowerStateLocked() 中的分析。
-
-#### 3.1.3 updatePowerStateLocked()
-
-详见下面 updatePowerStateLocked() 中的分析。
-
-到这里 PowerManagerService 的启动过程已经分析完毕，接下来分析下 WakeLock 机制。
-
-## 四、updatePowerStateLocked() 分析
+接下来我们来分析下 WakeLock 机制。
 
 ## 参考资料
 
