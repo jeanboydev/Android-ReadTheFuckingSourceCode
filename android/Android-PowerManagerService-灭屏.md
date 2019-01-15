@@ -1,6 +1,6 @@
 # Android - PowerManagerService 灭屏
 
-## 一、Power 按键亮屏
+## 一、Power 按键灭屏
 
 当 Power 键灭屏时，会在 PhoneWindowManager 中处理按键事件后，调用到 PMS 的 `gotoSleep()` 进行灭屏处理，下面直接看看 PhoneWindowManger 中对 Power 键灭屏的处理以及和 PMS 的交互。
 
