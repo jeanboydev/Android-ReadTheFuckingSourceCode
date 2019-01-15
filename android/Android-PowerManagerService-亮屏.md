@@ -32,7 +32,7 @@ public int interceptKeyBeforeQueueing(KeyEvent event, int policyFlags) {
 }
 ```
 
-在这个方法中，对Power键的按下和抬起做了处理，按下时，调用`interceptPowerKeyDown()` 。
+在这个方法中，对Power键的按下和抬起做了处理，按下时，调用 `interceptPowerKeyDown()` 。
 
 ### 1.1 interceptPowerKeyDown()
 
@@ -419,6 +419,10 @@ private boolean userActivityNoUpdateLocked(long eventTime, int event, int flags,
 
 这些方法执行完后,执行 `updatePowerStateLocked()` 方法更新所有信息，这个方法作为 PowerManagerService 的核心方法，在【PowerManagerService 启动流程】中【2.4】章节已经分析过了。
 
+到这里 Power 按键亮屏过程已经分析完了，我们来看下整体流程。
+
+![Power 按键亮屏流程](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_pms_wakeup/01.png)
+
 ## 二、USB 插入亮屏
 
 当插拔 USB 时，会发送 `BATTERY_CHANGED` 广播，PowerManagerService 中对该广播进行监听，如果收到广播后，配置了插播 USB 时亮屏，则会进行亮屏操作。
@@ -426,7 +430,7 @@ private boolean userActivityNoUpdateLocked(long eventTime, int event, int flags,
 在 BatteryService 中，如果电池状态发生改变，则会发送一个 `ACTION_BATTERY_CHANGED` 广播：
 
 ```java
-//frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java
+//frameworks/base/services/core/java/com/android/server/BatteryService.java
 
 private void sendIntentLocked() {
     //  Pack up the values and broadcast them to everyone
@@ -490,6 +494,10 @@ private void handleBatteryStateChangedLocked() {
 ### 1.2 updatePowerStateLocked()
 
 在之前已经分析过该方法了，具体分析详见【PowerManagerService - 启动流程】中【2.4】章节，其中调用的 `updateIsPoweredLocked()` 方法是插播 USB 亮屏的入口方法，所有和电池相关的都是在这里处理。
+
+到这里 USB 插入亮屏过程已经分析完了，我们来看下整体流程。
+
+![USB 插入亮屏流程](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_pms_wakeup/02.png)
 
 ## 三、PowerManager
 
