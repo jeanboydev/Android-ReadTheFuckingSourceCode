@@ -354,7 +354,7 @@ private void restartNofifyLongTimerLocked(WakeLock wakeLock) {
 
 到这里 WakeLock 的申请已经分析完了，我们来看下整体流程。
 
-
+![WakeLock 申请流程](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_pms_wakelock/01.png)
 
 ## 四、释放 WakeLock
 
@@ -488,7 +488,7 @@ private void removeWakeLockLocked(WakeLock wakeLock, int index) {
     //对带有 ON_AFTER_RELEASE 标志的 wakelock 进行处理
     applyWakeLockFlagsOnReleaseLocked(wakeLock);
     mDirty |= DIRTY_WAKE_LOCKS;
-    //更新电源状态信息
+    //更新电源状态信息，详见
     updatePowerStateLocked();
 }
 ```
@@ -513,9 +513,13 @@ private void applyWakeLockFlagsOnReleaseLocked(WakeLock wakeLock) {
 }
 ```
 
-最后，又将调用 updatePowerStateLocked()，其中和 WakeLock 申请和释放相关的都 updateSuspendBlockerLocked() 中。
+最后，又将调用 updatePowerStateLocked()。
 
-### 4.5 updateSuspendBlockerLocked()
+### 4.5 updatePowerStateLocked()
+
+该流程分析详见上一章【PackageManagerService 启动 - updatePowerStateLocked() 分析】，updatePowerStateLocked() 中的第5阶段会调用 updateSuspendBlockerLocked()，其中和 WakeLock 申请和释放相关的都 updateSuspendBlockerLocked() 中。
+
+### 4.6 updateSuspendBlockerLocked()
 
 
 ```Java
@@ -557,7 +561,7 @@ public void release() {
 
 在释放锁时，如果有多个锁，实际上是对锁计数的属性减1，直到剩余一个时才会调用 JNI 层执行释放操作。
 
-### 4.6 nativeReleaseSuspendBlocker()
+### 4.7 nativeReleaseSuspendBlocker()
 
 ```C++
 //frameworks\base\services\core\jni\com_android_server_power_PowerManagerService.cpp
@@ -583,7 +587,9 @@ int release_wake_lock(const char* id) {
 }
 ```
 
-到这里为止，WakeLock 的释放流程也就分析完毕了。
+到这里为止，WakeLock 的释放流程也就分析完毕了，我们来看下整体流程。
+
+![WakeLock 申请流程](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_pms_wakelock/02.png)
 
 ## 五、Broadcasts
 
@@ -591,6 +597,6 @@ int release_wake_lock(const char* id) {
 
 ## 参考资料
 
-- [资料标题](http://www.baidu.com)
-
+- [Android电源管理系列之 PowerManagerService](http://www.robinheztto.com/2017/06/14/android-power-pms-1/)
+- [PowerManagerService 分析](https://blog.csdn.net/FightFightFight/article/details/79532191)
 

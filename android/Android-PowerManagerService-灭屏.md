@@ -827,6 +827,6 @@ private boolean goToSleepNoUpdateLocked(long eventTime, int reason, int flags, i
 
 ## 参考资料
 
-- [资料标题](http://www.baidu.com)
-
+- [Android电源管理系列之 PowerManagerService](http://www.robinheztto.com/2017/06/14/android-power-pms-1/)
+- [PowerManagerService 分析](https://blog.csdn.net/FightFightFight/article/details/79532191)
 
