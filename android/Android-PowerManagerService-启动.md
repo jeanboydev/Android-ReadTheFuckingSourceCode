@@ -1937,7 +1937,7 @@ public void acquire() {
 在 JNI 层中可以明确的看到有一个申请锁的 acquire_wake_lock() 方法，代码如下：
 
 ```C++
-///hardware/libhardware_legacy/power/power.c
+//hardware/libhardware_legacy/power/power.c
 
 static void nativeAcquireSuspendBlocker(JNIEnv *env, jclass /* clazz */, jstring nameStr) {
     ScopedUtfChars name(env, nameStr);

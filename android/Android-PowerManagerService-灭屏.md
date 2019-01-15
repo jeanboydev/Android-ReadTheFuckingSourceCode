@@ -438,6 +438,10 @@ private boolean reallyGoToSleepNoUpdateLocked(long eventTime, int uid) {
 }
 ```
 
+到这里 Power 按键灭屏过程已经分析完了，我们来看下整体流程。
+
+![Power 按键灭屏流程](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_pms_gosleep/01.png)
+
 ## 二、超时灭屏
 
 经过上面的分析，我们知道了 Power 键灭屏由 PhoneWindowManager 发起了 `goToSleep`，现在来看看超时灭屏是如何实现的。
@@ -823,7 +827,9 @@ private boolean goToSleepNoUpdateLocked(long eventTime, int reason, int flags, i
 }
 ```
 
-整个超时灭屏的流程分析就到这里了，从以上流程中可以看到，mWakeLockSummary 和 mUserActivitySummary 的作用相当重要，我之前在 Android 4.4 手机上遇到过一个问题就是到达休眠时间后不会灭屏，分析后发现有一个应用申请了一个PowerManager.SCREEN_BRIGHT_WAKE_LOCK 锁，该锁导致 (mWakeLockSummary&WAKE_LOCK_STAY_AWAKE) != 0，从而没有灭屏。
+整个超时灭屏的流程分析就到这里了，从以上流程中可以看到，mWakeLockSummary 和 mUserActivitySummary 的作用相当重要。到这里超时灭屏过程已经分析完了，我们来看下整体流程。
+
+![Power 按键灭屏流程](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android_pms_gosleep/02.png)
 
 ## 参考资料
 

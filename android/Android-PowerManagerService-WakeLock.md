@@ -100,6 +100,8 @@ Wl.acquire(int timeout);//申请一个超时锁
 应用中获取 WakeLock 对象，获取的是位于 PowerManager 中的内部类 —— WakeLock 的实例，在 PowerManager 中看看相关方法：
 
 ```Java
+//frameworks/base/core/java/android/os/PowerManager.java
+
 public WakeLock newWakeLock(int levelAndFlags, String tag) {
     validateWakeLockParameters(levelAndFlags, tag);
     return new WakeLock(levelAndFlags, tag, mContext.getOpPackageName());
@@ -109,6 +111,8 @@ public WakeLock newWakeLock(int levelAndFlags, String tag) {
 在 PowerManager 的 newWakeLock() 方法中，首先进行了参数的校验，然后调用 WakeLock 构造方法获取实例，构造方法如下：
 
 ```Java
+//frameworks/base/core/java/android/os/PowerManager.java
+
 WakeLock(int flags, String tag, String packageName) {
     //表示 wakelock 类型或等级
     mFlags = flags;
@@ -125,6 +129,8 @@ WakeLock(int flags, String tag, String packageName) {
 ### 3.2 acquire()
 
 ```Java
+//frameworks/base/core/java/android/os/PowerManager.java
+
 public void acquire() {
     synchronized (mToken) {
         acquireLocked();
@@ -147,6 +153,8 @@ public void acquire(long timeout) {
 ### 3.3 acquireLocked()
 
 ```Java
+//frameworks/base/core/java/android/os/PowerManager.java
+
 private void acquireLocked() {
     //应用每次申请 wakelock，内部计数和外部计数加 1
     mInternalCount++;
@@ -171,6 +179,8 @@ private void acquireLocked() {
 是否是计数锁可以通过 setReferenceCount() 来设置，默认为计数锁：
 
 ```Java
+//frameworks/base/core/java/android/os/PowerManager.java
+
 public void setReferenceCounted(boolean value) {
     synchronized (mToken) {
         mRefCounted = value;
@@ -185,6 +195,8 @@ public void setReferenceCounted(boolean value) {
 PowerManagerService 中的 acquireWakeLock() 方法如下：
 
 ```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
 @Override // Binder call
 public void acquireWakeLock(IBinder lock, int flags, String tag, 
                      String packageName,WorkSource ws, String historyTag) {
@@ -217,6 +229,8 @@ public void acquireWakeLock(IBinder lock, int flags, String tag,
 ### 3.5 acquireWakeLockInternal()
 
 ```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
 private void acquireWakeLockInternal(IBinder lock, int flags, String tag, String packageName,
         WorkSource ws, String historyTag, int uid, int pid) {
     synchronized (mLock) {
@@ -291,6 +305,8 @@ private void acquireWakeLockInternal(IBinder lock, int flags, String tag, String
 ### 3.6 applyWakeLockFlagsOnAcquireLocked()
 
 ```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
 private void applyWakeLockFlagsOnAcquireLocked(WakeLock wakeLock, int uid) {
     if ((wakeLock.mFlags & PowerManager.ACQUIRE_CAUSES_WAKEUP) != 0
             && isScreenLock(wakeLock)) {
@@ -313,6 +329,8 @@ wakeUpNoUpdateLocked() 方法是唤醒设备的主要方法。在这个方法中
 如果有新的 WakeLock 实例创建，则 notifyAcquire 值为 true，通过以下这个方法通知 Notifier，Notifier 中则会根据该锁申请的时间开始计时，并以此来判断是否是一个长时间持有的锁。
 
 ```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
 private void notifyWakeLockAcquiredLocked(WakeLock wakeLock) {
     if (mSystemReady && !wakeLock.mDisabled) {
         wakeLock.mNotifiedAcquired = true;
@@ -332,6 +350,8 @@ private void notifyWakeLockAcquiredLocked(WakeLock wakeLock) {
 ### 3.9 restartNofifyLongTimerLocked()
 
 ```java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
 private void restartNofifyLongTimerLocked(WakeLock wakeLock) {
     wakeLock.mAcquireTime = SystemClock.uptimeMillis();
     if ((wakeLock.mFlags & PowerManager.WAKE_LOCK_LEVEL_MASK)
@@ -344,7 +364,9 @@ private void restartNofifyLongTimerLocked(WakeLock wakeLock) {
 ### 3.10 enqueueNotifyLongMsgLocked()
 
 ```java
- private void enqueueNotifyLongMsgLocked(long time) {
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
+private void enqueueNotifyLongMsgLocked(long time) {
      mNotifyLongScheduled = time;
      Message msg = mHandler.obtainMessage(MSG_CHECK_FOR_LONG_WAKELOCKS);
      msg.setAsynchronous(true);
@@ -363,9 +385,11 @@ private void restartNofifyLongTimerLocked(WakeLock wakeLock) {
 在前面分析申请锁时已经说了，如果是超时锁，通过 Handler.post(Runnable) 的方式进行释放，该 Runnable 定义如下：
 
 ```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
 private final Runnable mReleaser = new Runnable() {
     public void run() {
-        release(RELEASE_FLAG_TIMEOUT);
+        release();
     }
 };
 ```
@@ -375,6 +399,8 @@ private final Runnable mReleaser = new Runnable() {
 RELEASE_FLAG_TIMEOUT 是一个用于 release() 方法的 flag，表示释放的为超时锁。如果是永久锁，则必须通过调用 release() 方法进行释放了，该方法如下：
 
 ```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
 public void release() {
     release(0);
 }
@@ -383,6 +409,8 @@ public void release() {
 因此，不管是哪种锁的释放，其实都是在 release(int) 中进行的，只不过参数不同，该方法如下：
 
 ```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
 public void release(int flags) {
     synchronized (mToken) {
         //内部计数 -1
@@ -418,6 +446,8 @@ public void release(int flags) {
 ### 4.2 releaseWakeLock()
 
 ```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
 @Override // Binder call
 public void releaseWakeLock(IBinder lock, int flags) {
     if (lock == null) {
@@ -441,6 +471,8 @@ public void releaseWakeLock(IBinder lock, int flags) {
 在这个方法中，进行了权限检查后，就交给下一个方法去处理了，具体代码如下：
 
 ```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
 private void releaseWakeLockInternal(IBinder lock, int flags) {
     synchronized (mLock) {
         //查找 WakeLock 是否存在
@@ -471,6 +503,8 @@ private void releaseWakeLockInternal(IBinder lock, int flags) {
 ### 4.3 removeWakeLockLocked()
 
 ```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
 private void removeWakeLockLocked(WakeLock wakeLock, int index) {
     //从 List中 移除
     mWakeLocks.remove(index);
@@ -498,6 +532,8 @@ private void removeWakeLockLocked(WakeLock wakeLock, int index) {
 ### 4.4 applyWakeLockFlagsOnReleaseLocked()
 
 ```Java
+//frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+
 /**
  *如果当前释放的 wakelock 带有 PowerManager.ON_AFTER_RELEASE 标志，则会屏幕在灭屏时小亮一会儿才会熄灭
  */
@@ -544,6 +580,8 @@ private void updateSuspendBlockerLocked() {
 如果满足条件，则释放 SuspendBlocker 锁。申请 SuspendBlocker 流程已经分析过了，接下来我们分析释放 SuspendBlocker 流程。在 SuspendBlocker 中释放锁如下：
 
 ```Java
+//frameworks\base\services\core\jni\com_android_server_power_PowerManagerService.cpp
+
 @Override
 public void release() {
     synchronized (this) {
@@ -564,7 +602,7 @@ public void release() {
 ### 4.7 nativeReleaseSuspendBlocker()
 
 ```C++
-//frameworks\base\services\core\jni\com_android_server_power_PowerManagerService.cpp
+//hardware/libhardware_legacy/power/power.c
 
 static void nativeReleaseSuspendBlocker(JNIEnv *env, jclass /* clazz */, jstring nameStr) {
     ScopedUtfChars name(env, nameStr);
@@ -575,6 +613,8 @@ static void nativeReleaseSuspendBlocker(JNIEnv *env, jclass /* clazz */, jstring
 在 JNI 层方法中，调用了 HAL 层的方法，通过文件描述符向 `/sys/power/wake_unlock` 中写值完成释放：
 
 ```C++
+//hardware/libhardware_legacy/power/power.c
+
 int release_wake_lock(const char* id) {
     initialize_fds();
     //    ALOGI("release_wake_lock id='%s'\n", id);
