@@ -572,10 +572,15 @@ private void updateSettingsLocked() {
 }
 ```
 
-
 ### 2.4 updatePowerStateLocked()
 
-在 systemReady() 方法的最后，调用了 updatePowerStateLocked() 方法，它是整个 PowerManagerService 中的核心方法，也是整个 PowerManagerService 中最重要的一个方法，它用来更新整个电源状态的改变，并进行重新计算。PowerManagerService 中使用一个 int 值 mDirty 作为标志位判断电源状态是否发生变化。当电源状态发生改变时，如亮灭屏、电池状态改变、暗屏等等都会调用该方法，在该方法中调用了其他同级方法进行更新，下面逐个进行分析：
+在 systemReady() 方法的最后，调用了 updatePowerStateLocked() 方法，它是整个 PowerManagerService 中的核心方法，也是整个 PowerManagerService 中最重要的一个方法，这个流程比较复杂我们先走完 PowerManagerService 启动流程，待会儿再分析。
+
+
+
+
+
+updatePowerStateLocked() 用来更新整个电源状态的改变，并进行重新计算。PowerManagerService 中使用一个 int 值 mDirty 作为标志位判断电源状态是否发生变化。当电源状态发生改变时，如亮灭屏、电池状态改变、暗屏等等都会调用该方法，在该方法中调用了其他同级方法进行更新，下面逐个进行分析：
 
 ```Java
 //frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
@@ -688,7 +693,7 @@ private void updateIsPoweredLocked(int dirty) {
                 wakeUpNoUpdateLocked(now, "android.server.power:POWER", Process.SYSTEM_UID,
                         mContext.getOpPackageName(), Process.SYSTEM_UID);
             }
-            //如果设置了插拔充电器时需要唤醒设备，则在这里唤醒设备，详见【2.4.1.1.3】
+            //更新用户活动时间，详见【2.4.1.1.3】
             userActivityNoUpdateLocked(
                     now, PowerManager.USER_ACTIVITY_EVENT_OTHER, 0, Process.SYSTEM_UID);
 
@@ -1936,18 +1941,17 @@ public void onBootPhase(int phase) {
 
 #### 3.1.2 userActivityNoUpdateLocked()
 
-上面已经分析过，详见【2.4.1.1.2】
+详见下面 updatePowerStateLocked() 中的分析。
 
 #### 3.1.3 updatePowerStateLocked()
 
-上面已经分析过，详见【2.4】
+详见下面 updatePowerStateLocked() 中的分析。
 
 到这里 PowerManagerService 的启动过程已经分析完毕，接下来分析下 WakeLock 机制。
+
+## 四、updatePowerStateLocked() 分析
 
 ## 参考资料
 
 - [Android电源管理系列之 PowerManagerService](http://www.robinheztto.com/2017/06/14/android-power-pms-1/)
 - [PowerManagerService 分析](https://blog.csdn.net/FightFightFight/article/details/79532191)
-
-
-
