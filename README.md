@@ -1,19 +1,28 @@
 # Android 技术笔记
 
-记录日常开发中遇到的技术重点，难点，知识点总结，读书笔记，面试题，个人分享等。
+大家好！我是曹建波（@jeanboy），毕业于 [圆明园职业技术学院](https://www.pku.edu.cn) 计算机系，是一名专注于 Android 领域的开发者。目前主要从事移动端相关的开发工作，同时对 iOS | Java Web | 前端 | 小程序也有研究。
 
-如果对你有帮助，请 star 一下，然后 follow 我，给我增加一下分享动力，谢谢！:yum:
+这里主要记录日常的开发技巧，开发中遇到的技术重点、难点，各个知识点的总结。同时也会分享一些优质面试题，职业规划，读书的心得，个人的感悟，生活中的小技巧等等。😋
 
-如果你有什么疑问或者问题，可以提交 issue 和 request，发邮件给我 jeanboy@foxmail.com 。
+如果能帮助到你，我很开心。希望你能点击一下右上角的小星星「⭐️ Star」 一下，然后 [点击这里](https://github.com/jeanboydev) 找到头像下面按钮 Follow 一下我。赠人玫瑰，手留余香。你的 Star 和 Follow 是我分享的动力，十分感谢！😘
 
-或者加入下面的 QQ 群来一起学习交流。:kissing_heart:
+欢迎大家扫一扫下面的二维码，关注我的公众号，可以收到最新的文章推送，有丰厚的抽奖活动和福利等着你哦！😍
 
+<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/wechat/qrcode_for_gh_26eef6f9e7c1_258.jpg" width=200 height=200 />
 
-<a target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=0b505511df9ead28ec678df4eeb7a1a8f994ea8b75f2c10412b57e667d81b50d"><img border="0" src="http://pub.idqqimg.com/wpa/images/group.png" alt="Android技术进阶：386463747" title="Android技术进阶：386463747"></a>
+如果大家有什么疑问或者问题，可以 [点击这里](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/issues) 提交 issue，也可以发邮件给我 [jeanboy@foxmail.com](mailto:jeanboy@foxmail.com)。
 
+同时欢迎大家 [![Android技术进阶：386463747](https://camo.githubusercontent.com/615c9901677f501582b6057efc9396b3ed27dc29/687474703a2f2f7075622e69647171696d672e636f6d2f7770612f696d616765732f67726f75702e706e67)](http://shang.qq.com/wpa/qunwpa?idkey=0b505511df9ead28ec678df4eeb7a1a8f994ea8b75f2c10412b57e667d81b50d) 来一起交流学习，群里有很多大牛和学习资料，一定能帮助到大家！
 
-> 个人经验有限，内容上难免有不足甚至错误的地方，恳请各位发现后提交issue或其他方式联系我，万分感谢！技术交流，共同进步！
-> :full_moon_with_face::waxing_gibbous_moon::first_quarter_moon::waxing_crescent_moon::new_moon_with_face::waning_crescent_moon::last_quarter_moon::waning_gibbous_moon::full_moon_with_face:
+> 由于个人经验有限，内容上难免会有不足甚至错误的地方，恳请大家发现后提交 issue 或其它方式反馈给我，以免误导大家，万分感谢！🙏
+
+最后我来给大家表演一个黑化
+
+ 🌝🌔🌓🌒🌚
+然后再来一个黄化
+
+ 🌚🌘🌗🌖🌝
+我的表演完毕，谢谢大家！
 
 # 目录
 
