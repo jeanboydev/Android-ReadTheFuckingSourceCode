@@ -37,7 +37,7 @@
 
 ## Android
 
-- [Android 进阶思维导图](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/Android-思维导图.md)
+- [Android 入门学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/01_android_basic.md)
 - [Android 屏幕适配全攻略](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/Android-屏幕适配全攻略.md)
 - [一个 Demo 学会搭建 Android Studio JNI 开发环境](https://github.com/jeanboydev/Android-JNITest)
 - [一张图看明白 Android Handler 消息机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/Android-Handler消息机制.md)
