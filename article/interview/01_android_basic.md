@@ -2,7 +2,7 @@
 
 ## 思维导图
 
-![Android 基础](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/xmind/Android%E5%9F%BA%E7%A1%80.png)
+![Android 基础](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/android/xmind/Android%E5%9F%BA%E7%A1%80.png)
 
 ## 基础知识
 
