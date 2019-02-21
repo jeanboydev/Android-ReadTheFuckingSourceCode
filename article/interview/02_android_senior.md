@@ -235,3 +235,13 @@ Java 方面推荐看下：
 做技术开发的前 5 年是努力学习知识和技术沉淀的一个过程。有些人天赋比较好，进阶很快；有些人天赋虽然不好，但很勤奋，进阶也能很块。一定要让自己的工作经验与技术能力成正比，技术能力永远跟薪资成正比，能力越强薪资越高。
 
 如果以上知识点对你来说仍然太简单了，那么请接受我称你为「大佬」。敬请期待下一期 `Android 资深/专家工程师` 的学习指南，视频和书籍对资深/专家级别的工程师来说帮助不大了，这里不做推荐了。
+
+## 我的公众号
+
+欢迎你「扫一扫」下面的二维码，关注我的公众号，可以接受最新的文章推送，有丰厚的抽奖活动和福利等着你哦！😍
+
+<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_black_512.png" width=250 height=250 />
+
+如果你有什么疑问或者问题，可以 [点击这里](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/issues) 提交 issue，也可以发邮件给我 [jeanboy@foxmail.com](mailto:jeanboy@foxmail.com)。
+
+同时欢迎你 [![Android技术进阶：386463747](https://camo.githubusercontent.com/615c9901677f501582b6057efc9396b3ed27dc29/687474703a2f2f7075622e69647171696d672e636f6d2f7770612f696d616765732f67726f75702e706e67)](http://shang.qq.com/wpa/qunwpa?idkey=0b505511df9ead28ec678df4eeb7a1a8f994ea8b75f2c10412b57e667d81b50d) 来一起交流学习，群里有很多大牛和学习资料，相信一定能帮助到你！
