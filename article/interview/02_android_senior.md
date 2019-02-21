@@ -9,7 +9,6 @@
 ### 常见 IPC 方式
 
 - Binder 机制
-
 - AIDL 的使用
 
 ### Handler 机制
@@ -32,27 +31,20 @@
 ### Activity 难点
 
 - setResult() 和 finish() 的顺序关系？
-
 - onSaveInstanceState() 和 onRestoreInstanceState()
-
 - onNewIntent() 和 onConfigurationChanged()
 
 ### Service 难点
 
 - startService 与 bindService 的区别？
-
 - Service 中 onStartCommand 返回值的作用？
-
 - bindService后，ServiceConnection 里面的回调方法运行在哪个线程？它们的调用时机分别是什么？
-
 - Service 的 onCreate 运行在哪个线程？
 
 ### ContentProvider 难点
 
 - ContentProvider 的生命周期
-
 - ContentProvider 的 onCreate 和 CRUD 运行在哪个线程？它们是线程安全的吗？
-
 - ContentProvider 的内部存储只能是 SQLite 吗？
 
 ### RemoteViews
@@ -84,11 +76,8 @@
 ## 性能优化
 
 - 布局优化：ViewStub、include、merge 的使用，它们的区别？
-
 - 过度渲染的处理
-
 - ANR 的处理
-
 - 监控：埋点、Crash 上报
 
 ## 内存优化
@@ -96,55 +85,36 @@
 - OOM 的处理
 
 - 内存泄露的处理
-
 - 内存检测
-
 - 内存分析
-
 - Bitmap 的优化：超大图的加载原理
 
 ## 网络优化
 
 - API 优化
-
 - 流量优化
-
 - 弱网优化
 
 ## 电量优化
 
 - WakeLock 机制
-
 - JobScheduler 机制
 
 ## 第三方开源库
 
 - OKHttp 原理
-
 - Retrofit 原理
-
 - RxJava 原理
-
-- Glide 原理
-
-- 加载原理
-- 三级缓存
-- LRU 算法
-
+- Glide 原理：加载原理、三级缓存、LRU 算法
 - Dagger2 原理
-
 - ButterKnife 原理
-
 - EventBus 原理
-
 - RxJava 原理
 
 ## 混合开发
 
 - WebView
-
 - React Native
-
 - Flutter
 
 ## NDK 开发
@@ -161,20 +131,16 @@
 
 ## Gradle
 
-### Groovy 语法
-
-### Gradle 插件开发基础
+- Groovy 语法
+- Gradle 插件开发基础
 
 ## 设计模式与架构
 
 - 熟悉 6 大基本原则
 
 - MVC、MVP、MVVM
-
 - 组件化
-
 - Jetpack
-
 ## 其他问题
 
 - Activity、Window，View 之间的关系？
@@ -185,11 +151,8 @@
 ## Java 知识
 
 - String 常量池
-
 - 类型转换原理
-
 - ArrayList 实现原理
-
 - HashMap 实现原理
 - 常见锁（乐观锁、悲观锁），死锁解决方法
 - synchronized 关键字
