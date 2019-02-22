@@ -24,6 +24,7 @@
 
 - [精华面试题，长期更新！](https://github.com/android-exchange/Android-Interview)
 - [一篇文章看明白 HashMap 工作原理](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/basic/Java_HashMap.md)
+- [一篇文章看明白 ArrayList 工作原理](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/basic/Java_ArrayList.md)
 
 ## 网络通信
 
