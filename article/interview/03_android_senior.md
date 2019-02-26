@@ -2,7 +2,7 @@
 
 ## 思维导图
 
-
+![Android 资深(专家) 思维导图](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/xmind/Android%E8%B5%84%E6%B7%B1.png)
 
 ## 系统启动过程
 
@@ -170,11 +170,15 @@
 
 随着年龄的越来越大是继续做技术？还是转型做管理呢？Android 也没啥可研究的了，还是换其他领域呢？这是一个值得思考的问题，我还没有这个经历（岁数还没到）不敢妄下定论，哈哈。
 
-这里分享下网上的一份关于各大厂 Android 级别的薪资对比图（如有侵权，请联系我删除）。
+这里分享下网上的一份关于各大厂 Android 级别的薪资参考图（如有侵权，请联系我删除）。
+
+![大厂薪资参考，如有侵权立删！](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/interview/01.jpeg)
 
 我看到网上很多消息都说今年互联网寒冬什么什么的，其实每年都会说寒冬。互联网总共也就发展了十几年，从 2000 年初的诺基亚到现在的智能手机时代，也就十几年的时间。谁有会预料的下一个十年之后会是什么样的呢？
 
 由于前几年大量培训出来的开发者（这里只是说下客观事实，没有贬低的意思），整个市场涌入大量的初级、中级开发者，所以对于新人来说的确不好找工作了，因为竞争的人多了。
+
+![图片来源于网络，如有侵权立删！](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/interview/02.jpeg)
 
 作为开发者我们最好的准备就是知识的储备，如果我们努力学习达到了高级甚至更高，目前需求量还是很大的。目前我了解到的 Android 领域专家级别的工程师也没有多少，大家可以留意统计一下。
 
