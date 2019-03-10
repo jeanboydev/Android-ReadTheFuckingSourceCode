@@ -61,7 +61,7 @@ SingleTop 模式和 Standard 模式非常相似，主要区别就是当一个 Si
 
 - SingleTask
 
-SingleTask 模式的 Activity 在同一个 Task 内只有一个实例。如果 Activity 已经位于栈顶，系统不会创建新的 Activity 实例，和 SingleTop 模式一样。但 Activity 已经存在但不位于栈顶时，系统就会把该 Activity 移到栈顶，并把它上面的 Activity 出栈。
+SingleTask 模式的 Activity 在同一个 Task 内只有一个实例。如果 Activity 已经位于栈顶，系统不会创建新的 Activity 实例，和 SingleTop 模式一样。但 Activity 已经存在但不位于栈顶时，系统就会把该 Activity 移到栈顶，并把它上面的 Activity 出栈。
 
 - SingleInstance
 
