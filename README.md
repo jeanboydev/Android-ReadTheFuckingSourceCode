@@ -43,7 +43,7 @@
 - [Android 资深（专家）学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/03_android_senior.md)
 - [Android 屏幕适配全攻略](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/Android-屏幕适配全攻略.md)
 - [一个 Demo 学会搭建 Android Studio JNI 开发环境](https://github.com/jeanboydev/Android-JNITest)
-- [一篇文章学习 Android Activity 相关知识点](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/Android-Activity相关知识点.md)
+- [基础知识 -  Activity 相关知识点](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/Android-Activity相关知识点.md)
 - [一篇文章看明白 Android Activity 启动模式 & IntentFilter匹配规则](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/Android-Activity启动模式&IntentFilter匹配规则.md)
 - [一张图看明白 Android Handler 消息机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/Android-Handler消息机制.md)
 - [一篇文章学会使用 Android IPC 多进程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/Android-IPC多进程.md)
