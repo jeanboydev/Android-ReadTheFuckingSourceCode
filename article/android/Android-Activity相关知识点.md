@@ -407,8 +407,8 @@ finish();
 
 ## 参考资料
 
-- [Android 开发文档 - Activity 生命周期](https://developer.android.com/guide/components/activities/activity-lifecycle?hl=zh-cn)
-- [Android 开发文档 - 任务和返回栈](https://developer.android.com/guide/components/activities/tasks-and-back-stack?hl=zh-cn)
+- [Android 官方文档 - Activity 生命周期](https://developer.android.com/guide/components/activities/activity-lifecycle?hl=zh-cn)
+- [Android 官方文档 - 任务和返回栈](https://developer.android.com/guide/components/activities/tasks-and-back-stack?hl=zh-cn)
 
 ## 我的公众号
 
