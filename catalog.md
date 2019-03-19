@@ -3,9 +3,8 @@
 ```json
 |- article
     |- android
-        |- android_xxx
+        |- 01_xxx.md
         |- ...
-    |- blog
     |- design_patterns
     |- git
     |- gradle
@@ -14,7 +13,6 @@
     |- java
         |- basic
         |- jvm
-    |- mac
     |- network
     |- web
     |- web_front
