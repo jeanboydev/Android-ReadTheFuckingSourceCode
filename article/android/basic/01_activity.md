@@ -1,4 +1,4 @@
-# Activity 相关知识点
+# Activity
 
 ## 什么是 Activity？
 
