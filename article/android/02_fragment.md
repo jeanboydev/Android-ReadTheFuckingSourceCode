@@ -41,7 +41,7 @@ Fragment 与 Activity 生命周期很相似，与 Activity 一样，Fragment 也
 - Paused：另一个 Activity 处于最顶层，但是 Fragment 所在的 Activity 并没有被完全覆盖（顶层的 Activity 是半透明的或不占据整个屏幕）。
 - Stoped：Fragment 不可见，可能是它所在的 Activity 处于 stoped 状态或是 Fragment 被删除并添加到后退栈中了，此状态的 Fragment 仍然存在于内存中。
 
-![img](https://developer.android.com/images/activity_fragment_lifecycle.png?hl=zh-cn)
+![Fragment 生命周期](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android/02_fragment/01.png)
 
  Activity 直接影响它所包含的 Fragment 的生命周期，所以对 Activity 的某个生命周期方法的调用也会产生对Fragment 相同方法的调用。例如：当 Activity 的 onPause() 方法被调用时，它所包含的所有的 Fragment 的onPause() 方法都会被调用。
 
