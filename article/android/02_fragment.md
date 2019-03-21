@@ -18,13 +18,9 @@ compile 'com.android.support:support-fragment:24.2.1'
 ### Fragment 的特点
 
 - Fragment 是依赖于 Activity 的，不能独立存在的。
-
 - 一个 Activity 里可以有多个 Fragment。
-
 - 一个 Fragment 可以被多个 Activity 重用。
-
 - Fragment 有自己的生命周期，并能接收输入事件。
-
 - 可以在 Activity 运行时动态地添加或删除 Fragment。
 
 ### Fragment 的优势
