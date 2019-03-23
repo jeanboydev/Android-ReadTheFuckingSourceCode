@@ -47,7 +47,7 @@
 - [基础知识 -  Fragment](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/02_fragment.md)
 - [一张图看明白 Android Handler 消息机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-Handler消息机制.md)
 - [一篇文章学会使用 Android IPC 多进程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-IPC多进程.md)
-- [Windows 环境下载 Android 源码](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-Windows环境下载源码.md)
+- [Windows 环境下载 Android 源码](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-Windows环境下载源码.md)
 - [Android 反编译指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-反编译指南.md)
 - [Android 多渠道打包最佳实践](https://github.com/jeanboydev/Android-Flavors)
 - [Android Studio 3.x 升级指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-Android_Studio3升级指南.md)
