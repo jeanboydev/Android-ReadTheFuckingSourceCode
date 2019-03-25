@@ -1,6 +1,6 @@
 # Android 技术笔记
 
-<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png" alt="Android 波斯湾" width=450 height=250 />
+<center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png" alt="Android 波斯湾" width=450 height=250 /></center>
 
 欢迎你「扫一扫」上面的二维码，关注我的公众号，可以接受最新的文章推送。
 
