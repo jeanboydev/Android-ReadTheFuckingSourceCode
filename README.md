@@ -41,6 +41,7 @@
 - [Android 入门学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/01_android_basic.md)
 - [Android 高级学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/02_android_advanced.md)
 - [Android 资深（专家）学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/03_android_senior.md)
+- 👍 [图解 Android 系列（一）揭秘 Android 系统启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/01_system_start.md)
 - [Android 屏幕适配全攻略](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-屏幕适配全攻略.md)
 - [一个 Demo 学会搭建 Android Studio JNI 开发环境](https://github.com/jeanboydev/Android-JNITest)
 - [基础知识 -  Activity](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/01_activity.md)
