@@ -138,15 +138,15 @@ unbindService(aidlConnection);
 
 与 Activity 类似，Service 也有生命周期回调方法，可以实现这些方法来监控 Service 状态的变化来执行相关操作。
 
-![Service 生命周期](https://developer.android.com/images/service_lifecycle.png?hl=zh-cn)
+![Service 生命周期](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android/basic/03_service/01.png)
 
 ### startService()
 
-onCreate() -> onStartCommand() -> onDestroy()
+`onCreate()` -> `onStartCommand()` -> `onDestroy()`
 
 ### bindService()
 
-onCreate() -> onBind() -> onUnbind() -> onDestroy()
+`onCreate()` -> `onBind()` -> `onUnbind()` -> `onDestroy()`
 
 ## 系统资源回收
 
