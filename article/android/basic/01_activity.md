@@ -1,4 +1,4 @@
-# Activity
+# 重新认识 Activity
 
 ## 什么是 Activity？
 
@@ -19,7 +19,7 @@ Acitivity 本质上有四种状态：
 
 在上面的四中常有的状态之间，还有着其他的生命周期来作为不同状态之间的过度，用于在不同的状态之间进行转换。
 
-![Activity 生命周期](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android/android_activity_intro/activity_lifecycle.png)
+![Activity 生命周期](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android/basic/01_activity/activity_lifecycle.png)
 
 正常情况下的生命周期：
 
@@ -83,25 +83,25 @@ SingleInstance 模式并不常用，如果我们把一个 Activity 设置为 Sin
 
  堆栈中的 Activity 永远不会重新排列，仅推入和弹出堆栈：由当前 Activity 启动时推入堆栈；用户使用「返回」按钮退出时弹出堆栈。 因此，返回栈以「后进先出」对象结构运行。 如下图：
 
-![Activity 返回栈](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android/android_activity_intro/diagram_backstack.png)
+![Activity 返回栈](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android/basic/01_activity/diagram_backstack.png)
 
 如果用户继续按「返回」，堆栈中的相应 Activity 就会弹出，以显示前一个 Activity，直到用户返回主屏幕为止（或者，返回任务开始时正在运行的任意 Activity）。 当所有 Activity 均从堆栈中移除后，任务即不复存在。
 
 任务是一个有机整体，当用户开始新任务或通过「主页」按钮转到主屏幕时，可以移动到「后台」。 尽管在后台时，该任务中的所有 Activity 全部停止，但是任务的返回栈仍旧不变，也就是说，当另一个任务发生时，该任务仅仅失去焦点而已，如下图所示。然后，任务可以返回到「前台」，用户就能够回到离开时的状态。
 
-![Activity 多任务栈](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android/android_activity_intro/diagram_multitasking.png)
+![Activity 多任务栈](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android/basic/01_activity/diagram_multitasking.png)
 
 例如，假设当前任务（任务 A）的堆栈中有三个 Activity，即当前 Activity 下方还有两个 Activity。 用户先按「主页」按钮，然后从应用启动器启动新应用。 显示主屏幕时，任务 A 进入后台。新应用启动时，系统会使用自己的 Activity 堆栈为该应用启动一个任务（任务 B）。与该应用交互之后，用户再次返回主屏幕并选择最初启动任务 A 的应用。现在，任务 A 出现在前台，其堆栈中的所有三个 Activity 保持不变，而位于堆栈顶部的 Activity 则会恢复执行。 此时，用户还可以通过转到主屏幕并选择启动该任务的应用图标（或者，通过从「屏幕预览」择该应用的任务）切换回任务 B。这就是 Android 系统中的多任务的场景。
 
 无论 Activity 是在新任务中启动，还是在与启动 Activity 相同的任务中启动，用户按「返回」按钮始终会转到前一个 Activity。 但是，如果启动指定 `singleTask` 启动模式的 Activity，则当某后台任务中存在该 Activity 的实例时，整个任务都会转移到前台。此时，返回栈包括上移到堆栈顶部的任务中的所有 Activity，如下图：
 
-![Activity SingleTask 任务栈](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android/android_activity_intro/diagram_backstack_singletask_multiactivity.png)
+![Activity SingleTask 任务栈](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android/basic/01_activity/diagram_backstack_singletask_multiactivity.png)
 
 ## 保存与恢复
 
 Activity 为我们提供了两个回调方法 onSaveInstanceState() 和 onRestoreInstanceState() 用于当 Activity 在不是用户主动意识关闭的情况下来进行页面数据的保存和恢复。
 
-![Activity 保存与恢复](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android/android_activity_intro/basic-lifecycle-savestate.png)
+![Activity 保存与恢复](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/android/basic/01_activity/basic-lifecycle-savestate.png)
 
 那么那些情况下 onSaveInstanceState() 会被调用呢？分别有以下几种情况：
 
@@ -409,13 +409,3 @@ finish();
 
 - [Android 官方文档 - Activity 生命周期](https://developer.android.com/guide/components/activities/activity-lifecycle?hl=zh-cn)
 - [Android 官方文档 - 任务和返回栈](https://developer.android.com/guide/components/activities/tasks-and-back-stack?hl=zh-cn)
-
-## 我的公众号
-
-欢迎你「扫一扫」下面的二维码，关注我的公众号，可以接受最新的文章推送，有丰厚的抽奖活动和福利等着你哦！😍
-
-<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_black_512.png" width=250 height=250 />
-
-如果你有什么疑问或者问题，可以 [点击这里](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/issues) 提交 issue，也可以发邮件给我 [jeanboy@foxmail.com](mailto:jeanboy@foxmail.com)。
-
-同时欢迎你 [![Android技术进阶：386463747](https://camo.githubusercontent.com/615c9901677f501582b6057efc9396b3ed27dc29/687474703a2f2f7075622e69647171696d672e636f6d2f7770612f696d616765732f67726f75702e706e67)](http://shang.qq.com/wpa/qunwpa?idkey=0b505511df9ead28ec678df4eeb7a1a8f994ea8b75f2c10412b57e667d81b50d) 来一起交流学习，群里有很多大牛和学习资料，相信一定能帮助到你！

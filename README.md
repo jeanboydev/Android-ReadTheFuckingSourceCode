@@ -41,12 +41,12 @@
 - [Android 入门学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/01_android_basic.md)
 - [Android 高级学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/02_android_advanced.md)
 - [Android 资深（专家）学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/03_android_senior.md)
-- 👍 [图解 Android 系列（一）揭秘 Android 系统启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/01_system_start.md)
+- [基础知识 -  Activity](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/01_activity.md)
+- :+1:[基础知识 -  Fragment](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/02_fragment.md)
+- :+1:[基础知识 -  Service](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/03_service.md)
+- :+1:[图解 Android 系列（一）揭秘 Android 系统启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/01_system_start.md)
 - [Android 屏幕适配全攻略](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-屏幕适配全攻略.md)
 - [一个 Demo 学会搭建 Android Studio JNI 开发环境](https://github.com/jeanboydev/Android-JNITest)
-- [基础知识 -  Activity](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/01_activity.md)
-- [基础知识 -  Fragment](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/02_fragment.md)
-- [基础知识 -  Service](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/03_service.md)
 - [一张图看明白 Android Handler 消息机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-Handler消息机制.md)
 - [一篇文章学会使用 Android IPC 多进程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-IPC多进程.md)
 - [Windows 环境下载 Android 源码](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-Windows环境下载源码.md)
@@ -61,17 +61,13 @@
 - :+1: [一篇文章看明白 Android Service 启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-Service启动过程.md)
 - :+1: [一篇文章看明白 Android PackageManagerService 工作流程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PackageManagerService分析.md)
 - :+1: [一篇文章看明白 Android v1 & v2 签名机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/basic/android/Android-v1%26v2%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6.md)
-- 👍 [一篇文章看明白 Android PowerManagerService 启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-%E5%90%AF%E5%8A%A8.md)
-- 👍 [一篇文章看明白 Android PowerManagerService WakeLock 机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-WakeLock.md)
-- 👍 [一篇文章看明白 Android PowerManagerService 亮屏过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-%E4%BA%AE%E5%B1%8F.md)
-- 👍 [一篇文章看明白 Android PowerManagerService 灭屏过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-%E7%81%AD%E5%B1%8F.md)
+- :+1:[一篇文章看明白 Android PowerManagerService 启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-%E5%90%AF%E5%8A%A8.md)
+- :+1:[一篇文章看明白 Android PowerManagerService WakeLock 机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-WakeLock.md)
+- :+1:[一篇文章看明白 Android PowerManagerService 亮屏过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-%E4%BA%AE%E5%B1%8F.md)
+- :+1:[一篇文章看明白 Android PowerManagerService 灭屏过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-%E7%81%AD%E5%B1%8F.md)
 - :+1: [Android 项目架构探索](https://github.com/jeanboydev/Android-Architecture)
 - :+1: [Android 性能优化 - UI优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-性能优化-UI优化.md)
 - :+1: [Android 性能优化 - 内存优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-性能优化-内存优化.md)
-- [*Android Broadcast 启动过程]
-- [*Android ContentProvider 启动过程]
-- [*Android App 自动化测试]
-- [*Android Input 系统]
 
 ## Gradle
 
