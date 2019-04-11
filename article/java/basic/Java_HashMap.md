@@ -2,7 +2,11 @@
 
 ## 简介
 
-HashMap 是 Java 语言中常用的用于存放键值对数据类型的集合类。随着 JDK（Java Developmet Kit）版本的更新，JDK 1.8 对 HashMap 底层的实现进行了优化，底层实现也由之前的 `数组 + 链表` 改为 `数组 + 链表 + 红黑树` 。HashMap 的常用方法如下：
+HashMap 是 Java 语言中常用的用于存放键值对数据类型的集合类。
+
+随着 JDK（Java Developmet Kit）版本的更新，JDK 1.8 对 HashMap 底层的实现进行了优化，底层实现也由之前的 `数组 + 链表` 改为 `数组 + 链表 + 红黑树` 。
+
+HashMap 的常用方法如下：
 
 ```java
 //创建一个 map
@@ -51,7 +55,9 @@ static class Node<K, V> implements Map.Entry<K, V> {
 }
 ```
 
-Node 是 HashMap 的一个内部类，实现了 Map.Entry 接口，本质是就是一个映射（键值对）。上图中的每个黑色圆点就是一个 Node 对象。
+Node 是 HashMap 的一个内部类，实现了 Map.Entry 接口，本质是就是一个映射（键值对）。
+
+上图中的每个黑色圆点就是一个 Node 对象。
 
 ## 构造方法
 
@@ -89,7 +95,13 @@ public HashMap(Map<? extends K, ? extends V> m) {
 }
 ```
 
-上面 4 个构造方法中，大家平时用的最多的应该是第一个了。第一个构造方法很简单，仅将 loadFactor 变量设为默认值。构造方法 2 调用了构造方法 3，而构造方法 3 仍然只是设置了一些变量。构造方法 4 则是将另一个 Map 中的映射拷贝一份到自己的存储结构中来，这个方法不是很常用。
+上面 4 个构造方法中，大家平时用的最多的应该是第一个了。
+
+第一个构造方法很简单，仅将 loadFactor 变量设为默认值。
+
+构造方法 2 调用了构造方法 3，而构造方法 3 仍然只是设置了一些变量。
+
+构造方法 4 则是将另一个 Map 中的映射拷贝一份到自己的存储结构中来，这个方法不是很常用。
 
 我们得先了解下 HashMap 的几个字段，从 HashMap 的默认构造方法源码可知，构造方法就是对下面几个字段进行初始化：
 
@@ -107,15 +119,27 @@ int threshold;// 所能容纳的 key - value 对极限
 final float loadFactor;
 ```
 
-首先，`Node[] table` 的初始化长度 length（默认值是 16），loadFactor 为负载因子（默认值是 0.75），threshold 是 HashMap 所能容纳的最大数据量的 Node（键值对）个数。threshold = length * loadFactor。也就是说，在数组定义好长度之后，负载因子越大，所能容纳的键值对个数越多。
+首先，`Node[] table` 的初始化长度 length（默认值是 16），loadFactor 为负载因子（默认值是 0.75），threshold 是 HashMap 所能容纳的最大数据量的 Node（键值对）个数 threshold = length * loadFactor。也就是说，在数组定义好长度之后，负载因子越大，所能容纳的键值对个数越多。
 
-结合负载因子的定义公式可知，threshold 就是在此 loadFactor 和 length（数组长度）对应下允许的最大元素数目，超过这个数目就重新 resize（扩容），扩容后的 HashMap 容量是之前容量的两倍。默认的负载因子 0.75 是对空间和时间效率的一个平衡选择，建议大家不要修改，除非在时间和空间比较特殊的情况下，如果内存空间很多而又对时间效率要求很高，可以降低负载因子 loadFactor 的值；相反，如果内存空间紧张而对时间效率要求不高，可以增加负载因子 loadFactor 的值，这个值可以大于 1。
+结合负载因子的定义公式可知，threshold 就是在此 loadFactor 和 length（数组长度）对应下允许的最大元素数目，超过这个数目就重新 resize（扩容），扩容后的 HashMap 容量是之前容量的两倍。
 
-这里存在一个问题，即使负载因子和 Hash 算法设计的再合理，也免不了会出现拉链过长的情况，一旦出现拉链过长，则会严重影响 HashMap 的性能。于是，在 JDK1.8 版本中，对数据结构做了进一步的优化，引入了红黑树。而当链表长度太长（默认超过 8）时，链表就转换为红黑树，利用红黑树快速增删改查的特点提高 HashMap 的性能，其中会用到红黑树的插入、删除、查找等算法。这里不再对红黑树展开讨论，想了解更多红黑树数据结构的工作原理可以参考 ：http://blog.csdn.net/v_july_v/article/details/6105630
+默认的负载因子 0.75 是对空间和时间效率的一个平衡选择，建议大家不要修改，除非在时间和空间比较特殊的情况下，如果内存空间很多而又对时间效率要求很高，可以降低负载因子 loadFactor 的值。
+
+相反，如果内存空间紧张而对时间效率要求不高，可以增加负载因子 loadFactor 的值，这个值可以大于 1。
+
+这里存在一个问题，即使负载因子和 Hash 算法设计的再合理，也免不了会出现拉链过长的情况，一旦出现拉链过长，则会严重影响 HashMap 的性能。
+
+于是，在 JDK1.8 版本中，对数据结构做了进一步的优化，引入了红黑树。而当链表长度太长（默认超过 8）时，链表就转换为红黑树，利用红黑树快速增删改查的特点提高 HashMap 的性能，其中会用到红黑树的插入、删除、查找等算法。
+
+这里不再对红黑树展开讨论，想了解更多红黑树数据结构的工作原理可以参考「[教你初步了解红黑树](http://blog.csdn.net/v_july_v/article/details/6105630)」。
 
 ## 索引 Key 的位置
 
-不管增加、删除、查找键值对，定位到哈希桶数组的位置都是很关键的第一步。前面说过 HashMap 的数据结构是数组和链表的结合，所以我们当然希望这个 HashMap 里面的元素位置尽量分布均匀些，尽量使得每个位置上的元素数量只有一个。那么当我们用 hash 算法求得这个位置的时候，马上就可以知道对应位置的元素就是我们要的，不用遍历链表，大大优化了查询的效率。
+不管增加、删除、查找键值对，定位到哈希桶数组的位置都是很关键的第一步。
+
+前面说过 HashMap 的数据结构是数组和链表的结合，所以我们当然希望这个 HashMap 里面的元素位置尽量分布均匀些，尽量使得每个位置上的元素数量只有一个。
+
+那么当我们用 hash 算法求得这个位置的时候，马上就可以知道对应位置的元素就是我们要的，不用遍历链表，大大优化了查询的效率。
 
 计算 hash 的方法如下：
 
@@ -126,7 +150,11 @@ static final int hash(Object key) {
 }
 ```
 
-这里 `key.hashCode()` 函数调用的是 key 键值类型自带的哈希函数，返回 int 类型的散列值。理论上散列值是一个 int 类型，如果直接拿来作为下标访问 HashMap 的主数组的话，考虑到 2 进制 32 位带符号的 int 的范围从 -2147483648 ~ 2147483647，前后加起来大概 40 亿的映射空间。只要哈希函数映射的比较均匀松散，一般应用是很难出现碰撞的。
+这里 `key.hashCode()` 函数调用的是 key 键值类型自带的哈希函数，返回 int 类型的散列值。
+
+理论上散列值是一个 int 类型，如果直接拿来作为下标访问 HashMap 的主数组的话，考虑到 2 进制 32 位带符号的 int 的范围从 -2147483648 ~ 2147483647，前后加起来大概 40 亿的映射空间。
+
+只要哈希函数映射的比较均匀松散，一般应用是很难出现碰撞的。
 
 但问题是一个 40 亿长度的数组，内存是放不下的。所以这里使用对数组的长度取模运算，得到的余数才能用来方位数组的下标。
 
@@ -142,7 +170,9 @@ static int indexFor(int h, int length) {
 }
 ```
 
-这里正好解释了为什么 HashMap 的数组长度要设计为 2 的整次幂，因为这样 `h & (length - 1)` 正好相当于 `h % length`。由于取余的计算效率没有位运算高，所以是一个小的优化，关于模除的详细介绍请参考 [维基百科 - 模除 - 性能问题](https://zh.wikipedia.org/wiki/%E6%A8%A1%E9%99%A4)。
+这里正好解释了为什么 HashMap 的数组长度要设计为 2 的整次幂，因为这样 `h & (length - 1)` 正好相当于 `h % length`。
+
+由于取余的计算效率没有位运算高，所以是一个小的优化，关于模除的详细介绍请参考 [维基百科 - 模除 - 性能问题](https://zh.wikipedia.org/wiki/%E6%A8%A1%E9%99%A4)。
 
 但是问题又来了，这样就算我们的散列值分布再松散，仅仅是取最后几位的话，碰撞也会很严重，更何况散列本身也不是很完美。所以这里源码做了一下高位移位，将高位也加入计算。
 
@@ -174,7 +204,8 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
             e = p;
         // 4. 判断该链为红黑树
         else if (p instanceof TreeNode)
-            e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
+            e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash,
+                                              key, value);
         else {
              // 5. 该链为链表，对链表进行遍历，并统计链表长度
             for (int binCount = 0; ; ++binCount) {
@@ -188,7 +219,8 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                 }
                 // 条件为 true，表示当前链表包含要插入的键值对，终止遍历
                 if (e.hash == hash &&
-                    ((k = e.key) == key || (key != null && key.equals(k))))
+                    ((k = e.key) == key 
+                     || (key != null && key.equals(k))))
                     break;
                 p = e;
             }
@@ -226,7 +258,9 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 
 ## 扩容机制
 
-扩容（resize）就是重新计算容量，向 HashMap 对象里不停的添加元素，而 HashMap 对象内部的数组无法装载更多的元素时，对象就需要扩大数组的长度，以便能装入更多的元素。当然 Java 里的数组是无法自动扩容的，方法是使用一个新的数组代替已有的容量小的数组，就像我们用一个小桶装水，如果想装更多的水，就得换大水桶。
+扩容（resize）就是重新计算容量，向 HashMap 对象里不停的添加元素，而 HashMap 对象内部的数组无法装载更多的元素时，对象就需要扩大数组的长度，以便能装入更多的元素。
+
+当然 Java 里的数组是无法自动扩容的，方法是使用一个新的数组代替已有的容量小的数组，就像我们用一个小桶装水，如果想装更多的水，就得换大水桶。
 
 我们分析下 resize 的源码，鉴于 JDK 1.8 融入了红黑树，较复杂，为了便于理解我们仍然使用 JDK 1.7 的代码，好理解一些，本质上区别不大，具体区别后文再说。
 
@@ -268,13 +302,21 @@ void transfer(Entry[] newTable) {
 }
 ```
 
-newTable[i] 的引用赋给了 e.next，也就是使用了单链表的头插入方式，同一位置上新元素总会被放在链表的头部位置；这样先放在一个索引上的元素终会被放到 Entry 链的尾部（如果发生了 hash 冲突的话），这一点和 Jdk 1.8 有区别，下文详解。在旧数组中同一条 Entry 链上的元素，通过重新计算索引位置后，有可能被放到了新数组的不同位置上。
+newTable[i] 的引用赋给了 e.next，也就是使用了单链表的头插入方式，同一位置上新元素总会被放在链表的头部位置；这样先放在一个索引上的元素终会被放到 Entry 链的尾部（如果发生了 hash 冲突的话），这一点和 Jdk 1.8 有区别，下文详解。
 
-下面举个例子说明下扩容过程。假设了我们的 hash 算法就是简单的用 key mod（%） 一下表的大小（也就是数组的长度）。其中的哈希桶数组 table 的 size =2， 所以 key = 3、7、5，put 顺序依次为 5、7、3。在 mod（%） 2 以后都冲突在 table[1] 这里了。这里假设负载因子 loadFactor = 1，即当键值对的实际大小 size 大于 table 的实际大小时进行扩容。接下来的三个步骤是哈希桶数组 resize 成 4，然后所有的 Node 重新 rehash 的过程。
+在旧数组中同一条 Entry 链上的元素，通过重新计算索引位置后，有可能被放到了新数组的不同位置上。
+
+下面举个例子说明下扩容过程。假设了我们的 hash 算法就是简单的用 key mod（%） 一下表的大小（也就是数组的长度）。其中的哈希桶数组 table 的 size =2， 所以 key = 3、7、5，put 顺序依次为 5、7、3。在 mod（%） 2 以后都冲突在 table[1] 这里了。
+
+这里假设负载因子 loadFactor = 1，即当键值对的实际大小 size 大于 table 的实际大小时进行扩容。接下来的三个步骤是哈希桶数组 resize 成 4，然后所有的 Node 重新 rehash 的过程。
 
 ![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/java/basic/java_hashmap/03.png)
 
-下面我们讲解下 JDK1.8 做了哪些优化。经过观测可以发现，我们使用的是 2 次幂的扩展(指长度扩为原来2倍)，所以，元素的位置要么是在原位置，要么是在原位置再移动 2 次幂的位置。看下图可以明白这句话的意思，n 为 table 的长度，图（a）表示扩容前的 key1 和 key2 两种key确定索引位置的示例，图（b）表示扩容后 key1 和 key2 两种 key 确定索引位置的示例，其中 hash1 是 key1 对应的哈希与高位运算结果。
+下面我们讲解下 JDK1.8 做了哪些优化。
+
+经过观测可以发现，我们使用的是 2 次幂的扩展(指长度扩为原来2倍)，所以，元素的位置要么是在原位置，要么是在原位置再移动 2 次幂的位置。
+
+看下图可以明白这句话的意思，n 为 table 的长度，图（a）表示扩容前的 key1 和 key2 两种 key 确定索引位置的示例，图（b）表示扩容后 key1 和 key2 两种 key 确定索引位置的示例，其中 hash1 是 key1 对应的哈希与高位运算结果。
 
 ![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/java/basic/java_hashmap/04.png)
 
@@ -282,11 +324,15 @@ newTable[i] 的引用赋给了 e.next，也就是使用了单链表的头插入�
 
 ![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/java/basic/java_hashmap/05.png)
 
-因此，我们在扩充 HashMap 的时候，不需要像 JDK1.7 的实现那样重新计算 hash，只需要看看原来的 hash 值新增的那个 bit 是 1 还是 0 就好了，是 0 的话索引没变，是1的话索引变成“原索引+oldCap”，可以看看下图为 16 扩充为 32 的 resize 示意图：
+因此，我们在扩充 HashMap 的时候，不需要像 JDK1.7 的实现那样重新计算 hash，只需要看看原来的 hash 值新增的那个 bit 是 1 还是 0 就好了，是 0 的话索引没变，是1的话索引变成「原索引 + oldCap」，可以看看下图为 16 扩充为 32 的 resize 示意图：
 
 ![](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/java/basic/java_hashmap/06.png)
 
-这个设计确实非常的巧妙，既省去了重新计算 hash 值的时间，而且同时，由于新增的 1bit 是 0 还是 1 可以认为是随机的，因此 resize 的过程，均匀的把之前的冲突的节点分散到新的 bucket 了。这一块就是 JDK 1.8 新增的优化点。有一点注意区别，JDK 1.7 中 rehash 的时候，旧链表迁移新链表的时候，如果在新表的数组索引位置相同，则链表元素会倒置，但是从上图可以看出，JDK 1.8 不会倒置。有兴趣的同学可以研究下 JDK 1.8 的 resize 源码，写的很赞，如下:
+这个设计确实非常的巧妙，既省去了重新计算 hash 值的时间，而且同时，由于新增的 1bit 是 0 还是 1 可以认为是随机的，因此 resize 的过程，均匀的把之前的冲突的节点分散到新的 bucket 了。这一块就是 JDK 1.8 新增的优化点。
+
+有一点注意区别，JDK 1.7 中 rehash 的时候，旧链表迁移新链表的时候，如果在新表的数组索引位置相同，则链表元素会倒置，但是从上图可以看出，JDK 1.8 不会倒置。
+
+有兴趣的同学可以研究下 JDK 1.8 的 resize 源码，写的很赞，如下:
 
 ```java
 final Node<K,V>[] resize() {
@@ -312,7 +358,7 @@ final Node<K,V>[] resize() {
          * HashMap 使用 threshold 变量暂时保存 initialCapacity 参数的值
          */ 
         newCap = oldThr;
-    else {               // zero initial threshold signifies using defaults
+    else { // zero initial threshold signifies using defaults
          /*
          * 调用无参构造方法时，桶数组容量为默认容量，
          * 阈值为默认容量与默认负载因子乘积
@@ -323,7 +369,8 @@ final Node<K,V>[] resize() {
     // 计算新的 resize 上限
     if (newThr == 0) {
         float ft = (float)newCap * loadFactor;
-        newThr = (newCap < MAXIMUM_CAPACITY && ft < (float)MAXIMUM_CAPACITY ?
+        newThr = (newCap < MAXIMUM_CAPACITY 
+                  && ft < (float)MAXIMUM_CAPACITY ?
                   (int)ft : Integer.MAX_VALUE);
     }
     threshold = newThr;
@@ -409,7 +456,8 @@ final Node<K,V> getNode(int hash, Object key) {
             // 3. 对链表进行查找
             do {
                 if (e.hash == hash &&
-                    ((k = e.key) == key || (key != null && key.equals(k))))
+                    ((k = e.key) == key 
+                     || (key != null && key.equals(k))))
                     return e;
             } while ((e = e.next) != null);
         }
@@ -495,7 +543,9 @@ for(HashMap.Entry entry : map.entrySet()) {
 }
 ```
 
-从上面代码片段中可以看出，大家一般都是对 HashMap 的 key 集合或 Entry 集合进行遍历。上面代码片段中用 foreach 遍历 keySet 方法产生的集合，在编译时会转换成用迭代器遍历，等价于：
+从上面代码片段中可以看出，大家一般都是对 HashMap 的 key 集合或 Entry 集合进行遍历。
+
+上面代码片段中用 foreach 遍历 keySet 方法产生的集合，在编译时会转换成用迭代器遍历，等价于：
 
 ```java
 Set keys = map.keySet();
@@ -583,7 +633,11 @@ abstract class HashIterator {
 }
 ```
 
-如上面的源码，遍历所有的键时，首先要获取键集合 `KeySet` 对象，然后再通过 KeySet 的迭代器 `KeyIterator` 进行遍历。KeyIterator 类继承自 `HashIterator` 类，核心逻辑也封装在 HashIterator 类中。HashIterator 的逻辑并不复杂，在初始化时，HashIterator 先从桶数组中找到包含链表节点引用的桶。然后对这个桶指向的链表进行遍历。遍历完成后，再继续寻找下一个包含链表节点引用的桶，找到继续遍历。找不到，则结束遍历。
+如上面的源码，遍历所有的键时，首先要获取键集合 `KeySet` 对象，然后再通过 KeySet 的迭代器 `KeyIterator` 进行遍历。
+
+KeyIterator 类继承自 `HashIterator` 类，核心逻辑也封装在 HashIterator 类中。HashIterator 的逻辑并不复杂，在初始化时，HashIterator 先从桶数组中找到包含链表节点引用的桶。然后对这个桶指向的链表进行遍历。
+
+遍历完成后，再继续寻找下一个包含链表节点引用的桶，找到继续遍历。找不到，则结束遍历。
 
 ## 参考资料
 
@@ -591,14 +645,3 @@ abstract class HashIterator {
 - [JDK 源码中 HashMap 的 hash 方法原理是什么？](https://www.zhihu.com/question/20733617)
 - [Java 8系列之重新认识HashMap](https://tech.meituan.com/java_hashmap.html)
 - [HashMap 源码详细分析(JDK1.8)](http://www.tianxiaobo.com/2018/01/18/HashMap-源码详细分析-JDK1-8)
-
-
-## 我的公众号
-
-欢迎你「扫一扫」下面的二维码，关注我的公众号，可以接受最新的文章推送，有丰厚的抽奖活动和福利等着你哦！😍
-
-<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_black_512.png" width=250 height=250 />
-
-如果你有什么疑问或者问题，可以 [点击这里](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/issues) 提交 issue，也可以发邮件给我 [jeanboy@foxmail.com](mailto:jeanboy@foxmail.com)。
-
-同时欢迎你 [![Android技术进阶：386463747](https://camo.githubusercontent.com/615c9901677f501582b6057efc9396b3ed27dc29/687474703a2f2f7075622e69647171696d672e636f6d2f7770612f696d616765732f67726f75702e706e67)](http://shang.qq.com/wpa/qunwpa?idkey=0b505511df9ead28ec678df4eeb7a1a8f994ea8b75f2c10412b57e667d81b50d) 来一起交流学习，群里有很多大牛和学习资料，相信一定能帮助到你！

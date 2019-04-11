@@ -60,7 +60,7 @@
 - :+1: [一篇文章看明白 Android 图形系统 Surface 与 SurfaceFlinger 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-SurfaceFlinger图形系统.md)
 - :+1: [一篇文章看明白 Android Service 启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-Service启动过程.md)
 - :+1: [一篇文章看明白 Android PackageManagerService 工作流程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PackageManagerService分析.md)
-- :+1: [一篇文章看明白 Android v1 & v2 签名机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/basic/android/Android-v1%26v2%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6.md)
+- :+1: [一篇文章看明白 Android v1 & v2 签名机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-v1%26v2%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6.md)
 - :+1:[一篇文章看明白 Android PowerManagerService 启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-%E5%90%AF%E5%8A%A8.md)
 - :+1:[一篇文章看明白 Android PowerManagerService WakeLock 机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-WakeLock.md)
 - :+1:[一篇文章看明白 Android PowerManagerService 亮屏过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-%E4%BA%AE%E5%B1%8F.md)
