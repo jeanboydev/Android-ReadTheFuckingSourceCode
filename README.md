@@ -1,11 +1,5 @@
 # Android 技术笔记
 
-<center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png" alt="Android 波斯湾" width=450 height=250 /></center>
-
-欢迎你「扫一扫」上面的二维码，关注我的公众号，可以接受最新的文章推送。
-
-大家好！我是曹建波（@jeanboy），毕业于 [圆明园职业技术学院](https://www.pku.edu.cn) 计算机系，是一名专注于 Android 领域的开发者。目前主要从事移动端相关的开发工作，同时对 iOS | Java Web | 前端 | 小程序也有研究。
-
 这里主要记录日常的开发技巧，开发中遇到的技术重点、难点，各个知识点的总结。同时也会分享一些优质面试题，职业规划，读书心得，个人感悟等等。😋
 
  🌝🌔🌓🌒🌚🌚🌘🌗🌖🌝
@@ -14,9 +8,25 @@
 
 如果你有什么疑问或者问题，可以 [点击这里](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/issues) 提交 issue，也可以发邮件给我 [jeanboy@foxmail.com](mailto:jeanboy@foxmail.com)。
 
-同时欢迎你 [![Android技术进阶：386463747](https://camo.githubusercontent.com/615c9901677f501582b6057efc9396b3ed27dc29/687474703a2f2f7075622e69647171696d672e636f6d2f7770612f696d616765732f67726f75702e706e67)](http://shang.qq.com/wpa/qunwpa?idkey=0b505511df9ead28ec678df4eeb7a1a8f994ea8b75f2c10412b57e667d81b50d) 来一起交流学习，群里有很多大牛和学习资料，相信一定能帮助到你！
-
 > 由于个人经验有限，内容上难免会有不足甚至错误的地方，恳请大家发现后提交 issue 或其它方式反馈给我，以免误导大家，万分感谢！🙏
+
+## 我的公众号
+
+欢迎关注我的公众号，分享各种技术干货，各种学习资料，职业发展和行业动态。
+
+<center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png" alt="Android 波斯湾" width=450 height=250 /></center>
+
+大家好！我是曹建波（@jeanboy），毕业于 [圆明园职业技术学院](https://www.pku.edu.cn) 计算机系，是一名专注于 Android 领域的开发者。
+
+目前主要从事移动端相关的开发工作，同时对 iOS | Java Web | 前端 | 小程序也有研究。
+
+## 技术交流群
+
+欢迎加入技术交流群，来一起交流学习。群里有很多大牛和学习资料，相信一定能帮助到你！
+
+<center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq%E7%BE%A4%E6%A8%AA%E7%89%88.jpg" alt="Android 波斯湾" width=450 height=129 /></center>
+
+<center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/%E5%BE%AE%E4%BF%A1%E7%BE%A4%E6%A8%AA%E7%89%88.jpg" alt="Android 波斯湾" width=450 height=129 /></center>
 
 # 目录
 
