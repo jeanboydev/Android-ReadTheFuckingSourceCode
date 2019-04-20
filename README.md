@@ -24,9 +24,9 @@
 
 欢迎加入技术交流群，来一起交流学习。群里有很多大牛和学习资料，相信一定能帮助到你！
 
-<center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq%E7%BE%A4%E6%A8%AA%E7%89%88.jpg" alt="Android 波斯湾" width=450 height=129 /></center>
+<center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq群_横版.jpg" alt="Android 波斯湾" width=450 height=129 /></center>
 
-<center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/%E5%BE%AE%E4%BF%A1%E7%BE%A4%E6%A8%AA%E7%89%88.jpg" alt="Android 波斯湾" width=450 height=129 /></center>
+<center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/微信群_横版.jpg" alt="Android 波斯湾" width=450 height=129 /></center>
 
 # 目录
 
