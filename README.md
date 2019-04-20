@@ -22,11 +22,11 @@
 
 ## 技术交流群
 
-欢迎加入技术交流群，来一起交流学习。群里有很多大牛和学习资料，相信一定能帮助到你！
+欢迎加入技术交流群，来一起交流学习。
 
-<center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq群_横版.jpg" alt="Android 波斯湾" width=450 height=129 /></center>
+<center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq群_横版.jpg" alt="QQ 技术交流群" width=450 height=129 /></center>
 
-<center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/微信群_横版.jpg" alt="Android 波斯湾" width=450 height=129 /></center>
+<center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/微信群_横版.jpg" alt="微信技术交流群" width=450 height=129 /></center>
 
 # 目录
 
