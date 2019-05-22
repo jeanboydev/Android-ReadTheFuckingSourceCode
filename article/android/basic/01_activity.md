@@ -1,4 +1,4 @@
-# 重新认识 Activity
+# 四大组件之 Activity
 
 ## 什么是 Activity？
 
