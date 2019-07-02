@@ -15,7 +15,6 @@
 欢迎关注我的公众号，分享各种技术干货，各种学习资料，职业发展和行业动态。
 
 <center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png" alt="Android 波斯湾" width=450 height=250 /></center>
-
 大家好！我是曹建波（@jeanboy），毕业于 [圆明园职业技术学院](https://www.pku.edu.cn) 计算机系，是一名专注于 Android 领域的开发者。
 
 目前主要从事移动端相关的开发工作，同时对 iOS | Java Web | 前端 | 小程序也有研究。
@@ -25,9 +24,7 @@
 欢迎加入技术交流群，来一起交流学习。
 
 <center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq群_横版.jpg" alt="QQ 技术交流群" width=450 height=129 /></center>
-
 <center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/微信群_横版.jpg" alt="微信技术交流群" width=450 height=129 /></center>
-
 # 目录
 
 
@@ -67,6 +64,7 @@
 - :+1:[图解 Android 系列（一）揭秘 Android 系统启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/01_system_start.md)
 - :+1:[图解 Android 系列（二）深入理解 init 与 zygote 进程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/02_init_zygote.md)
 - :+1:[图解 Android 系列（三）探索 SystemServer 进程创建过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/03_system_server_01.md)
+- :+1:[图解 Android 系列（四）原来 SystemServer 启动时干了这么多](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/04_system_server_02.md)
 
 ## Android 基础知识
 
