@@ -72,6 +72,7 @@
 - :+1:[Fragment 相关知识点](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/02_fragment.md)
 - :+1:[如何正确的使用 Service？](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/03_service.md)
 - :+1:[分享一些 Broadcast 使用技巧](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/04_broadcast.md)
+- :+1:[很少有人知道的 ContentProvider 使用技巧](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/05_content_provider.md)
 - :+1:[屏幕适配最佳实践](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/06_multiple_screen_support.md)
 - :+1:[最通俗易懂的 Handler 源码解析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/07_handler.md)
 - [一个 Demo 学会搭建 Android Studio JNI 开发环境](https://github.com/jeanboydev/Android-JNITest)
