@@ -1,5 +1,9 @@
 # Android 技术笔记
 
+大家好！我是曹建波（@jeanboy），毕业于圆明园职业技术学院计算机系，是一名专注于 Android 领域的开发者。
+
+目前主要从事移动端相关的开发工作，同时对 iOS | Java Web | 前端 | 小程序也有研究。
+
 这里主要记录日常的开发技巧，开发中遇到的技术重点、难点，各个知识点的总结。同时也会分享一些优质面试题，职业规划，读书心得，个人感悟等等。😋
 
  🌝🌔🌓🌒🌚🌚🌘🌗🌖🌝
@@ -15,13 +19,9 @@
 欢迎关注我的公众号，分享各种技术干货，各种学习资料，职业发展和行业动态。
 
 <center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png" alt="Android 波斯湾" width=450 height=250 /></center>
-大家好！我是曹建波（@jeanboy），毕业于 [圆明园职业技术学院](https://www.pku.edu.cn) 计算机系，是一名专注于 Android 领域的开发者。
-
-目前主要从事移动端相关的开发工作，同时对 iOS | Java Web | 前端 | 小程序也有研究。
-
 ## 技术交流群
 
-欢迎加入技术交流群，来一起交流学习。
+同时欢迎加入技术交流群，来一起交流学习。
 
 <center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq群_横版.jpg" alt="QQ 技术交流群" width=450 height=129 /></center>
 <center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/微信群_横版.jpg" alt="微信技术交流群" width=450 height=129 /></center>
