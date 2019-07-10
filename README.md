@@ -75,6 +75,7 @@
 - :+1:[很少有人知道的 ContentProvider 使用技巧](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/05_content_provider.md)
 - :+1:[屏幕适配最佳实践](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/06_multiple_screen_support.md)
 - :+1:[最通俗易懂的 Handler 源码解析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/07_handler.md)
+- :+1:[Activity 的 Task 亲和关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/08_task_affinity.md)
 - [一个 Demo 学会搭建 Android Studio JNI 开发环境](https://github.com/jeanboydev/Android-JNITest)
 - [一篇文章学会使用 Android IPC 多进程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-IPC多进程.md)
 - [Windows 环境下载 Android 源码](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-Windows环境下载源码.md)
