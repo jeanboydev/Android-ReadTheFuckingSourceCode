@@ -74,7 +74,7 @@ Display #0 (activities from top to bottom):
         Hist #0: ActivityRecord{37c25eb6 u0 com.jeanboy.app.task2/.MainActivity t221}
 ```
 
-可以清楚的看到两个任务栈，Task（任务栈）#222，栈名为 `com.jeanboy.app.task.other2`；Task（任务栈）#222，栈名为 `com.jeanboy.app.task2`。
+可以清楚的看到两个任务栈，Task（任务栈）#222，栈名为 `com.jeanboy.app.task.other2`；Task（任务栈）#221，栈名为 `com.jeanboy.app.task2`。
 
 到此我们也明白了，我们确实可以通过 `singleTask` 与 `android:taskAffinity` 属性相结合的方式来指定我们 Activity 所需要的栈名称，使相应的 Activity 存在于不同的栈中。
 
