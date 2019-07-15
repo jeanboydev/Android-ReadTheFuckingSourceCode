@@ -4,7 +4,7 @@
 
 我们知道 Activity 启动后就可以看到我们写的 Layout 布局界面，Activity 从 setContentView() 到显示中间做了什么呢？下面我们就来分析下这个过程。
 
-如不了解 Activity 的启动过程请参阅：[Activity 启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/framework/Android-Activity启动过程.md)
+如不了解 Activity 的启动过程请参阅：[Activity 启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-Activity启动过程.md)
 
 本文主要对于以下问题进行分析：
 
@@ -337,7 +337,7 @@ public int addWindow(Session session, IWindow client, int seq, WindowManager.Lay
 }
 ```
 
-创建 Surface 的过程详见：[SurfaceFlinger 图形系统](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/framework/Android-SurfaceFlinger图形系统.md)
+创建 Surface 的过程详见：[SurfaceFlinger 图形系统](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-SurfaceFlinger图形系统.md)
 
 Activity 中 Window 创建过程：
 
