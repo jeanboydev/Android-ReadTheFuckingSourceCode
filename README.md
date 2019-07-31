@@ -19,14 +19,12 @@
 欢迎关注我的公众号，分享各种技术干货，各种学习资料，职业发展和行业动态。
 
 <center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png" alt="Android 波斯湾" width=450 height=250 /></center>
-
 ## 技术交流群
 
 同时欢迎加入技术交流群，来一起交流学习。
 
 <center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq群_横版.jpg" alt="QQ 技术交流群" width=450 height=129 /></center>
 <center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/微信群_横版.jpg" alt="微信技术交流群" width=450 height=129 /></center>
-
 # 目录
 
 
@@ -78,6 +76,7 @@
 - :+1:[屏幕适配最佳实践](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/06_multiple_screen_support.md)
 - :+1:[最通俗易懂的 Handler 源码解析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/07_handler.md)
 - :+1:[Activity 的 Task 亲和关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/08_task_affinity.md)
+- :+1:[Android 签名机制 v1、v2、v3](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/09_signature.md)
 - [一个 Demo 学会搭建 Android Studio JNI 开发环境](https://github.com/jeanboydev/Android-JNITest)
 - [一篇文章学会使用 Android IPC 多进程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-IPC多进程.md)
 - [Windows 环境下载 Android 源码](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-Windows环境下载源码.md)
@@ -91,7 +90,6 @@
 - [一篇文章看明白 Android 图形系统 Surface 与 SurfaceFlinger 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-SurfaceFlinger图形系统.md)
 -  [一篇文章看明白 Android Service 启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-Service启动过程.md)
 - [一篇文章看明白 Android PackageManagerService 工作流程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PackageManagerService分析.md)
-- [一篇文章看明白 Android v1 & v2 签名机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-v1%26v2%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6.md)
 - [一篇文章看明白 Android PowerManagerService 启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-%E5%90%AF%E5%8A%A8.md)
 - [一篇文章看明白 Android PowerManagerService WakeLock 机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-WakeLock.md)
 - [一篇文章看明白 Android PowerManagerService 亮屏过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/Android-PowerManagerService-%E4%BA%AE%E5%B1%8F.md)
