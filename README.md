@@ -19,12 +19,14 @@
 欢迎关注我的公众号，分享各种技术干货，各种学习资料，职业发展和行业动态。
 
 <center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png" alt="Android 波斯湾" width=450 height=250 /></center>
+
 ## 技术交流群
 
 同时欢迎加入技术交流群，来一起交流学习。
 
 <center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq群_横版.jpg" alt="QQ 技术交流群" width=450 height=129 /></center>
 <center><img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/微信群_横版.jpg" alt="微信技术交流群" width=450 height=129 /></center>
+
 # 目录
 
 ## 数据结构与算法
@@ -59,6 +61,7 @@
 - [JVM 内存分配机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/jvm/JVM-内存分配机制.md)
 - [JVM 垃圾回收机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/jvm/JVM-垃圾回收机制.md)
 - [图解 Java 虚拟机系列（一）字节码文件结构](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/jvm/01_bytecode_class.md)
+- [图解 Java 虚拟机系列（二）字节码指令](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/jvm/02_bytecode_command.md)
 
 ## Android 进阶攻略
 
