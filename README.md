@@ -81,7 +81,7 @@
 
 - :+1:[性能优化系列（一）渲染性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/01_render.md)
 - :+1:[性能优化系列（二）计算性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/02_compute.md)
-- :+1:[性能优化系列（三）计算性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/03_memory.md)
+- :+1:[性能优化系列（三）内存性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/03_memory.md)
 - :+1:[性能优化系列（四）电量性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/04_battery.md)
 - :+1:[性能优化系列（五）网络性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/05_network.md)
 
