@@ -79,9 +79,11 @@
 
 ## 性能优化系列
 
-- :+1:[性能优化系列（一）找出卡顿的元凶 - 渲染性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/01_render.md)
-- :+1:[性能优化系列（二）彻底告别卡顿与 ANR - 计算性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/02_compute.md)
-- +1:[性能优化系列（三）如果你深受其害，不妨来看看这篇内存优化 - 计算性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/03_memory.md)
+- :+1:[性能优化系列（一）渲染性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/01_render.md)
+- :+1:[性能优化系列（二）计算性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/02_compute.md)
+- :+1:[性能优化系列（三）计算性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/03_memory.md)
+- :+1:[性能优化系列（四）电量性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/04_battery.md)
+- :+1:[性能优化系列（五）网络性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/05_network.md)
 
 ## Android 基础知识
 
