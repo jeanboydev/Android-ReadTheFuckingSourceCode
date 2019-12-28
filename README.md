@@ -18,15 +18,15 @@
 
 欢迎关注我的公众号，分享各种技术干货，各种学习资料，职业发展和行业动态。
 
-<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png" alt="Android波斯湾" style="zoom:50%;" />
+<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png" alt="Android 波斯湾" width="450" height="250" style="max-width:100%;">
 
 ## 技术交流群
 
 同时欢迎加入技术交流群，来一起交流学习。
 
-<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq群_横版.jpg" alt="QQ 技术交流群" style="zoom:50%;" />
+<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq群_横版.jpg" alt="QQ 技术交流群" width="450" height="129" style="max-width:100%;">
 
-<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/微信群_横版.jpg" alt="微信技术交流群" style="zoom:50%;" />
+<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/微信群_横版.jpg" alt="微信技术交流群" width="450" height="129" style="max-width:100%;">
 
 # 目录
 
