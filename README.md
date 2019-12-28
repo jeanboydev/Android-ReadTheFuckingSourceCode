@@ -18,38 +18,17 @@
 
 欢迎关注我的公众号，分享各种技术干货，各种学习资料，职业发展和行业动态。
 
-![Android波斯湾](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png)
+<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png" alt="Android波斯湾" style="zoom:50%;" />
 
 ## 技术交流群
 
 同时欢迎加入技术交流群，来一起交流学习。
 
-![QQ 技术交流群](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq群_横版.jpg)
+<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq群_横版.jpg" alt="QQ 技术交流群" style="zoom:50%;" />
 
-![微信技术交流群](https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/微信群_横版.jpg)
+<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/微信群_横版.jpg" alt="微信技术交流群" style="zoom:50%;" />
 
 # 目录
-
-## 数据结构与算法
-
-### 线性表
-
-- [LinkedList 源码分析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/basic/03_linkedlist.md)
-- [ArrayList 源码分析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/basic/02_arraylist.md)
-
-### 栈和队列
-
-### 树
-
-- [HashMap 源码分析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/basic/01_hashmap.md)
-- [Treemap 源码分析（上）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/basic/04_treemap_01.md)
-- [Treemap 源码分析（下）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/basic/05_treemap_02.md)
-
-### 图
-
-### 查找
-
-### 排序
 
 
 ## 网络通信
@@ -118,6 +97,7 @@
 - [Android 性能优化 - UI优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-性能优化-UI优化.md)
 - [Android 性能优化 - 内存优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-性能优化-内存优化.md)
 
+
 ## Gradle
 
 - [Gradle 简介](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/gradle/Gradle-简介.md)
@@ -126,6 +106,27 @@
 - [Android Plugin DSL](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/gradle/Gradle-Android_Plugin_DSL.md)
 - [插件开发](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/gradle/Gradle-插件开发.md)
 - [插件发布](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/gradle/Gradle-插件发布.md)
+
+## 数据结构与算法
+
+### 线性表
+
+- [LinkedList 源码分析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/basic/03_linkedlist.md)
+- [ArrayList 源码分析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/basic/02_arraylist.md)
+
+### 栈和队列
+
+### 树
+
+- [HashMap 源码分析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/basic/01_hashmap.md)
+- [Treemap 源码分析（上）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/basic/04_treemap_01.md)
+- [Treemap 源码分析（下）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/basic/05_treemap_02.md)
+
+### 图
+
+### 查找
+
+### 排序
 
 ## 前端
 
