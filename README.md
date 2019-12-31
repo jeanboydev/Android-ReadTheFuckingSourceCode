@@ -64,6 +64,7 @@
 - :+1:[性能优化系列（三）内存性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/03_memory.md)
 - :+1:[性能优化系列（四）电量性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/04_battery.md)
 - :+1:[性能优化系列（五）网络性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/05_network.md)
+- :+1:[性能优化系列（六）启动性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/06_launch.md)
 
 ## Android 基础知识
 
