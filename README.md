@@ -63,6 +63,11 @@
 - :+1:[性能优化系列（六）启动性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/06_launch.md)
 - :+1:[性能优化系列（七）APK 体积优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/07_apk.md)
 
+## 热修复与插件化系列
+
+- [聊聊反射](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/plugin/01_reflection.md)
+- [不得不学之代理模式](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/plugin/02_proxy.md)
+
 ## Android 基础知识
 
 - [四大组件之 Activity](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/01_activity.md)
