@@ -1,5 +1,7 @@
 # Android 技术笔记
 
+> 图片看不到的小伙伴，请打开科学上网
+
 这里主要记录日常的开发技巧，开发中遇到的技术重点、难点，各个知识点的总结。同时也会分享一些优质面试题，职业规划，读书心得，个人感悟等等。😋
 
  🌝🌔🌓🌒🌚🌚🌘🌗🌖🌝
@@ -67,6 +69,7 @@
 
 - [聊聊反射](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/plugin/01_reflection.md)
 - [不得不学之代理模式](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/plugin/02_proxy.md)
+- [Hook 初探](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/plugin/03_hook.md)
 
 ## Android 基础知识
 
