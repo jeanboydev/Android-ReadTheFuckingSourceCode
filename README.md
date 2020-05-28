@@ -70,6 +70,7 @@
 - [聊聊反射](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/plugin/01_reflection.md)
 - [不得不学之代理模式](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/plugin/02_proxy.md)
 - [Hook 初探](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/plugin/03_hook.md)
+- [Hook 实战之 Hook AMS](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/plugin/04_hook_ams.md)
 
 ## Android 基础知识
 
