@@ -12,20 +12,6 @@
 
 > 由于个人经验有限，内容上难免会有不足甚至错误的地方，恳请大家发现后提交 issue 或其它方式反馈给我，以免误导大家，万分感谢！🙏
 
-## 我的公众号
-
-欢迎关注我的公众号，分享各种技术干货，各种学习资料，职业发展和行业动态。
-
-<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png" alt="Android 波斯湾" width="450" height="250" style="max-width:100%;">
-
-## 技术交流群
-
-同时欢迎加入技术交流群，来一起交流学习。
-
-<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq群_横版.jpg" alt="QQ 技术交流群" width="450" height="129" style="max-width:100%;">
-
-<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/微信群_横版.jpg" alt="微信技术交流群" width="450" height="129" style="max-width:100%;">
-
 # 目录
 
 
@@ -190,13 +176,16 @@
 24. [Visitor（访问者模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Visitor.md)
 
 
-## 常见开源库源码分析
+## 我的公众号
 
-- [Lottie 动画开源库使用 & 源码分析](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/other/Lottie动画开源库使用&源码分析.md)
-- [Universal-Image-Loader 源码分析 from 【codeKK】](http://a.codekk.com/detail/Android/huxian99/Android%20Universal%20Image%20Loader%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-- [Glide 源码分析 from 【郭霖】](http://blog.csdn.net/column/details/15318.html)
-- [EventBus 源码分析 from 【codeKK】](http://a.codekk.com/detail/Android/Trinea/EventBus%20%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90)
-- [OkHttp 源码分析 from 【Piasy】](https://blog.piasy.com/2016/07/11/Understand-OkHttp/)
-- [Volley 源码分析 from 【codeKK】](http://a.codekk.com/detail/Android/grumoon/Volley%20%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90)
+欢迎关注我的公众号，分享各种技术干货，各种学习资料，职业发展和行业动态。
 
+<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qrcode_android_besos_banner.png" alt="Android 波斯湾" width="450" height="250" style="max-width:100%;">
 
+## 技术交流群
+
+同时欢迎加入技术交流群，来一起交流学习。
+
+<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/qq群_横版.jpg" alt="QQ 技术交流群" width="450" height="129" style="max-width:100%;">
+
+<img src="https://raw.githubusercontent.com/jeanboydev/Android-ReadTheFuckingSourceCode/master/resources/images/about_me/微信群_横版.jpg" alt="微信技术交流群" width="450" height="129" style="max-width:100%;">
