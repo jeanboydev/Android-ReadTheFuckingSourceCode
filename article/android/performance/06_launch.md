@@ -169,5 +169,4 @@ Complete
 - [YouTube - Android 性能优化典范第 6 季](https://www.youtube.com/watch?v=AkafJ6NdrhY&list=PLWz5rJ2EKKc-9gqRx5anfX0Ozp-qEI2CF)
 - [胡凯 - Android 性能优化典范 - 第 6 季](http://hukai.me/android-performance-patterns-season-6/)
 - [Android 开发文档 - App startup time](https://developer.android.com/topic/performance/vitals/launch-time)
-- [Android 你应该知道的的应用冷启动过程分析和优化方案](http://yifeng.studio/2016/11/15/android-optimize-for-cold-start/)
 - [Android 开发之 App 启动时间统计](https://www.jianshu.com/p/c967653a9468)
