@@ -1,4 +1,4 @@
-# HTTP，HTTPS，SSL/TSL
+# HTTP，HTTPS，SSL/TLS
 ## 概述
 
 ## 什么是 HTTP ？
