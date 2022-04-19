@@ -120,7 +120,8 @@
 
 ### 排序
 
-- 
+- [快速排序](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/data_structure_algorithm/01_quick_sort.md)
+- [冒泡排序](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/data_structure_algorithm/02_bubble_sort.md)
 
 ## 前端
 
