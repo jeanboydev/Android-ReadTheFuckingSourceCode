@@ -14,26 +14,6 @@
 
 # 目录
 
-
-## 网络通信
-
-- [一篇文章看明白 TCP/IP，TCP，UDP，IP，Socket 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/network/TCP_IP_UDP_Socket.md)
-- [一篇文章看明白 HTTP，HTTPS，SSL/TSL 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/network/HTTP_HTTPS_SSL_TSL.md)
-
-## 深入理解 Java 虚拟机
-
-- [JVM 内存分配机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/jvm/JVM-内存分配机制.md)
-- [JVM 垃圾回收机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/jvm/JVM-垃圾回收机制.md)
-- :+1:[图解 Java 虚拟机系列（一）字节码文件结构](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/jvm/01_bytecode_class.md)
-- [图解 Java 虚拟机系列（二）字节码指令](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/jvm/02_bytecode_command.md)
-
-## Android 进阶攻略
-
-- [精华面试题，长期更新！](https://github.com/android-exchange/Android-Interview)
-- [Android 入门学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/01_android_basic.md)
-- [Android 高级学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/02_android_advanced.md)
-- [Android 资深（专家）学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/03_android_senior.md)
-
 ## 图解 Android 系列
 
 - :+1:[图解 Android 系列（一）揭秘 Android 系统启动过程](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/framework/01_system_start.md)
@@ -50,6 +30,13 @@
 - :+1:[性能优化系列（五）网络性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/05_network.md)
 - :+1:[性能优化系列（六）启动性能优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/06_launch.md)
 - :+1:[性能优化系列（七）APK 体积优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/performance/07_apk.md)
+
+## 深入理解 Java 虚拟机
+
+- [JVM 内存分配机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/jvm/JVM-内存分配机制.md)
+- [JVM 垃圾回收机制](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/jvm/JVM-垃圾回收机制.md)
+- :+1:[图解 Java 虚拟机系列（一）字节码文件结构](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/jvm/01_bytecode_class.md)
+- [图解 Java 虚拟机系列（二）字节码指令](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/jvm/02_bytecode_command.md)
 
 ## 热修复与插件化系列
 
@@ -90,6 +77,13 @@
 - [Android 性能优化 - UI优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-性能优化-UI优化.md)
 - [Android 性能优化 - 内存优化](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/android/basic/Android-性能优化-内存优化.md)
 
+## Android 进阶攻略
+
+- [精华面试题，长期更新！](https://github.com/android-exchange/Android-Interview)
+- [Android 入门学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/01_android_basic.md)
+- [Android 高级学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/02_android_advanced.md)
+- [Android 资深（专家）学习指南](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/interview/03_android_senior.md)
+
 
 ## Gradle
 
@@ -99,6 +93,11 @@
 - [Android Plugin DSL](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/gradle/Gradle-Android_Plugin_DSL.md)
 - [插件开发](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/gradle/Gradle-插件开发.md)
 - [插件发布](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/gradle/Gradle-插件发布.md)
+
+## 网络通信
+
+- [一篇文章看明白 TCP/IP，TCP，UDP，IP，Socket 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/network/TCP_IP_UDP_Socket.md)
+- [一篇文章看明白 HTTP，HTTPS，SSL/TSL 之间的关系](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/network/HTTP_HTTPS_SSL_TSL.md)
 
 ## 数据结构与算法
 
@@ -121,6 +120,8 @@
 
 ### 排序
 
+- 
+
 ## 前端
 
 - [前端发展简史](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/web_front/WebFront-发展简史.md)
@@ -141,39 +142,21 @@
 
 ## 设计模式
 
-1. [面向对象设计原则](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/面向对象设计原则.md)
+- [面向对象设计原则](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/面向对象设计原则.md)
 
-- 创建型模式
-
-2. [Singleton（单例模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Singleton.md)
-3. [Factory（工厂模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Factory.md)
-4. [Abstract Factory（抽象工厂模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Abstract_Factory.md)
-5. [Builder（建造者模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Builder.md)
-6. [Prototype（原型模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Prototype.md)
-
-- 结构型模式
-
-7. [Adapter（适配器模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Adapter.md)
-8. [Bridge（桥接模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Bridge.md)
-9. [Composite（组合模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Composite.md)
-10. [Decorator（装饰模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Decorator.md)
-11. [Facade（外观模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Facade.md)
-12. [Flyweight（享元模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Flyweight.md)
-13. [Proxy（代理模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Proxy.md)
-
-- 行为型模式
-
-14. [Chain of Responsibility（责任链模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Chain_of_Responsibility.md)
-15. [Command（命令模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Command.md)
-16. [Interpreter（解释器模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Interpreter.md)
-17. [Iterator（迭代器模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Iterator.md)
-18. [Mediator（中介者模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Mediator.md)
-19. [Memento（备忘录模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Memento.md)
-20. [Observer（观察者模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Observer.md)
-21. [State（状态模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-State.md)
-22. [Strategy（策略模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Strategy.md)
-23. [Template Method（模板方法模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Template_Method.md)
-24. [Visitor（访问者模式）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Visitor.md)
+| 创建型模式                                                   | 结构型模式                                                   | 行为型模式                                                   |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [Singleton（单例）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Singleton.md) | [Adapter（适配器）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Adapter.md) | [Chain of Responsibility（责任链）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Chain_of_Responsibility.md) |
+| [Factory（工厂）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Factory.md) | [Bridge（桥接）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Bridge.md) | [Command（命令）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Command.md) |
+| [Abstract Factory（抽象工厂）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Abstract_Factory.md) | [Composite（组合）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Composite.md) | [Interpreter（解释器）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Interpreter.md) |
+| [Builder（建造者）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Builder.md) | [Decorator（装饰）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Decorator.md) | [Iterator（迭代器）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Iterator.md) |
+| [Prototype（原型）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Prototype.md) | [Facade（外观）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Facade.md) | [Mediator（中介者）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Mediator.md) |
+|                                                              | [Flyweight（享元）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Flyweight.md) | [Memento（备忘录）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Memento.md) |
+|                                                              | [Proxy（代理）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Proxy.md) | [Observer（观察者）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Observer.md) |
+|                                                              |                                                              | [State（状态）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-State.md) |
+|                                                              |                                                              | [Strategy（策略）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Strategy.md) |
+|                                                              |                                                              | [Template Method（模板方法）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Template_Method.md) |
+|                                                              |                                                              | [Visitor（访问者）](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/design_patterns/设计模式-Visitor.md) |
 
 
 ## 我的公众号
