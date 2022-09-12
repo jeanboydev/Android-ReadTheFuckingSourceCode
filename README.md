@@ -140,6 +140,10 @@
 
 - [Git 常用命令](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/git/Git常用命令.md)
 
+## Redis
+
+- [Redis 使用手册](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/java/basic/Redis.md)
+
 
 ## 设计模式
 
