@@ -250,6 +250,12 @@ zset 的成员是唯一的，但分数（score）却可以重复。
 3) "orange"
 ```
 
+## 常用操作
+
+### 查看 key 类型
+
+> $ type <key_name>
+
 ## 参考资料
 
 Redis 官网：https://redis.io
