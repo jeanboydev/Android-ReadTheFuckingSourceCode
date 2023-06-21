@@ -16,9 +16,9 @@
 
 ## 瞎玩
 
-<img src="https://raw.githubusercontent.com/jeanboydev/android-readthefuckingsourcecode/master/resources/images/hardware/led/20.jpg" alt="流光溢彩效果" width="404" height="303" style="max-width:100%;">
+- :+1:[【流光溢彩】物联网入门 ESP8266 + WS2812B 制作流光溢彩灯带](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/hardware/esp8266_ws2812.md)
 
-- :+1:[流光溢彩】物联网入门 ESP8266 + WS2812B 制作流光溢彩灯带](https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/article/hardware/esp8266_ws2812.md)
+<img src="https://raw.githubusercontent.com/jeanboydev/android-readthefuckingsourcecode/master/resources/images/hardware/led/20.jpg" alt="流光溢彩效果" width="404" height="303" style="max-width:100%;">
 
 ## 图解 Android 系列
 
